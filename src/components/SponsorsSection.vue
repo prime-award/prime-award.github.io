@@ -11,7 +11,7 @@ import geekText from '../assets/geek-text.svg'
 
 <template>
   <section class="sponsors">
-    <h2 class="heading">При поддержкЕ</h2>
+    <h2 class="heading">Спонсоры</h2>
     <ul class="brands">
       <li>
         <SponsorButton
@@ -62,13 +62,37 @@ import geekText from '../assets/geek-text.svg'
 }
 
 .brands {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 20px;
+  /* боковые колонки равной ширины (1fr) — центральная всегда ровно по центру */
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  column-gap: 20px;
   width: 100%;
   margin: 0;
   padding: 5px 5px 15px;
   list-style: none;
+}
+
+/* левый прижат к центральному справа, правый — слева */
+.brands li:nth-child(1) {
+  justify-self: end;
+}
+
+.brands li:nth-child(2) {
+  justify-self: center;
+}
+
+.brands li:nth-child(3) {
+  justify-self: start;
+}
+
+/* на узких экранах трёх в ряд не помещается — возвращаем перенос */
+@media (max-width: 720px) {
+  .brands {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+  }
 }
 </style>
