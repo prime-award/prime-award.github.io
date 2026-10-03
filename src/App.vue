@@ -1,12 +1,12 @@
 <script setup>
-import FirstScreen from './components/FirstScreen.vue'
+import MainBlock from './components/MainBlock.vue'
 import CardsCarousel from './components/CardsCarousel.vue'
 import SponsorsSection from './components/SponsorsSection.vue'
 </script>
 
 <template>
   <main>
-    <FirstScreen />
+    <MainBlock />
     <CardsCarousel />
     <SponsorsSection />
   </main>
