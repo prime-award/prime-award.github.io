@@ -80,7 +80,7 @@ import MainButton from "./MainButton.vue";
   margin: 0;
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: clamp(32px, 3vw, 80px);
+  font-size: clamp(32px, 4vw, 80px);
   line-height: normal;
   color: var(--text);
 }

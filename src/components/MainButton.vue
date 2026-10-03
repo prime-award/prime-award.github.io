@@ -31,8 +31,8 @@ function onMove(e) {
   border-radius: 25px;
   background: var(--text);
   color: var(--bg);
-  font-family: var(--font-display);
-  font-size: clamp(22px, 2.5vw, 48px);
+  font-family: var(--font-display), serif;
+  font-size: clamp(22px, 3vw, 42px);
   text-decoration: none;
   cursor: pointer;
   transition: transform 0.2s, opacity 0.2s, box-shadow 0.3s;

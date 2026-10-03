@@ -49,18 +49,16 @@ import geekText from '../assets/geek-text.svg'
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 15px;
-  padding: 10px 20px 30px;
-  background: var(--bg);
 }
 
 .heading {
-  margin: 0;
-  font-family: var(--font-display);
+  font-family: var(--font-display), serif;
   font-weight: 400;
   font-size: clamp(26px, 2.1vw, 40px);
   color: #fff;
   text-align: center;
+  margin-top: 24px;
+  margin-bottom: 6px;
 }
 
 .brands {
