@@ -4,10 +4,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "assets": "node scripts/download-assets.mjs",
-    "predev": "node scripts/download-assets.mjs",
     "dev": "vite",
-    "prebuild": "node scripts/download-assets.mjs",
     "build": "vite build",
     "preview": "vite preview"
   },

@@ -1,5 +1,5 @@
 <script setup>
-import SponsorCard from './SponsorCard.vue'
+import SponsorButton from './SponsorButton.vue'
 
 import balconyLogo from '../assets/balcony-logo.png'
 import balconyText from '../assets/balcony-text.svg'
@@ -14,7 +14,7 @@ import geekText from '../assets/geek-text.svg'
     <h2 class="heading">При поддержкЕ</h2>
     <ul class="brands">
       <li>
-        <SponsorCard
+        <SponsorButton
             name="balcony"
             :logo-image="balconyLogo"
             :text-image="balconyText"
@@ -23,7 +23,7 @@ import geekText from '../assets/geek-text.svg'
         />
       </li>
       <li>
-        <SponsorCard
+        <SponsorButton
             name="steamlvlup"
             :logo-image="steamLogo"
             :text-image="steamText"
@@ -32,7 +32,7 @@ import geekText from '../assets/geek-text.svg'
         />
       </li>
       <li>
-        <SponsorCard
+        <SponsorButton
             name="Гик новости"
             :logo-image="geekLogo"
             :text-image="geekText"
@@ -57,7 +57,7 @@ import geekText from '../assets/geek-text.svg'
   font-size: clamp(26px, 2.1vw, 40px);
   color: #fff;
   text-align: center;
-  margin-top: 24px;
+  margin-top: 0;
   margin-bottom: 6px;
 }
 

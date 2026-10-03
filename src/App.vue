@@ -1,13 +1,13 @@
 <script setup>
 import MainBlock from './components/MainBlock.vue'
-import CardsCarousel from './components/CardsCarousel.vue'
+import Carousel from './components/Carousel.vue'
 import SponsorsSection from './components/SponsorsSection.vue'
 </script>
 
 <template>
   <main>
     <MainBlock/>
-    <CardsCarousel/>
+    <Carousel/>
     <h2 class="heading">Отборочный этап:<br/>03.10.26 - 23.10.26</h2>
     <SponsorsSection/>
   </main>
@@ -15,7 +15,7 @@ import SponsorsSection from './components/SponsorsSection.vue'
 
 <style scoped>
 .heading {
-  padding: 20px;
+  padding: 60px;
   font-family: var(--font-display), serif;
   font-weight: 400;
   font-size: clamp(26px, 2.1vw, 40px);
