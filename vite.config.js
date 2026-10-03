@@ -1,4 +1,8 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 
-export default defineConfig({ plugins: [vue()] })
+// base './' — относительные пути, работает на GitHub Pages под любым именем репозитория
+export default defineConfig({
+  base: './',
+  plugins: [vue()],
+})
