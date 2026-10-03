@@ -1,13 +1,13 @@
 <script setup>
-import AppHeader from './components/AppHeader.vue'
-import HeroSection from './components/HeroSection.vue'
-import NominationSection from './components/NominationSection.vue'
+import FirstScreen from './components/FirstScreen.vue'
+import CardsCarousel from './components/CardsCarousel.vue'
+import SponsorsSection from './components/SponsorsSection.vue'
 </script>
 
 <template>
-  <AppHeader />
   <main>
-    <HeroSection />
-    <NominationSection />
+    <FirstScreen />
+    <CardsCarousel />
+    <SponsorsSection />
   </main>
 </template>
