@@ -1,0 +1,32 @@
+/* Шрифт заголовков: положите файл в public/fonts/ (FoglihtenNo06.woff2 или .otf) */
+@font-face {
+  font-family: 'Foglihten No06';
+  src: local('Foglihten No06'), local('FoglihtenNo06'),
+    url('/fonts/FoglihtenNo06.woff2') format('woff2'),
+    url('/fonts/FoglihtenNo06.otf') format('opentype'),
+    url('/fonts/FoglihtenNo06.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --bg: #08090b;
+  --bg-top: #171a1f;
+  --text: #e5e7ea;
+  --muted: #687789;
+  --white: #fff;
+  --font-display: 'Foglihten No06', 'Cormorant Garamond', Georgia, serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body { margin: 0; background: var(--bg); }
+
+body {
+  color: var(--text);
+  font-family: var(--font-body);
+  font-weight: 500;
+  -webkit-font-smoothing: antialiased;
+}

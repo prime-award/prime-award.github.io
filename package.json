@@ -1,0 +1,20 @@
+{
+  "name": "prime-landing",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "assets": "node scripts/download-assets.mjs",
+    "predev": "node scripts/download-assets.mjs",
+    "dev": "vite",
+    "prebuild": "node scripts/download-assets.mjs",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@fontsource/inter": "^5.3.0",
+    "@vitejs/plugin-vue": "^6.0.9",
+    "vite": "^8.3.2",
+    "vue": "^3.5.43"
+  }
+}
