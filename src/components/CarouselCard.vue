@@ -1,14 +1,33 @@
 <script setup lang="ts">
+import {computed, onBeforeUnmount, onMounted, ref} from 'vue'
 import type {Streamer} from '../types/streamer.ts'
+import {injectLazyImages} from "../composable/useLazyImages.ts";
 
-defineProps<{
+
+const props = defineProps<{
   streamer: Streamer
   hidden?: boolean
 }>()
+
+const lazy = injectLazyImages()
+const card = ref<HTMLElement | null>(null)
+const imageReady = ref(false)
+
+// src появляется только когда карточка подошла к видимой области
+const src = computed(() => (lazy.isLoaded(props.streamer.avatar) ? props.streamer.avatar : undefined))
+
+onMounted(() => {
+  if (card.value) lazy.observe(card.value, props.streamer.avatar)
+})
+
+onBeforeUnmount(() => {
+  if (card.value) lazy.unobserve(card.value)
+})
 </script>
 
 <template>
   <a
+      ref="card"
       class="card"
       :href="streamer.twitchLink"
       target="_blank"
@@ -17,7 +36,14 @@ defineProps<{
       :aria-hidden="hidden"
       :tabindex="hidden ? -1 : 0"
   >
-    <img :src="streamer.avatar" alt="" loading="lazy" draggable="false"/>
+    <img
+        :src="src"
+        :class="{ ready: imageReady }"
+        alt=""
+        decoding="async"
+        draggable="false"
+        @load="imageReady = true"
+    />
   </a>
 </template>
 
@@ -45,6 +71,13 @@ defineProps<{
   height: 100%;
   object-fit: cover;
   object-position: top;
+  /* пока картинка не пришла, виден градиент карточки */
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.card img.ready {
+  opacity: 1;
 }
 
 .card::after {

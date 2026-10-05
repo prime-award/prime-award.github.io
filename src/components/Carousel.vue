@@ -1,16 +1,21 @@
 <script setup lang="ts">
-import {onMounted} from 'vue'
+import {onMounted, ref} from 'vue'
 import {useStreamerCarousel} from "../composable/useStreamerCarousel.ts";
 import CarouselCard from "./CarouselCard.vue";
+import {provideLazyImages} from "../composable/useLazyImages.ts";
 
 
 const {streamers, shuffleStreamers} = useStreamerCarousel()
+
+// root для IntersectionObserver: карточки грузятся, когда подъезжают к краю карусели
+const carouselEl = ref<HTMLElement | null>(null)
+provideLazyImages(carouselEl)
 
 onMounted(shuffleStreamers)
 </script>
 
 <template>
-  <section class="carousel" aria-label="Участники">
+  <section ref="carouselEl" class="carousel" aria-label="Участники">
     <h2 class="heading">Кто станет королём рунета 2026?</h2>
 
     <div
