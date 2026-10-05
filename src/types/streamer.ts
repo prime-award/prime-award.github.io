@@ -6,4 +6,4 @@ export interface Streamer {
 
 /** Путь к аватару по имени файла в src/assets/streamers (без расширения). */
 export const avatarOf = (fileName: string): string =>
-    new URL(`../assets/streamers/${fileName}.png`, import.meta.url).href
+    new URL(`../assets/streamers/${fileName}.webp`, import.meta.url).href
