@@ -3,7 +3,7 @@ import SponsorButton from './SponsorButton.vue'
 
 import balconyLogo from '../assets/balcony-logo.png'
 import balconyText from '../assets/balcony-text.svg'
-import steamLogo from '../assets/steam-logo.png'
+import steamLogo from '../assets/steamlvlup-icon.png'
 import steamText from '../assets/steamlvlup-text.png'
 import geekLogo from '../assets/geek-logo.png'
 import geekText from '../assets/geek-text.svg'
@@ -57,12 +57,10 @@ import geekText from '../assets/geek-text.svg'
   font-size: clamp(26px, 2.1vw, 40px);
   color: #fff;
   text-align: center;
-  margin-top: 0;
-  margin-bottom: 6px;
+  margin: 0;
 }
 
 .brands {
-  /* боковые колонки равной ширины (1fr) — центральная всегда ровно по центру */
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;

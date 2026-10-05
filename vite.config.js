@@ -1,8 +1,13 @@
-import { defineConfig } from 'vite'
+import {defineConfig} from 'vite'
+import {fileURLToPath, URL} from 'node:url'
 import vue from '@vitejs/plugin-vue'
 
-// base './' — относительные пути, работает на GitHub Pages под любым именем репозитория
 export default defineConfig({
-  base: './',
-  plugins: [vue()],
+    base: './',
+    plugins: [vue()],
+    resolve: {
+        alias: {
+            '@': fileURLToPath(new URL('./src', import.meta.url))
+        }
+    }
 })

@@ -1,60 +1,75 @@
-<script setup>
-import CarouselCard from './CarouselCard.vue'
+<script setup lang="ts">
+import {onMounted} from 'vue'
+import {useStreamerCarousel} from "../composable/useStreamerCarousel.ts";
+import CarouselCard from "./CarouselCard.vue";
 
-import p1 from '../assets/аравудуспнг.png'
-import p2 from '../assets/арчидоспнг.png'
-import p3 from '../assets/ласкапнг.png'
-import p4 from '../assets/лизонпнг.png'
-import p5 from '../assets/мелхарукоспнг.png'
-import p6 from '../assets/мэддисонпнг.png'
-import p7 from '../assets/сегаллпнг.png'
 
-const cards = [p1, p2, p3, p4, p5, p6, p7]
+const {streamers, shuffleStreamers} = useStreamerCarousel()
+
+onMounted(shuffleStreamers)
 </script>
 
 <template>
   <section class="carousel" aria-label="Участники">
-    <h2 class="heading">Кто,<br/>если<br/>не мы?</h2>
-    <div class="track">
-      <template v-for="copy in 2" :key="copy">
-        <CarouselCard
-            v-for="(src, i) in cards"
-            :key="i"
-            :src="src"
-            :hidden="copy === 2"
-        />
-      </template>
+    <h2 class="heading">Кто станет королём рунета 2026?</h2>
+
+    <div
+        v-if="streamers.length"
+        class="track"
+        :style="{ '--count': streamers.length }"
+    >
+      <!-- Две одинаковые группы: сдвиг на -50% равен ширине ровно одной группы, поэтому стык незаметен -->
+      <ul v-for="copy in 2" :key="copy" class="group">
+        <li v-for="streamer in streamers" :key="streamer.nickname">
+          <CarouselCard :streamer="streamer" :hidden="copy === 2"/>
+        </li>
+      </ul>
     </div>
   </section>
 </template>
 
 <style scoped>
 .carousel {
+  --gap: 12px;
+  --seconds-per-card: 6s;
+
   overflow: hidden;
   margin-top: 20px;
   margin-bottom: 20px;
 }
 
 .heading {
-  margin: 0;
+  margin: 10px 0 20px 0;
   font-family: var(--font-display), serif;
   font-weight: 400;
-  font-size: clamp(26px, 2.1vw, 40px);
+  font-size: clamp(26px, 3vw, 54px);
   color: #fff;
   text-align: center;
 }
 
 .track {
   display: flex;
-  gap: 12px;
   width: max-content;
-  padding-left: 30px;
-  animation: scroll 60s linear infinite;
+  /* margin, а не padding: он не входит в ширину, от которой считается -50% */
+  margin-left: 30px;
+  /* скорость не зависит от количества карточек */
+  animation: scroll calc(var(--count) * var(--seconds-per-card)) linear infinite;
+  will-change: transform;
+}
+
+
+.group {
+  display: flex;
+  flex-shrink: 0;
+  gap: var(--gap);
+  margin: 0;
+  padding: 0 var(--gap) 0 0;
+  list-style: none;
 }
 
 @keyframes scroll {
   to {
-    transform: translateX(calc(-50% - 15px));
+    transform: translateX(-50%);
   }
 }
 

@@ -1,30 +1,42 @@
-<script setup>
-defineProps({
-  src: { type: String, required: true },
-  hidden: { type: Boolean, default: false },
-})
+<script setup lang="ts">
+import type {Streamer} from '../types/streamer.ts'
+
+defineProps<{
+  streamer: Streamer
+  hidden?: boolean
+}>()
 </script>
 
 <template>
-  <div class="card" :aria-hidden="hidden">
-    <img :src="src" alt="" loading="lazy" />
-  </div>
+  <a
+      class="card"
+      :href="streamer.twitchLink"
+      target="_blank"
+      rel="noopener noreferrer"
+      :aria-label="streamer.nickname"
+      :aria-hidden="hidden"
+      :tabindex="hidden ? -1 : 0"
+  >
+    <img :src="streamer.avatar" alt="" loading="lazy" draggable="false"/>
+  </a>
 </template>
 
 <style scoped>
 .card {
   position: relative;
+  display: block;
   flex: none;
-  width: 281px;
-  height: 341px;
+  width: 280px;
+  height: 340px;
   border-radius: 20px;
   overflow: hidden;
-  background: linear-gradient(180deg, rgba(104, 119, 137, 0.5), rgba(8, 9, 11, 0.5));
+  background: radial-gradient(circle, #687789 0%, #08090B 100%);
   opacity: 0.5;
   transition: opacity 0.3s ease;
 }
 
-.card:hover {
+.card:hover,
+.card:focus-visible {
   opacity: 1;
 }
 
