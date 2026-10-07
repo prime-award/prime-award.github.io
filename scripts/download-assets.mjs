@@ -1,50 +1,161 @@
-// Скачивает картинки фрейма "все персонажи" из Figma в src/assets/streamers
-// (ссылки временные, живут ~7 дней — после этого нужно получить новые).
-// Если ссылки истекли — экспортируйте слои вручную в src/assets/streamers с теми же именами.
-import { mkdirSync } from 'node:fs'
-import { writeFile } from 'node:fs/promises'
+#!/usr/bin/env node
+/**
+ * Выгрузка всех изображений из блока (node) Figma-файла.
+ *
+ * Запуск:
+ *   node --env-file=.env scripts/figma-export.mjs                 # оригиналы картинок, без градиентов/задника
+ *   node --env-file=.env scripts/figma-export.mjs "<ссылка на блок>" --out=src/assets/figma
+ *   node --env-file=.env scripts/figma-export.mjs --rendered --format=png --scale=2   # рендер слоя целиком
+ *
+ * В .env:  FIGMA_TOKEN=figd_xxx   (Personal access token, scope: file_content:read)
+ */
+import {mkdir, writeFile} from 'node:fs/promises'
+import path from 'node:path'
 
-const B = 'https://www.figma.com/api/mcp/asset/'
-const OUT_DIR = 'src/assets/streamers'
-const assets = {
-  'arrowwoods.png': B + '202c6392-fc9b-43c1-bbde-bfd71b8838e3.png',
-  'bratishkinoff.png': B + '135c5518-da8e-4b89-91f2-9e6c218c2019.png',
-  'dedbaldesh.png': B + 'e960ddb8-06b4-40fb-ba12-b9ffdcb5c449.png',
-  'rectangle-1.png': B + '7f972229-41bd-4813-bb2b-1f075eca85f4.png',
-  'rectangle-2.png': B + '96b51dcb-8d91-4fcc-ba86-5f1bad4c2973.png',
-  'alinarin.png': B + 'f015a2f9-e0bd-4b7c-a1fc-562982b00108.png',
-  'rectangle-3.png': B + '9401db63-3a70-463e-8743-5f451a7bdae4.png',
-  'buster.png': B + 'bdc7c1a1-abf9-4ed7-93a6-28b2db76d53e.png',
-  'dunduk.png': B + 'd7fd62c4-681a-442e-a7a0-20b39caad9dc.png',
-  'guit88man.png': B + 'ecec1281-bb3f-4aaf-992d-fd7334a5b509.png',
-  'itpedia.png': B + 'e695492f-9f68-4b15-8bdc-e64b041b7aae.png',
-  'kuplinovplay.png': B + '46f9baf3-0743-40ac-8929-cc9119d720af.png',
-  'lyasyaa.png': B + 'fdad879a-404d-4aba-9ae2-63b026d25ebd.png',
-  'melharucos.png': B + '9c583d4a-d9a4-4dc7-8ea5-6a48a59fe47c.png',
-  'nenormova.png': B + '7b9fad7e-76ef-4725-a9e1-59fb02f56600.png',
-  'praden.png': B + 'b2e39dc4-41c7-47c6-89b6-1e00eb862d86.png',
-  'segall.png': B + 'ad4f3f2b-c340-469d-9648-75ed9d5518a8.png',
-  'gladiatorpwnz.png': B + 'be1f2f62-1af0-4cca-9178-d10f8d1735bc.png',
-  'vanomas.png': B + '48f22420-ad8a-48f3-939e-0e05347ac2e4.png',
-  'voodoosh.png': B + 'b35a4b9f-6ffa-447e-b7ee-d706cbb92dcb.png',
-  'welovegames.png': B + 'c92d6db9-c493-4c98-9aa5-435640d010eb.png',
-  'welovegames-2.png': B + '01f9e76a-3d35-47c6-922c-b5fc6b8e4911.png', // новый слой 110:4
+const DEFAULT_URL =
+    'https://www.figma.com/design/BEYwOkIq7KyT3ZkNCu7pta/Untitled?node-id=89-22'
+
+// ---------- аргументы ----------
+const args = process.argv.slice(2)
+const flag = (name, def) => {
+    const a = args.find((x) => x.startsWith(`--${name}=`))
+    return a ? a.slice(name.length + 3) : def
+}
+const url = args.find((a) => a.startsWith('http')) ?? DEFAULT_URL
+const FORMAT = flag('format', 'png') // png | jpg | svg | pdf
+const SCALE = flag('scale', '2') // 0.01 – 4
+const OUT_DIR = flag('out', 'public/figma-images')
+// По умолчанию качаем исходные файлы картинок (только Image-заливка, без градиентов и др. заливок слоя).
+// Флаг --rendered включает рендер всего слоя целиком (со всеми заливками, обрезкой, эффектами).
+const ORIGINAL = !args.includes('--rendered')
+
+
+if (!TOKEN) {
+    console.error('Нет FIGMA_TOKEN. Добавьте его в .env (FIGMA_TOKEN=figd_...)')
+    process.exit(1)
 }
 
-mkdirSync(OUT_DIR, { recursive: true })
+// ---------- разбор ссылки ----------
+const parsed = new URL(url)
+const fileKey = parsed.pathname.split('/')[2]
+const rawNodeId = parsed.searchParams.get('node-id')
+if (!fileKey || !rawNodeId) {
+    console.error('Не удалось получить file key / node-id из ссылки')
+    process.exit(1)
+}
+const nodeId = rawNodeId.replace('-', ':') // в URL "89-22", в API "89:22"
 
-// Все файлы качаются параллельно, существующие перезаписываются
-await Promise.all(
-    Object.entries(assets).map(async ([name, url]) => {
-      const path = `${OUT_DIR}/${name}`
-      try {
-        const res = await fetch(url)
-        if (!res.ok) throw new Error(`HTTP ${res.status}`)
-        await writeFile(path, Buffer.from(await res.arrayBuffer()))
-        console.log('✓', name)
-      } catch (e) {
-        console.error(`✗ ${name}: ${e.message}. Экспортируйте слой из Figma вручную в ${path}`)
-        process.exitCode = 1
-      }
-    }),
-)
+// ---------- утилиты ----------
+async function api(endpoint, params = {}, attempt = 0) {
+    const u = new URL(`https://api.figma.com/v1${endpoint}`)
+    Object.entries(params).forEach(([k, v]) => u.searchParams.set(k, v))
+    const res = await fetch(u, {headers: {'X-Figma-Token': TOKEN}})
+    if (res.status === 429 && attempt < 5) {
+        const wait = Number(res.headers.get('retry-after') ?? 5) * 1000
+        console.log(`Rate limit, ждём ${wait / 1000}с...`)
+        await new Promise((r) => setTimeout(r, wait))
+        return api(endpoint, params, attempt + 1)
+    }
+    if (!res.ok) throw new Error(`Figma API ${res.status}: ${await res.text()}`)
+    return res.json()
+}
+
+const slug = (s) =>
+    s
+        .toLowerCase()
+        .replace(/[^a-z0-9а-яё]+/gi, '-')
+        .replace(/^-+|-+$/g, '')
+        .slice(0, 60) || 'image'
+
+const chunk = (arr, n) =>
+    Array.from({length: Math.ceil(arr.length / n)}, (_, i) => arr.slice(i * n, i * n + n))
+
+async function download(fileUrl) {
+    const res = await fetch(fileUrl)
+    if (!res.ok) throw new Error(`Не скачалось (${res.status}): ${fileUrl}`)
+    return {
+        buffer: Buffer.from(await res.arrayBuffer()),
+        type: res.headers.get('content-type') ?? '',
+    }
+}
+
+// Рекурсивно собираем узлы, у которых есть видимая заливка-картинка
+function collectImageNodes(node, out = []) {
+    const imageFills = (node.fills ?? []).filter((f) => f.type === 'IMAGE' && f.visible !== false)
+    if (imageFills.length) {
+        out.push({id: node.id, name: node.name, refs: imageFills.map((f) => f.imageRef)})
+    }
+    node.children?.forEach((c) => collectImageNodes(c, out))
+    return out
+}
+
+// ---------- основной сценарий ----------
+async function main() {
+    console.log(`Файл: ${fileKey}, блок: ${nodeId}`)
+
+    const data = await api(`/files/${fileKey}/nodes`, {ids: nodeId})
+    const root = data.nodes?.[nodeId]?.document
+    if (!root) throw new Error(`Узел ${nodeId} не найден`)
+
+    const nodes = collectImageNodes(root)
+    console.log(`Найдено узлов с изображениями: ${nodes.length}`)
+    if (!nodes.length) return
+
+    await mkdir(OUT_DIR, {recursive: true})
+    const used = new Set()
+    const fileName = (node, ext) => {
+        const name = slug(node.name)
+        let base = name
+        // суффикс -2, -3 появляется только если слоёв с одинаковым названием несколько
+        for (let i = 2; used.has(base); i++) base = `${name}-${i}`
+        used.add(base)
+        return `${base}.${ext}`
+    }
+
+    if (ORIGINAL) {
+        // Оригинальные файлы (как были загружены в Figma)
+        const {meta} = await api(`/files/${fileKey}/images`)
+        const seen = new Set()
+        for (const node of nodes) {
+            for (const ref of node.refs) {
+                if (seen.has(ref) || !meta.images[ref]) continue
+                seen.add(ref)
+                const {buffer, type} = await download(meta.images[ref])
+                const ext = type.split('/')[1]?.split(';')[0]?.replace('jpeg', 'jpg') || 'png'
+                const file = fileName(node, ext)
+                await writeFile(path.join(OUT_DIR, file), buffer)
+                console.log('✓', file)
+            }
+        }
+        return
+    }
+
+    // Рендер узлов (учитывает обрезку, скругления, эффекты)
+    const byId = new Map(nodes.map((n) => [n.id, n]))
+    for (const ids of chunk([...byId.keys()], 50)) {
+        const {images, err} = await api(`/images/${fileKey}`, {
+            ids: ids.join(','),
+            format: FORMAT,
+            scale: SCALE,
+        })
+        if (err) throw new Error(err)
+
+        for (const id of ids) {
+            const link = images[id]
+            if (!link) {
+                console.warn('✗ не отрендерился:', byId.get(id).name, id)
+                continue
+            }
+            const {buffer} = await download(link)
+            const file = fileName(byId.get(id), FORMAT)
+            await writeFile(path.join(OUT_DIR, file), buffer)
+            console.log('✓', file)
+        }
+    }
+    console.log(`Готово → ${OUT_DIR}`)
+}
+
+main().catch((e) => {
+    console.error(e.message)
+    process.exit(1)
+})

@@ -40,11 +40,11 @@ onMounted(shuffleStreamers)
 
   overflow: hidden;
   margin-top: 20px;
-  margin-bottom: 20px;
+  margin-bottom: 25px;
 }
 
 .heading {
-  margin: 10px 0 20px 0;
+  margin: 0 0 20px 0;
   font-family: var(--font-display), serif;
   font-weight: 400;
   font-size: clamp(26px, 3vw, 54px);

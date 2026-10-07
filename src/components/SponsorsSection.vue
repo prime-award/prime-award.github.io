@@ -2,23 +2,23 @@
 import SponsorButton from './SponsorButton.vue'
 
 import balconyLogo from '../assets/balcony-logo.png'
-import balconyText from '../assets/balcony-text.svg'
+import balconyText from '../assets/balcony-text.png'
 import steamLogo from '../assets/steamlvlup-icon.png'
 import steamText from '../assets/steamlvlup-text.png'
 import geekLogo from '../assets/geek-logo.png'
-import geekText from '../assets/geek-text.svg'
+import geekText from '../assets/geek-text.png'
 </script>
 
 <template>
   <section class="sponsors">
-    <h2 class="heading">Спонсоры</h2>
+    <h2 class="heading">При поддержкЕ</h2>
     <ul class="brands">
       <li>
         <SponsorButton
             name="balcony"
             :logo-image="balconyLogo"
             :text-image="balconyText"
-            :text-height="23"
+            :text-height="30"
             href="https://balcony.su/"
         />
       </li>
@@ -46,32 +46,39 @@ import geekText from '../assets/geek-text.svg'
 
 <style scoped>
 .sponsors {
+  margin-top: 0px;
+  margin-bottom: 20px;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  background: #08090b;
 }
 
 .heading {
   font-family: var(--font-display), serif;
   font-weight: 400;
-  font-size: clamp(26px, 2.1vw, 40px);
-  color: #fff;
+  font-size: clamp(26px, 2vw, 45px);
+  color: #e5e7ea;
   text-align: center;
-  margin: 0;
+  margin-bottom: 10px;
 }
 
 .brands {
+  box-sizing: border-box;
   display: grid;
   grid-template-columns: 1fr auto 1fr;
+  column-gap: 60px;
   align-items: center;
-  column-gap: 20px;
   width: 100%;
   margin: 0;
-  padding: 5px 5px 15px;
+  padding: 0;
   list-style: none;
 }
 
-/* левый прижат к центральному справа, правый — слева */
 .brands li:nth-child(1) {
   justify-self: end;
 }
@@ -84,13 +91,5 @@ import geekText from '../assets/geek-text.svg'
   justify-self: start;
 }
 
-/* на узких экранах трёх в ряд не помещается — возвращаем перенос */
-@media (max-width: 720px) {
-  .brands {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 20px;
-  }
-}
+
 </style>

@@ -1,24 +1,15 @@
 <script setup>
-defineProps({
-  href: {type: String, default: ''},
-})
+import {RouterLink} from 'vue-router'
 
-// Передаём позицию курсора в CSS — по ней рисуется "прожектор"
-function onMove(e) {
-  const el = e.currentTarget
-  const rect = el.getBoundingClientRect()
-  el.style.setProperty('--x', `${e.clientX - rect.left}px`)
-  el.style.setProperty('--y', `${e.clientY - rect.top}px`)
-}
+defineProps({
+  to: {type: [String, Object], default: '/form'},
+})
 </script>
 
 <template>
-  <a v-if="href" class="button" :href="href" @mousemove="onMove">
+  <RouterLink class="button" :to="to">
     <slot/>
-  </a>
-  <button v-else class="button" type="button" @mousemove="onMove">
-    <slot/>
-  </button>
+  </RouterLink>
 </template>
 
 <style scoped>
@@ -32,7 +23,7 @@ function onMove(e) {
   background: var(--text);
   color: var(--bg);
   font-family: var(--font-display), serif;
-  font-size: clamp(22px, 3vw, 42px);
+  font-size: clamp(22px, 2.5vw, 36px);
   text-decoration: none;
   cursor: pointer;
   transition: transform 0.2s, opacity 0.2s, box-shadow 0.3s;

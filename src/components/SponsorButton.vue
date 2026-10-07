@@ -30,17 +30,9 @@ defineProps({
   gap: 10px;
   padding: 10px 20px;
   border-radius: 15px;
-  background: linear-gradient(180deg, rgba(99, 112, 133, 0.3), rgba(23, 26, 31, 0.5));
   color: inherit;
   text-decoration: none;
   transition: box-shadow 0.2s ease;
-}
-
-/* Белая подсветка — только у кликабельных карточек (с href) */
-a.sponsor:hover,
-a.sponsor:focus-visible {
-  box-shadow: 0 0 20px rgba(255, 255, 255, 0.2), 0 0 4px rgba(255, 255, 255, 0.3);
-  outline: none;
 }
 
 .logo {

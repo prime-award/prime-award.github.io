@@ -3,14 +3,22 @@ import mainScreenVideo from '../assets/main-background.mp4'
 import primeLogo from '../assets/prime-logo.png'
 import MainButton from './MainButton.vue'
 import SteamLvlUpLogo from './SteamLvlUpLogo.vue'
+import AppLoader from './AppLoader.vue'
 import {useMainBackground} from "../composable/useMainBlock.ts";
 
 
-const {videoRef, onRevealEnd, isEnded} = useMainBackground()
+const {videoRef, onRevealEnd, isEnded, isLoaded, isRevealStarted, onLoaderLeave} = useMainBackground()
 </script>
 
 <template>
-  <section class="main-screen">
+  <!-- Пока видео не загрузилось — висит лоадер. Когда он исчез, is-revealing запускает вступительную анимацию -->
+  <Transition name="loader-fade" @after-leave="onLoaderLeave">
+    <div v-if="!isLoaded" class="main-screen__loader">
+      <AppLoader/>
+    </div>
+  </Transition>
+
+  <section class="main-screen" :class="{ 'is-revealing': isRevealStarted }">
     <video
         ref="videoRef"
         class="main-screen__background"
@@ -98,7 +106,7 @@ const {videoRef, onRevealEnd, isEnded} = useMainBackground()
 .main-screen__flicker {
   --flicker-color: #000;          /* цвет затемняющего слоя */
   --flicker-intensity: 1;         /* множитель силы вспышек: 0 — нет эффекта, 0.5 — вдвое слабее */
-  --flicker-duration: 9s;         /* длительность одного цикла */
+  --flicker-duration: 12s;         /* длительность одного цикла */
   --flicker-delay: 0s;            /* пауза между окончанием видео и первым циклом */
   --flicker-iterations: infinite; /* число повторов: infinite или число */
 
@@ -160,8 +168,10 @@ const {videoRef, onRevealEnd, isEnded} = useMainBackground()
 .main-screen__logo {
   position: relative;
   flex-shrink: 0;
-  width: 600px;
+
+  width: clamp(500px, 42vw, 1000px);
   aspect-ratio: 3 / 1;
+
   max-width: 100%;
   overflow: hidden;
 }
@@ -182,7 +192,7 @@ const {videoRef, onRevealEnd, isEnded} = useMainBackground()
   margin: 0;
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: clamp(32px, 4vw, 80px);
+  font-size: clamp(32px, 4vw, 76px);
   line-height: normal;
   color: var(--text);
 }
@@ -191,11 +201,34 @@ const {videoRef, onRevealEnd, isEnded} = useMainBackground()
   display: inline-block;
 }
 
+.main-screen__loader {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--bg);
+}
+
+.loader-fade-leave-active {
+  transition: opacity 0.1s ease;
+}
+
+.loader-fade-leave-to {
+  opacity: 0;
+}
+
+/* До окончания загрузки элементы скрыты, анимация стартует только с классом is-revealing */
 .reveal {
   --reveal-duration: 0.7s;
   --reveal-step: 0.3s;
   --reveal-start-delay: 0.1s;
 
+  opacity: 0;
+}
+
+.main-screen.is-revealing .reveal {
   animation: reveal var(--reveal-duration) cubic-bezier(0.22, 1, 0.36, 1) both;
   animation-delay: calc(var(--reveal-start-delay) + var(--reveal-index, 0) * var(--reveal-step));
 }
@@ -203,7 +236,7 @@ const {videoRef, onRevealEnd, isEnded} = useMainBackground()
 @keyframes reveal {
   from {
     opacity: 0;
-    transform: translateY(32px);
+    transform: translateY(8px);
   }
   to {
     opacity: 1;
@@ -212,8 +245,14 @@ const {videoRef, onRevealEnd, isEnded} = useMainBackground()
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .reveal {
+  .reveal,
+  .main-screen.is-revealing .reveal {
+    opacity: 1;
     animation: none;
+  }
+
+  .loader-fade-leave-active {
+    transition: none;
   }
 
   .main-screen__flicker.is-active {
