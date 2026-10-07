@@ -1,8 +1,5 @@
 <script setup>
-import {computed} from 'vue'
 import logo from '@/assets/steamlvlup-logo.png'
-
-
 </script>
 
 <template>

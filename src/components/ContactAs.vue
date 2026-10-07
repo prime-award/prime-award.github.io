@@ -34,10 +34,10 @@ import MainDivider from "../components/MainDivider.vue";
   align-items: center;
   justify-content: space-between;
   gap: 10px 20px;
-  padding: 15px 30px 30px;
+  padding: 15px 30px 20px;
   background: linear-gradient(180deg, #08090B 0%, #171a1f 100%);
 
-  font-family: 'Palatino Linotype', Palatino, 'Book Antiqua', serif;
+  font-family: 'Inter', sans-serif;
   font-size: 20px;
   font-weight: 400;
   font-style: normal;
