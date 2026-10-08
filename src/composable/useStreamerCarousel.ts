@@ -28,7 +28,8 @@ export const streamers: Streamer[] = [
     {nickname: 'voodoosh', avatar: avatarOf('voodoosh'), twitchLink: 'https://twitch.tv/voodoosh'},
     {nickname: 'welovegames', avatar: avatarOf('welovegames'), twitchLink: 'https://twitch.tv/welovegames'},
     {nickname: 'uzya', avatar: avatarOf('uzya'), twitchLink: 'https://twitch.tv/uzya'},
-    {nickname: 'zhmil', avatar: avatarOf('zhmil'), twitchLink: 'https://www.youtube.com/channel/UCmSImlPUez2i1wvsctTB0Gw'}
+    {nickname: 'zhmil', avatar: avatarOf('zhmil'), twitchLink: 'https://www.youtube.com/channel/UCmSImlPUez2i1wvsctTB0Gw'},
+    {nickname: 'vihor', avatar: avatarOf('vihor'), twitchLink: 'https://www.youtube.com/channel/UC4oN_lEAD2Adg2yeU_psq5w'}
 ]
 
 /** Fisher–Yates: равномерное перемешивание, исходный массив не мутируется. */
