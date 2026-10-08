@@ -1,17 +1,15 @@
 <script setup>
 import {ref} from 'vue'
-import {useRouter} from 'vue-router'
 import AppLoader from '@/components/AppLoader.vue'
 import FormButton from '@/components/FormButton.vue'
+import {useHead} from "@unhead/vue";
 
 const STREAMER_FORM_URL =
     'https://docs.google.com/forms/d/e/1FAIpQLSfSUu7bT6KIt4vJvoIWbO8iN72zHpg51t0alqoqaMH5s71-Kw/viewform?embedded=true'
 const MOMENT_FORM_URL =
     'https://docs.google.com/forms/d/e/1FAIpQLSexHEFjKmWuJYTYoD4n0zNDVcG-GvahtrpqNud12XZ-f_IkHA/viewform?embedded=true'
 
-// Ссылка выбранной формы. Пока пусто — показан экран выбора, iframe не подключён
 const currentUrl = ref('')
-// true — iframe ещё грузится
 const loading = ref(false)
 
 function openForm(url) {
@@ -19,10 +17,22 @@ function openForm(url) {
   currentUrl.value = url
 }
 
-// Назад: уходим на главную, FormView размонтируется и форма закрывается
 function goBack() {
   currentUrl.value = ''
 }
+
+useHead({
+  title: 'PRIME 2026 - Форма для голосования',
+  meta: [
+    {
+      name: 'description',
+      content: 'Главная народная премия ру-стриминга. Ежегодно подведём итоги, увидим борьбу легенд русскоязычного стриминга'
+    },
+  ],
+  link: [
+    {rel: 'canonical', href: 'https://prime-award.ru/form'},
+  ],
+})
 </script>
 
 <template>

@@ -16,6 +16,7 @@ import geekText from '../assets/geek-text.png'
       <li>
         <SponsorButton
             name="balcony"
+            event-name="sponsor_click_balcony"
             :logo-image="balconyLogo"
             :text-image="balconyText"
             :text-height="30"
@@ -25,6 +26,7 @@ import geekText from '../assets/geek-text.png'
       <li>
         <SponsorButton
             name="steamlvlup"
+            event-name="sponsor_click_steamlvlup"
             :logo-image="steamLogo"
             :text-image="steamText"
             :text-height="19"
@@ -34,6 +36,7 @@ import geekText from '../assets/geek-text.png'
       <li>
         <SponsorButton
             name="Гик новости"
+            event-name="sponsor_click_geek_news"
             :logo-image="geekLogo"
             :text-image="geekText"
             :text-height="18"
