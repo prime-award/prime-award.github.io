@@ -3,7 +3,7 @@ import logo from '@/assets/steamlvlup-logo.png'
 </script>
 
 <template>
-  <a href="https://steamlvlup.com/" target="_blank" rel="noopener noreferrer" class="logo-link">
+  <a href="https://slvlup.com/r/prime?utm_source=prime&utm_medium=web" target="_blank" rel="noopener noreferrer" class="logo-link">
     <img :src="logo" alt="SteamLvlUp"/>
   </a>
 </template>

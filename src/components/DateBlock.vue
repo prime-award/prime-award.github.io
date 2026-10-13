@@ -2,7 +2,7 @@
 </script>
 <template>
   <section class="date">
-    <h2 class="date__text">Отборочный этап:<br/>23 октября - 20 ноября</h2>
+    <h2 class="date__text">Отборочный этап:<br/>14 октября - 20 ноября</h2>
   </section>
 </template>
 

@@ -30,7 +30,7 @@ import geekText from '../assets/geek-text.png'
             :logo-image="steamLogo"
             :text-image="steamText"
             :text-height="19"
-            href="https://steamlvlup.com/"
+            href="https://slvlup.com/r/prime?utm_source=prime&utm_medium=web"
         />
       </li>
       <li>
