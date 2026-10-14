@@ -7,6 +7,8 @@ import {injectLazyImages} from "../composable/useLazyImages.ts";
 const props = defineProps<{
   streamer: Streamer
   hidden?: boolean
+  // путь, на который перемещаем пользователя
+  to?: string
 }>()
 
 const lazy = injectLazyImages()
@@ -26,25 +28,27 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <a
-      ref="card"
-      class="card"
-      :href="streamer.twitchLink"
-      target="_blank"
-      rel="noopener noreferrer"
-      :aria-label="streamer.nickname"
-      :aria-hidden="hidden"
-      :tabindex="hidden ? -1 : 0"
-  >
-    <img
-        :src="src"
-        :class="{ ready: imageReady }"
-        alt=""
-        decoding="async"
-        draggable="false"
-        @load="imageReady = true"
-    />
-  </a>
+  <RouterLink v-slot="{ href, navigate }" :to="to ?? '../form'" custom>
+    <a
+        ref="card"
+        class="card"
+        :href="href"
+        :title="streamer.nickname"
+        :aria-label="streamer.nickname"
+        :aria-hidden="hidden"
+        :tabindex="hidden ? -1 : 0"
+        @click="navigate"
+    >
+      <img
+          :src="src"
+          :class="{ ready: imageReady }"
+          alt=""
+          decoding="async"
+          draggable="false"
+          @load="imageReady = true"
+      />
+    </a>
+  </RouterLink>
 </template>
 
 <style scoped>
