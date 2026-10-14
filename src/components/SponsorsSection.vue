@@ -94,5 +94,33 @@ import geekText from '../assets/geek-text.png'
   justify-self: start;
 }
 
+/* Планшеты: чуть уменьшаем расстояние между спонсорами */
+@media (max-width: 1024px) {
+  .brands {
+    column-gap: 30px;
+  }
+}
 
+/* Мелкие экраны: спонсоры друг за другом, по центру */
+@media (max-width: 768px) {
+  .sponsors {
+    padding: 0 16px;
+  }
+
+  .heading {
+    font-size: 26px;
+    margin-bottom: 16px;
+  }
+
+  .brands {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .brands li:nth-child(n) {
+    justify-self: auto;
+  }
+}
 </style>
