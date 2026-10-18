@@ -1,36 +1,62 @@
-# PRIME 2026 — лендинг (Vue 3 + Vite)
+# PRIME 2026 — frontend (Vue 3 + Vite)
+
+Сайт голосования народной премии ру-стриминга. Статический SPA для GitHub Pages; API — отдельный бэкенд
+на другом домене (репозиторий backend). Авторизация — Bearer-токен в `localStorage`, cookie не используются.
+
+## Запуск локально
+
+Нужен Node 24+ и запущенный бэкенд (`cd ../backend && ./scripts/db-reset.sh && ./gradlew runLocal`).
 
 ```bash
 npm install
-npm run assets   # скачать картинки из Figma (также запускается автоматически перед dev/build)
-npm run dev
+npm run dev       # http://localhost:5173, API — из .env.development (http://localhost:8080)
+npm test          # unit-тесты (vitest)
+npm run build     # vue-tsc (проверка типов) + сборка в dist/
 ```
 
-## Шрифт заголовков
-Заголовки используют **Foglihten No06**. Положите файл шрифта в `public/fonts/`
-как `FoglihtenNo06.woff2` (или `.otf` / `.ttf`). Пока файла нет, используется запасной serif.
+Войти локально: «Войти» → «Войти как тестовый пользователь» → выбрать пользователя на странице mock-провайдера
+(`dev_new` — без голосов, `dev_half` — половина, `dev_almost` — осталась одна номинация, `dev_done` — всё,
+или «Создать нового»). Кнопка появляется, только если бэкенд запущен с `auth.devLogin: true`.
 
-Inter подключён через `@fontsource/inter`.
+## Страницы
 
-## Картинки
-Ссылки Figma временные (7 дней). Если скрипт не скачал файлы, экспортируйте слои из Figma
-в `src/assets/` с именами: `logo.png`, `nominee-1.png` … `nominee-4.png`.
+| Путь | |
+|---|---|
+| `/` | главная: видео-экран, по 4 номинации на страницу (`?page=`), лента номинантов, «Выбрать» |
+| `/vote/:id` | анкета: выбор → «Подтвердить голос» двойным нажатием → «Выбрано» → следующая непроголосованная |
+| `/vote` | первая непроголосованная анкета |
+| `/profile` | непроголосованные и проголосованные номинации (по 6 на странице), «Поделиться» → PNG |
+| `/auth/callback` | возврат после входа (одноразовый код во фрагменте URL меняется на токен) |
+| `/dev/stats` | статистика голосов (только при dev-режиме бэкенда) |
+| `/demo`, `/demo/form` | прежний демо-экран отборочного этапа (код в `src/demo`) |
 
-## Деплой на GitHub Pages (GitHub Actions)
+## Структура
 
-Перед первым пушем скачайте картинки и **закоммитьте их** (`src/assets/*.png`), а также файл шрифта
-в `public/fonts/` — ссылки Figma временные, и в CI скачать картинки не получится.
+- `src/api` — клиент API (fetch + Bearer, типизированные ошибки) и типы ответов;
+- `src/composable` — состояние: вход (`useAuth`), окно входа, конфиг бэкенда, голоса пользователя, каталог,
+  двойное подтверждение, пагинация, видимость главного экрана для шапки;
+- `src/components` — шапка и меню, окно входа, карточки номинантов/моментов, лента с треугольниками,
+  плеер, профиль, карточка «Поделиться»;
+- `src/views` — страницы; `src/demo` — демо-экран;
+- `public/media` — вся медиа (плашки номинаций, фото, видео). В базе бэкенда хранятся только пути
+  `media/...`, поэтому файлы лежат без хэшей в именах. Новые картинки кладите сюда же.
 
-```bash
-npm run assets
-git init && git add . && git commit -m "init"
-git branch -M main
-git remote add origin git@github.com:<user>/<repo>.git
-git push -u origin main
-```
+## Деплой (GitHub Pages)
 
-В репозитории: Settings → Pages → Source: **GitHub Actions**.
-Дальше каждый пуш в `main` сам собирает и публикует сайт (`.github/workflows/deploy.yml`).
-Первый запуск можно сделать вручную: вкладка Actions → Deploy to GitHub Pages → Run workflow.
+Workflow `.github/workflows/deploy.yml` собирает сайт при пуше в `master` (тесты + сборка) и публикует `dist`.
 
-Сайт будет доступен по адресу `https://<user>.github.io/<repo>/`.
+## Что осталось сделать вручную
+
+1. Settings → Pages → Source: **GitHub Actions**; при своём домене — добавить `public/CNAME`.
+2. Settings → Secrets and variables → Actions → Variables: `VITE_API_URL` = публичный адрес API
+   (по умолчанию `https://api.prime-award.ru`). Если сайт открывается из подпапки
+   (`https://user.github.io/repo/`), задать ещё `VITE_BASE=/repo/` в шаге сборки.
+3. На бэкенде добавить адрес сайта в `APP_FRONTEND_URLS` (CORS и возврат после входа).
+4. Заменить тестовые данные настоящими: плашки и фото в `public/media`, номинации и номинанты — в базе;
+   видео моментов — ссылки YouTube/Twitch или файлы (`video_url` у номинации, `timecode_seconds` у моментов).
+5. Шрифт заголовков Foglihten лежит в `public/fonts/FoglihtenNo06.otf` — проверьте лицензию на веб-использование.
+
+## Проверка в браузере (e2e)
+
+Сценарии Playwright лежат вне репозитория, в `~/prime/e2e` (Playwright установлен в `~/tools/playwright`):
+`node scenarios.mjs [--mobile]` — нужны запущенные бэкенд (:8080) и Vite (:5173).
