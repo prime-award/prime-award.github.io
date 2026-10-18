@@ -3,7 +3,7 @@ import {computed, reactive, ref} from 'vue'
 import {useRouter} from 'vue-router'
 import {useHead} from '@unhead/vue'
 import AppLoader from '@/components/AppLoader.vue'
-import FormButton from '@/components/FormButton.vue'
+import FormButton from '@/demo/components/FormButton.vue'
 
 defineOptions({name: 'FormView'})
 
@@ -34,7 +34,7 @@ const isLoading = computed(() => activeId.value !== null && !loaded[activeId.val
 const navButton = computed(() =>
     activeId.value
         ? {label: 'Назад', action: () => (activeId.value = null)}
-        : {label: 'Главная', action: () => router.push('/')},
+        : {label: 'Главная', action: () => router.push('/demo')},
 )
 
 function openForm(id) {
@@ -50,7 +50,7 @@ useHead({
     },
   ],
   link: [
-    {rel: 'canonical', href: 'https://prime-award.ru/form'},
+    {rel: 'canonical', href: 'https://prime-award.ru/demo/form'},
   ],
 })
 

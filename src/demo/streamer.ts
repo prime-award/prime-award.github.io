@@ -1,4 +1,4 @@
-import {mediaUrl} from '../utils/media.ts'
+import {mediaUrl} from '@/utils/media.ts'
 
 export interface Streamer {
     nickname: string

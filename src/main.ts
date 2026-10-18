@@ -9,7 +9,8 @@ import {initAnalytics, trackPageView} from "./analytics/google.ts";
 
 const VITE_GA_ID = 'G-F07HNYPWKV'
 
-initAnalytics(VITE_GA_ID)
+// аналитику не грузим при локальной разработке
+if (import.meta.env.PROD) initAnalytics(VITE_GA_ID)
 router.afterEach((to) => {
     nextTick(() => trackPageView(to.fullPath, document.title))
 })

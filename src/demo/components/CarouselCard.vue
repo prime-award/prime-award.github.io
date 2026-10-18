@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {computed, onBeforeUnmount, onMounted, ref} from 'vue'
-import type {Streamer} from '../types/streamer.ts'
+import type {Streamer} from '../streamer.ts'
 import {injectLazyImages} from "../composable/useLazyImages.ts";
 
 
@@ -28,7 +28,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <RouterLink v-slot="{ href, navigate }" :to="to ?? '../form'" custom>
+  <RouterLink v-slot="{ href, navigate }" :to="to ?? '/demo/form'" custom>
     <a
         ref="card"
         class="card"

@@ -1,5 +1,5 @@
 import {shallowRef} from 'vue'
-import {avatarOf, type Streamer} from '../types/streamer.ts'
+import {avatarOf, type Streamer} from '../streamer.ts'
 
 export const streamers: Streamer[] = [
     {nickname: 'AlinaRinRin', avatar: avatarOf('alinarin'), twitchLink: 'https://twitch.tv/alinarinrin'},

@@ -1,15 +1,20 @@
 <script setup>
 import primeLogo from '../assets/prime-logo.png'
-import MainButton from './MainButton.vue'
 import SteamLvlUpLogo from './SteamLvlUpLogo.vue'
 import AppLoader from './AppLoader.vue'
 import {useMainBackground} from "../composable/useMainBlock.ts";
 import {mediaUrl} from '../utils/media.ts'
+import {useHeroVisibility} from '../composable/useHeroVisibility.ts'
 
 const mainScreenVideo = mediaUrl('media/video/main-background.mp4')
 
+defineProps({
+  // строки заголовка под логотипом (каждая появляется своей анимацией)
+  titleLines: {type: Array, default: () => ['Главная народная', 'премия ру-стриминга']},
+})
 
 const {videoRef, onRevealEnd, isEnded, isLoaded, isRevealStarted, onLoaderLeave} = useMainBackground()
+const {heroRef} = useHeroVisibility()
 </script>
 
 <template>
@@ -20,7 +25,7 @@ const {videoRef, onRevealEnd, isEnded, isLoaded, isRevealStarted, onLoaderLeave}
     </div>
   </Transition>
 
-  <section class="main-screen" :class="{ 'is-revealing': isRevealStarted }">
+  <section ref="heroRef" class="main-screen" :class="{ 'is-revealing': isRevealStarted }">
     <video
         ref="videoRef"
         class="main-screen__background"
@@ -54,12 +59,16 @@ const {videoRef, onRevealEnd, isEnded, isLoaded, isRevealStarted, onLoaderLeave}
       </div>
 
       <h1 class="main-screen__title">
-        <span class="main-screen__title-line reveal" style="--reveal-index: 1">Главная народная</span>
-        <span class="main-screen__title-line reveal" style="--reveal-index: 2">премия ру-стриминга</span>
+        <span
+            v-for="(line, index) in titleLines"
+            :key="line"
+            class="main-screen__title-line reveal"
+            :style="{ '--reveal-index': index + 1 }"
+        >{{ line }}</span>
       </h1>
 
       <div class="main-screen__actions reveal" style="--reveal-index: 3" @animationend="onRevealEnd">
-        <MainButton href="#apply">Участвовать в отборе</MainButton>
+        <slot name="actions"/>
       </div>
     </div>
   </section>
