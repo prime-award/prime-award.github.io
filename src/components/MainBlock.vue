@@ -1,10 +1,12 @@
 <script setup>
-import mainScreenVideo from '../assets/main-background.mp4'
 import primeLogo from '../assets/prime-logo.png'
 import MainButton from './MainButton.vue'
 import SteamLvlUpLogo from './SteamLvlUpLogo.vue'
 import AppLoader from './AppLoader.vue'
 import {useMainBackground} from "../composable/useMainBlock.ts";
+import {mediaUrl} from '../utils/media.ts'
+
+const mainScreenVideo = mediaUrl('media/video/main-background.mp4')
 
 
 const {videoRef, onRevealEnd, isEnded, isLoaded, isRevealStarted, onLoaderLeave} = useMainBackground()
