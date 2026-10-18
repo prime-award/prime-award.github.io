@@ -234,6 +234,8 @@ const photo = computed(() => mediaUrl(props.nominee.photoPath))
 
 .nominee-card__action-button {
   pointer-events: auto;
+  /* двойной тап не должен масштабировать страницу (iOS) */
+  touch-action: manipulation;
   color: var(--text);
   cursor: pointer;
   transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;

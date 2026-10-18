@@ -277,6 +277,8 @@ const timecode = computed(() =>
 
 .moment-card__action-button {
   pointer-events: auto;
+  /* двойной тап не должен масштабировать страницу (iOS) */
+  touch-action: manipulation;
   color: var(--text);
   cursor: pointer;
 }

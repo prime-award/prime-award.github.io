@@ -23,3 +23,16 @@ describe('formatTimecode', () => {
         expect(formatTimecode(3725)).toBe('1:02:05')
     })
 })
+
+import {parseVideoSource} from '@/components/vote/videoSource.ts'
+
+describe('parseVideoSource', () => {
+    it('recognises files, youtube and twitch', () => {
+        expect(parseVideoSource('media/video/a.mp4')).toEqual({kind: 'file', src: '/media/video/a.mp4'})
+        expect(parseVideoSource('https://www.youtube.com/watch?v=abc_123')).toEqual({kind: 'youtube', id: 'abc_123'})
+        expect(parseVideoSource('https://youtu.be/xyz')).toEqual({kind: 'youtube', id: 'xyz'})
+        expect(parseVideoSource('https://www.twitch.tv/streamer/clip/FunnyClip-1')).toEqual({kind: 'twitch-clip', slug: 'FunnyClip-1'})
+        expect(parseVideoSource('https://www.twitch.tv/videos/123456')).toEqual({kind: 'twitch-video', id: '123456'})
+        expect(parseVideoSource(null)).toBeNull()
+    })
+})
