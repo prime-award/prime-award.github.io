@@ -57,9 +57,9 @@ const count = computed(() => props.items.length)
   padding: 0;
   border: 0;
   background: none;
-  font-family: var(--font-display);
-  font-weight: 400;
-  font-size: clamp(24px, 2.2vw, 40px);
+  font-family: var(--font-serif);
+  font-weight: 700;
+  font-size: clamp(22px, 1.8vw, 34px);
   cursor: pointer;
 }
 

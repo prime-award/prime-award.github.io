@@ -1,5 +1,5 @@
 <script setup>
-import primeLogo from '../assets/prime-logo.png'
+import primeLogo from '../assets/prime-logo.webp'
 import SteamLvlUpLogo from './SteamLvlUpLogo.vue'
 import AppLoader from './AppLoader.vue'
 import {useMainBackground} from "../composable/useMainBlock.ts";
@@ -95,6 +95,12 @@ const {heroRef} = useHeroVisibility()
   z-index: 1;
 }
 
+/* макет: затемнение rgba(8,9,11,.63) сверху и снизу, прозрачное к середине */
+.main-screen::before {
+  pointer-events: none;
+  background: linear-gradient(to bottom, rgba(8, 9, 11, 0.63) 0%, rgba(102, 102, 102, 0) 50%, rgba(8, 9, 11, 0.63) 100%);
+}
+
 
 
 .main-screen::after {
@@ -180,7 +186,8 @@ const {heroRef} = useHeroVisibility()
   position: relative;
   flex-shrink: 0;
 
-  width: clamp(500px, 42vw, 1000px);
+  /* макет: логотип 986 px при ширине 1920 */
+  width: clamp(300px, 51vw, 1000px);
   aspect-ratio: 3 / 1;
 
   max-width: 100%;
@@ -203,7 +210,7 @@ const {heroRef} = useHeroVisibility()
   margin: 0;
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: clamp(32px, 4vw, 76px);
+  font-size: clamp(32px, 5vw, 96px);
   line-height: normal;
   color: var(--text);
 }

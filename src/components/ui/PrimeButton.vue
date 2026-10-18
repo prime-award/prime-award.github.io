@@ -53,21 +53,21 @@ const tag = computed(() => (props.to ? 'RouterLink' : props.href ? 'a' : 'button
 
 .prime-button--sm { padding: 9px 16px; font-size: 15px; }
 .prime-button--md { padding: 12px 22px; font-size: clamp(16px, 1.25vw, 22px); }
-.prime-button--lg { padding: 14px 30px; font-size: clamp(20px, 2vw, 34px); }
+.prime-button--lg { padding: 0.31em 0.62em; font-size: clamp(22px, 2.5vw, 48px); }
 
-/* как «Проголосовать» в макете: светлая пилюля с мягким градиентом */
+/* «Проголосовать» (макет 74:174): сплошная #e5e7ea, скругление 25, Foglihten */
 .prime-button--light {
   color: var(--bg);
-  background: linear-gradient(180deg, #f4f5f7 0%, #c9cdd3 100%);
-  border-color: rgba(255, 255, 255, 0.6);
-  box-shadow: inset 0 -2px 6px rgba(0, 0, 0, 0.18);
+  background: var(--text);
+  border-radius: 25px;
 }
 
-/* как «Сделать выбор» / «Подтвердить голос»: тёмная полупрозрачная пилюля с тонкой обводкой */
+/* «Сделать выбор» (макет 367:500): полупрозрачная тёмная пилюля, Palatino капсом */
 .prime-button--dark {
-  color: var(--text);
-  background: linear-gradient(180deg, rgba(40, 45, 53, 0.85) 0%, rgba(14, 16, 20, 0.85) 100%);
-  border-color: var(--line);
+  color: rgba(255, 255, 255, 0.7);
+  background: rgba(23, 26, 31, 0.6);
+  border-color: rgba(229, 231, 234, 0.18);
+  font-family: var(--font-serif);
   backdrop-filter: blur(6px);
 }
 
@@ -82,10 +82,12 @@ const tag = computed(() => (props.to ? 'RouterLink' : props.href ? 'a' : 'button
 }
 
 .prime-button--light:hover:not(.is-disabled) {
-  box-shadow: 0 0 24px var(--accent-glow), inset 0 -2px 6px rgba(0, 0, 0, 0.18);
+  opacity: 0.92;
+  box-shadow: 0 0 25px var(--accent-glow);
 }
 
 .prime-button--dark:hover:not(.is-disabled) {
+  color: #fff;
   border-color: var(--line-strong);
   box-shadow: 0 0 14px rgba(229, 231, 234, 0.15);
 }

@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import {computed} from 'vue'
 import {useRoute} from 'vue-router'
-import primeLogo from '@/assets/prime-logo.png'
+import primeLogo from '@/assets/prime-logo-2026.webp'
 import {useAuth} from '@/composable/useAuth.ts'
 import {useHeroInView} from '@/composable/useHeroVisibility.ts'
 import {useLoginModal} from '@/composable/useLoginModal.ts'
 import UserMenu from '@/components/auth/UserMenu.vue'
-import PrimeButton from '@/components/ui/PrimeButton.vue'
 
 const {isLoggedIn} = useAuth()
 const heroInView = useHeroInView()
@@ -29,21 +28,24 @@ const solid = computed(() => !heroInView.value)
         :aria-hidden="!showLogo"
         aria-label="PRIME — на главную"
     >
-      <img :src="primeLogo" alt="PRIME"/>
+      <img :src="primeLogo" alt="PRIME 2026"/>
     </RouterLink>
 
     <div class="app-header__actions">
+      <nav v-if="isLoggedIn && route.name !== 'home'" class="app-header__links" aria-label="Разделы">
+        <RouterLink to="/">Главная</RouterLink>
+        <RouterLink to="/profile">Профиль</RouterLink>
+      </nav>
       <UserMenu v-if="isLoggedIn"/>
-      <PrimeButton
+      <button
           v-else
-          variant="ghost"
-          size="sm"
+          type="button"
           class="app-header__login"
           data-testid="login-button"
           @click="loginModal.open(route.fullPath)"
       >
         Войти
-      </PrimeButton>
+      </button>
     </div>
   </header>
 </template>
@@ -83,18 +85,56 @@ const solid = computed(() => !heroInView.value)
 
 .app-header__logo img {
   width: auto;
-  height: 36px;
+  height: clamp(30px, 2.3vw, 44px);
 }
 
 .app-header__actions {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: clamp(16px, 2vw, 40px);
   margin-left: auto;
 }
 
-.app-header__login {
+/* «Главная / Профиль» (макет 264:87): Palatino 24, rgba(229,231,234,.7) */
+.app-header__links {
+  display: flex;
+  gap: clamp(16px, 2vw, 40px);
+  font-family: var(--font-serif);
+  font-size: clamp(17px, 1.25vw, 24px);
+  letter-spacing: -0.03em;
+}
+
+.app-header__links a {
+  color: rgba(229, 231, 234, 0.7);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.app-header__links a:hover,
+.app-header__links a.router-link-exact-active {
   color: var(--text);
-  font-size: 18px;
+}
+
+@media (max-width: 760px) {
+  .app-header__links {
+    display: none;
+  }
+}
+
+/* «Войти» (макет 74:8): Inter Medium 24, без капса */
+.app-header__login {
+  padding: 6px 4px;
+  border: 0;
+  background: none;
+  color: var(--text);
+  font-family: var(--font-text);
+  font-size: clamp(17px, 1.25vw, 24px);
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.app-header__login:hover {
+  opacity: 0.75;
 }
 </style>

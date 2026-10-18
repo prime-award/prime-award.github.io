@@ -37,29 +37,32 @@ const suffix = computed(() => (props.year && !/года$/i.test(props.nomination
 
 .nomination-title__name {
   font-size: clamp(30px, 4.2vw, 80px);
+  color: #fff;
 }
 
 .nomination-title--h1 .nomination-title__name {
-  font-size: clamp(34px, 4.6vw, 88px);
+  font-size: clamp(34px, 5vw, 96px);
 }
 
 .nomination-title__icon {
   width: auto;
-  height: clamp(40px, 4.2vw, 80px);
+  height: clamp(40px, 4.4vw, 84px);
   aspect-ratio: 380 / 185;
   object-fit: contain;
 }
 
 .nomination-title__description {
   max-width: 70ch;
-  margin: clamp(6px, 0.8vw, 12px) 0 0;
-  color: var(--muted-2);
-  font-size: clamp(15px, 1.15vw, 20px);
-  line-height: 1.4;
+  margin: clamp(4px, 0.6vw, 10px) 0 0;
+  color: rgba(229, 231, 234, 0.7);
+  font-family: var(--font-serif);
+  font-size: clamp(16px, 1.4vw, 28px);
+  line-height: 1.3;
 }
 
 .nomination-title--h1 .nomination-title__description {
-  color: var(--text);
-  font-size: clamp(16px, 1.5vw, 28px);
+  color: #fff;
+  font-size: clamp(18px, 2.5vw, 48px);
+  letter-spacing: -0.025em;
 }
 </style>

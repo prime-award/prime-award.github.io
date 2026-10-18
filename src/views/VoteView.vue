@@ -299,9 +299,9 @@ const actionHint = computed(() =>
     </Transition>
 
     <nav v-if="nomination && summary" class="vote__nav" aria-label="Анкеты">
-      <button type="button" class="vote__arrow" :disabled="!prevId" aria-label="Предыдущая номинация" data-testid="prev-nomination" @click="go(prevId)">‹</button>
+      <button type="button" class="vote__arrow" :disabled="!prevId" aria-label="Предыдущая номинация" data-testid="prev-nomination" @click="go(prevId)">&lt;</button>
       <span class="vote__counter" data-testid="nomination-counter">{{ index + 1 }}/{{ summary.length }}</span>
-      <button type="button" class="vote__arrow" :disabled="!nextId" aria-label="Следующая номинация" data-testid="next-nomination" @click="go(nextId)">›</button>
+      <button type="button" class="vote__arrow" :disabled="!nextId" aria-label="Следующая номинация" data-testid="next-nomination" @click="go(nextId)">&gt;</button>
     </nav>
 
     <PrimeButton
@@ -373,9 +373,10 @@ const actionHint = computed(() =>
 
 .vote__subtitle {
   margin: clamp(24px, 2.6vw, 44px) 0 clamp(14px, 1.4vw, 24px);
-  font-family: var(--font-display);
+  font-family: var(--font-serif);
   font-weight: 400;
-  font-size: clamp(24px, 2.4vw, 44px);
+  font-size: clamp(22px, 2.1vw, 40px);
+  letter-spacing: -0.03em;
 }
 
 .vote__notice {
@@ -438,18 +439,19 @@ const actionHint = computed(() =>
   border-radius: var(--radius-pill);
   background: rgba(8, 9, 11, 0.85);
   backdrop-filter: blur(10px);
-  font-family: var(--font-display);
-  font-size: clamp(20px, 1.6vw, 26px);
+  font-family: var(--font-serif);
+  font-size: clamp(22px, 1.875vw, 36px);
+  letter-spacing: -0.03em;
 }
 
 .vote__arrow {
   width: 40px;
   height: 40px;
-  padding: 0 0 4px;
+  padding: 0 0 2px;
   border: 0;
   border-radius: 50%;
   background: transparent;
-  font-size: 1.3em;
+  font-size: 1em;
   line-height: 1;
   cursor: pointer;
 }

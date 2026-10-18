@@ -29,14 +29,14 @@ const deadline = computed(() => {
 
 .voting-info__title {
   margin: 0;
-  font-family: var(--font-display);
-  font-weight: 400;
-  font-size: clamp(24px, 2.4vw, 46px);
+  font-family: var(--font-serif);
+  font-weight: 700;
+  font-size: clamp(22px, 2.5vw, 48px);
 }
 
 .voting-info__text {
-  margin: 6px 0 0;
-  color: var(--muted-2);
-  font-size: clamp(15px, 1.4vw, 26px);
+  margin: 8px 0 0;
+  font-family: var(--font-serif);
+  font-size: clamp(16px, 1.875vw, 36px);
 }
 </style>

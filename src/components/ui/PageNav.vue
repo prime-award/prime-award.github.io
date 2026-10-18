@@ -16,11 +16,11 @@ function go(page: number) {
 <template>
   <nav v-if="total > 1" class="page-nav" :aria-label="label ?? 'Страницы'">
     <button type="button" class="page-nav__arrow" :disabled="page <= 1" aria-label="Предыдущая страница" @click="go(page - 1)">
-      ‹
+      &lt;
     </button>
     <span class="page-nav__counter" aria-live="polite">{{ page }}/{{ total }}</span>
     <button type="button" class="page-nav__arrow" :disabled="page >= total" aria-label="Следующая страница" @click="go(page + 1)">
-      ›
+      &gt;
     </button>
   </nav>
 </template>
@@ -31,8 +31,9 @@ function go(page: number) {
   align-items: center;
   justify-content: center;
   gap: 10px;
-  font-family: var(--font-display);
-  font-size: clamp(20px, 1.6vw, 28px);
+  font-family: var(--font-serif);
+  font-size: clamp(22px, 1.875vw, 36px);
+  letter-spacing: -0.03em;
 }
 
 .page-nav__arrow {
@@ -40,11 +41,11 @@ function go(page: number) {
   place-items: center;
   width: 40px;
   height: 40px;
-  padding: 0 0 4px;
+  padding: 0 0 2px;
   border: 0;
   border-radius: 50%;
   background: transparent;
-  font-size: 1.3em;
+  font-size: 1em;
   line-height: 1;
   cursor: pointer;
   transition: background-color 0.2s ease, opacity 0.2s ease;

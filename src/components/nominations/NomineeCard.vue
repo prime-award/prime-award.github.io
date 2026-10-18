@@ -76,21 +76,28 @@ const photo = computed(() => mediaUrl(props.nominee.photoPath))
 </template>
 
 <style scoped>
+/* Размеры и цвета — из макета (компонент «состояния карт», 295:153): карточка 370×524, фото 370×450 сверху,
+   ник Palatino 40 капсом в полосе 74 px снизу, обводка 1px #687789, при наведении #e5e7ea, выбранная — 3px. */
 .nominee-card {
+  --photo-h: calc(450 / 524 * 100%);
   position: relative;
   aspect-ratio: 370 / 524;
   overflow: hidden;
-  border: 1px solid var(--line);
+  border: 1px solid var(--border);
   border-radius: var(--radius-card);
-  background: radial-gradient(circle at 50% 35%, #687789 0%, #1a1e24 45%, var(--bg) 100%);
+  background: var(--bg);
   isolation: isolate;
-  transition: border-color 0.25s ease, box-shadow 0.25s ease, opacity 0.25s ease, transform 0.25s ease;
+  container-type: inline-size;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, opacity 0.25s ease;
 }
 
 .nominee-card__media {
   position: absolute;
-  inset: 0;
+  inset: 0 0 auto;
   z-index: -1;
+  height: var(--photo-h);
+  /* «bg photo»: радиальный градиент #687789 -> прозрачный */
+  background: radial-gradient(67% 67% at 50% 50%, rgba(104, 119, 137, 1) 0%, rgba(56, 64, 74, 0.5) 50%, rgba(8, 9, 11, 0) 100%);
 }
 
 .nominee-card__media img {
@@ -106,23 +113,28 @@ const photo = computed(() => mediaUrl(props.nominee.photoPath))
   opacity: 1;
 }
 
-/* затемнение снизу под ник и мягкая внутренняя тень, как в макете */
+/* «black gradient»: снизу #08090b -> прозрачный к 38.9% высоты фото */
 .nominee-card__media::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(8, 9, 11, 0.95) 0%, rgba(8, 9, 11, 0.55) 18%, transparent 42%);
-  box-shadow: inset 0 6px 60px rgba(0, 0, 0, 0.55);
+  background: linear-gradient(to top, var(--bg) 0%, rgba(8, 9, 11, 0) 38.889%);
 }
 
 .nominee-card__name {
   position: absolute;
-  inset: auto 8px 6%;
+  inset: auto 0 0;
+  display: grid;
+  place-items: center;
+  height: calc(74 / 524 * 100%);
   margin: 0;
-  font-family: var(--font-display);
+  padding: 0 10px 2%;
+  font-family: var(--font-serif);
   font-weight: 400;
-  font-size: clamp(18px, 1.5vw, 30px);
-  line-height: 1.05;
+  /* 40px при ширине карточки 370px */
+  font-size: clamp(15px, 10.8cqi, 40px);
+  line-height: 1;
+  color: #fff;
   text-align: center;
   text-transform: uppercase;
   overflow-wrap: anywhere;
@@ -166,16 +178,18 @@ const photo = computed(() => mediaUrl(props.nominee.photoPath))
   outline-offset: -4px;
 }
 
+/* «Подтвердить голос» (295:93): пилюля rgba(23,26,31,.2), 15/30, скругление 40, Palatino 32 */
 .nominee-card__hover-label,
 .nominee-card__action-button {
-  padding: 12px 22px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-pill);
-  background: linear-gradient(180deg, rgba(40, 45, 53, 0.82) 0%, rgba(14, 16, 20, 0.82) 100%);
-  backdrop-filter: blur(6px);
-  font-family: var(--font-display);
-  font-size: clamp(16px, 1.15vw, 22px);
-  line-height: 1;
+  padding: 0.47em 0.94em;
+  border: 1px solid rgba(229, 231, 234, 0.25);
+  border-radius: 40px;
+  background: rgba(23, 26, 31, 0.45);
+  backdrop-filter: blur(4px);
+  color: #fff;
+  font-family: var(--font-serif);
+  font-size: clamp(14px, 8.6cqi, 32px);
+  line-height: 1.15;
   white-space: nowrap;
 }
 
@@ -186,15 +200,14 @@ const photo = computed(() => mediaUrl(props.nominee.photoPath))
   pointer-events: none;
 }
 
-/* ---- hover (desktop) ---- */
+/* ---- mouse enter (295:151): светлая обводка ---- */
 @media (hover: hover) {
   .nominee-card.is-idle:hover {
-    border-color: var(--line-strong);
-    box-shadow: 0 0 22px rgba(229, 231, 234, 0.12);
+    border-color: var(--text);
   }
 
   .nominee-card.is-idle:hover .nominee-card__media img {
-    transform: scale(1.03);
+    transform: scale(1.02);
   }
 
   .nominee-card.has-hover-label.is-idle:hover .nominee-card__hover-label {
@@ -208,14 +221,14 @@ const photo = computed(() => mediaUrl(props.nominee.photoPath))
   transform: none;
 }
 
-/* ---- active: фото размыто, кнопка подтверждения поверх ---- */
+/* ---- active + button (295:152): содержимое размыто на 5px, обводка светлая, кнопка поверх ---- */
 .nominee-card.is-active {
-  border-color: var(--line-strong);
+  border-color: var(--text);
 }
 
 .nominee-card.is-active .nominee-card__media img,
 .nominee-card.is-active .nominee-card__name {
-  filter: blur(6px) brightness(0.65);
+  filter: blur(5px);
 }
 
 .nominee-card__action {
@@ -236,7 +249,6 @@ const photo = computed(() => mediaUrl(props.nominee.photoPath))
   pointer-events: auto;
   /* двойной тап не должен масштабировать страницу (iOS) */
   touch-action: manipulation;
-  color: var(--text);
   cursor: pointer;
   transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
 }
@@ -256,13 +268,12 @@ const photo = computed(() => mediaUrl(props.nominee.photoPath))
   text-shadow: 0 1px 6px rgba(0, 0, 0, 0.8);
 }
 
-/* ---- selected: белая обводка ---- */
+/* ---- selected (295:213): обводка 3px #e5e7ea ---- */
 .nominee-card.is-selected {
-  border: 2px solid var(--text);
-  box-shadow: 0 0 26px rgba(229, 231, 234, 0.25);
+  border: 3px solid var(--text);
 }
 
-/* ---- dimmed: голос отдан за другого ---- */
+/* ---- голос отдан за другого ---- */
 .nominee-card.is-dimmed {
   opacity: 0.4;
   filter: grayscale(0.5);

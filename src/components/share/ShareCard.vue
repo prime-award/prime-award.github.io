@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {computed} from 'vue'
 import type {User, VotedNomination} from '@/api'
-import primeLogo from '@/assets/prime-logo.png'
+import primeLogo from '@/assets/prime-logo.webp'
 import {mediaUrl} from '@/utils/media.ts'
 
 /*

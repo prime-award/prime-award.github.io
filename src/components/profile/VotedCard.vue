@@ -22,9 +22,10 @@ defineProps<{ item: VotedNomination }>()
   flex-direction: column;
   align-items: center;
   height: 100%;
-  padding: clamp(20px, 2.4vw, 40px) clamp(16px, 1.6vw, 28px);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-card);
+  /* макет: обводка 2px #687789, скругление 50, отступы 56/15 */
+  padding: clamp(24px, 2.9vw, 56px) clamp(12px, 1.2vw, 24px);
+  border: 2px solid var(--border);
+  border-radius: clamp(28px, 2.6vw, 50px);
   background: var(--bg);
   color: inherit;
   text-align: center;
@@ -33,7 +34,7 @@ defineProps<{ item: VotedNomination }>()
 }
 
 .voted-card:hover {
-  border-color: var(--line-strong);
+  border-color: var(--text);
   box-shadow: 0 0 22px rgba(229, 231, 234, 0.08);
 }
 
@@ -66,16 +67,17 @@ defineProps<{ item: VotedNomination }>()
 }
 
 .voted-card__nomination {
-  margin-top: clamp(14px, 1.4vw, 24px);
-  font-size: clamp(22px, 2vw, 40px);
-  line-height: 1.1;
+  margin-top: clamp(14px, 1.5vw, 29px);
+  font-size: clamp(28px, 3.6vw, 70px);
+  line-height: 1.05;
 }
 
+/* ник (367:282): Palatino 40 капсом, rgba(229,231,234,.7) */
 .voted-card__nominee {
-  margin: 10px 0 0;
-  color: var(--muted-2);
-  font-family: var(--font-display);
-  font-size: clamp(18px, 1.5vw, 28px);
+  margin: clamp(8px, 0.8vw, 15px) 0 0;
+  color: rgba(229, 231, 234, 0.7);
+  font-family: var(--font-serif);
+  font-size: clamp(18px, 2.08vw, 40px);
   text-transform: uppercase;
   overflow-wrap: anywhere;
 }

@@ -80,27 +80,31 @@ const timecode = computed(() =>
 </template>
 
 <style scoped>
+/* Из макета (415:367): карточка 405×363, обводка 1px #687789, скругление 20; превью 10px от краёв, высота 228,
+   скругление 10, картинка с opacity .7 и градиентом вниз в #08090b; название Palatino 36 (трекинг -3%),
+   участники/таймкод — 16px, rgba(229,231,234,.5). */
 .moment-card {
   position: relative;
   display: flex;
   flex-direction: column;
   aspect-ratio: 405 / 363;
   overflow: hidden;
-  padding: 10px;
-  border: 1px solid var(--line);
+  padding: calc(10 / 405 * 100%);
+  border: 1px solid var(--border);
   border-radius: var(--radius-card);
-  background: var(--surface);
+  background: var(--bg);
   isolation: isolate;
+  container-type: inline-size;
   transition: border-color 0.25s ease, box-shadow 0.25s ease, opacity 0.25s ease;
 }
 
 .moment-card__preview {
   position: relative;
   flex: none;
-  aspect-ratio: 16 / 9;
+  height: calc(228 / 405 * 100cqi);
   overflow: hidden;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #1b2028, #0b0d10);
+  border-radius: 10px;
+  background: var(--bg);
 }
 
 .moment-card__preview img {
@@ -113,14 +117,14 @@ const timecode = computed(() =>
 }
 
 .moment-card__preview img.is-loaded {
-  opacity: 1;
+  opacity: 0.7;
 }
 
 .moment-card__preview::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, var(--surface) 0%, transparent 45%);
+  background: linear-gradient(to bottom, rgba(8, 9, 11, 0) 0%, var(--bg) 100%);
 }
 
 .moment-card__body {
@@ -129,40 +133,48 @@ const timecode = computed(() =>
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  padding: 4px 6px 30px;
+  gap: 2px;
+  padding: 0 calc(11 / 405 * 100cqi) calc(30 / 405 * 100cqi);
+  font-family: var(--font-serif);
   text-align: center;
+  text-wrap: balance;
   transition: filter 0.3s ease;
 }
 
 .moment-card__title {
   margin: 0;
-  font-family: var(--font-display);
+  font-family: var(--font-serif);
   font-weight: 400;
-  font-size: clamp(17px, 1.35vw, 26px);
+  font-size: clamp(15px, 8.9cqi, 36px);
   line-height: 1.1;
+  letter-spacing: -0.03em;
+  color: #fff;
   overflow-wrap: anywhere;
+}
+
+.moment-card__participants,
+.moment-card__timecode {
+  font-family: var(--font-serif);
+  font-size: clamp(11px, 4cqi, 16px);
+  letter-spacing: -0.03em;
+  color: rgba(229, 231, 234, 0.5);
 }
 
 .moment-card__participants {
   margin: 0;
-  color: var(--muted-2);
-  font-size: 12px;
   line-height: 1.3;
 }
 
 .moment-card__timecode {
   position: absolute;
-  bottom: 10px;
+  bottom: calc(10 / 405 * 100cqi);
   left: 50%;
   z-index: 1;
   translate: -50% 0;
-  padding: 4px 10px;
+  padding: 3px 10px;
   border: 1px solid transparent;
   border-radius: var(--radius-pill);
   background: transparent;
-  color: var(--muted-2);
-  font-size: 13px;
   font-variant-numeric: tabular-nums;
   cursor: pointer;
   transition: color 0.2s ease, border-color 0.2s ease;
@@ -218,14 +230,15 @@ const timecode = computed(() =>
 
 .moment-card__hover-label,
 .moment-card__action-button {
-  padding: 12px 22px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-pill);
-  background: linear-gradient(180deg, rgba(40, 45, 53, 0.85) 0%, rgba(14, 16, 20, 0.85) 100%);
-  backdrop-filter: blur(6px);
-  font-family: var(--font-display);
-  font-size: clamp(16px, 1.15vw, 22px);
-  line-height: 1;
+  padding: 0.47em 0.94em;
+  border: 1px solid rgba(229, 231, 234, 0.25);
+  border-radius: 40px;
+  background: rgba(23, 26, 31, 0.55);
+  backdrop-filter: blur(4px);
+  color: #fff;
+  font-family: var(--font-serif);
+  font-size: clamp(14px, 7.4cqi, 30px);
+  line-height: 1.15;
   white-space: nowrap;
 }
 
@@ -239,12 +252,11 @@ const timecode = computed(() =>
 
 @media (hover: hover) {
   .moment-card.is-idle:hover {
-    border-color: var(--line-strong);
-    box-shadow: 0 0 22px rgba(229, 231, 234, 0.12);
+    border-color: var(--text);
   }
 
   .moment-card.is-idle:hover .moment-card__preview img {
-    transform: scale(1.04);
+    transform: scale(1.03);
   }
 
   .moment-card.has-hover-label.is-idle:hover .moment-card__hover-label {
@@ -254,12 +266,12 @@ const timecode = computed(() =>
 }
 
 .moment-card.is-active {
-  border-color: var(--line-strong);
+  border-color: var(--text);
 }
 
 .moment-card.is-active .moment-card__preview img,
 .moment-card.is-active .moment-card__body {
-  filter: blur(5px) brightness(0.6);
+  filter: blur(5px);
 }
 
 .moment-card__action {
@@ -279,7 +291,6 @@ const timecode = computed(() =>
   pointer-events: auto;
   /* двойной тап не должен масштабировать страницу (iOS) */
   touch-action: manipulation;
-  color: var(--text);
   cursor: pointer;
 }
 
@@ -294,8 +305,7 @@ const timecode = computed(() =>
 }
 
 .moment-card.is-selected {
-  border: 2px solid var(--text);
-  box-shadow: 0 0 26px rgba(229, 231, 234, 0.25);
+  border: 3px solid var(--text);
 }
 
 .moment-card.is-dimmed {
