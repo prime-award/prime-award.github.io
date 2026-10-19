@@ -1,9 +1,9 @@
 <script setup lang="ts" generic="T">
-import {computed, ref, toRef} from 'vue'
+import {computed, toRef} from 'vue'
 import PageNav from '@/components/ui/PageNav.vue'
 import {usePagination} from '@/composable/usePagination.ts'
 
-// Сворачиваемая секция профиля (▾ «Ждут вашего голоса» / ▾ «Ваш выбор») со страницами по pageSize карточек.
+// Секция профиля («Ждут вашего голоса» / «Ваш выбор») со страницами по pageSize карточек.
 const props = withDefaults(defineProps<{
   title: string
   items: readonly T[]
@@ -14,7 +14,6 @@ const props = withDefaults(defineProps<{
   testId: string
 }>(), {pageSize: 6})
 
-const open = ref(true)
 const {page, totalPages, pageItems, setPage} = usePagination(toRef(props, 'items'), props.pageSize)
 const count = computed(() => props.items.length)
 </script>
@@ -22,22 +21,17 @@ const count = computed(() => props.items.length)
 <template>
   <section class="profile-section" :data-testid="testId">
     <h2 class="profile-section__head">
-      <button type="button" class="profile-section__toggle" :aria-expanded="open" @click="open = !open">
-        <span class="profile-section__caret" :class="{ 'is-open': open }" aria-hidden="true"/>
-        {{ title }}
-        <span class="profile-section__count">{{ count }}</span>
-      </button>
+      {{ title }}
+      <span class="profile-section__count">{{ count }}</span>
     </h2>
 
-    <div v-show="open">
-      <p v-if="!count" class="profile-section__empty">{{ emptyText }}</p>
-      <ul v-else class="profile-section__grid">
-        <li v-for="item in pageItems" :key="itemKey(item as T)">
-          <slot :item="item"/>
-        </li>
-      </ul>
-      <PageNav class="profile-section__pages" :page="page" :total="totalPages" :label="`Страницы: ${title}`" @change="setPage"/>
-    </div>
+    <p v-if="!count" class="profile-section__empty">{{ emptyText }}</p>
+    <ul v-else class="profile-section__grid">
+      <li v-for="item in pageItems" :key="itemKey(item as T)">
+        <slot :item="item"/>
+      </li>
+    </ul>
+    <PageNav class="profile-section__pages" :page="page" :total="totalPages" :label="`Страницы: ${title}`" @change="setPage"/>
   </section>
 </template>
 
@@ -47,34 +41,12 @@ const count = computed(() => props.items.length)
 }
 
 .profile-section__head {
-  margin: 0 0 var(--space-4);
-}
-
-/* заголовок-переключатель: зона нажатия 48dp, текст — subtitle */
-.profile-section__toggle {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: var(--space-3);
   min-height: var(--touch-target);
-  padding: 0 var(--space-2) 0 0;
-  border: 0;
-  background: none;
+  margin: 0 0 var(--space-4);
   font: 700 var(--type-subtitle) var(--font-serif);
-  cursor: pointer;
-}
-
-/* треугольник: ▼ открыто, ▶ свёрнуто */
-.profile-section__caret {
-  width: 0;
-  height: 0;
-  border-inline: var(--space-2) solid transparent;
-  border-top: var(--space-3) solid var(--text);
-  transform: rotate(-90deg);
-  transition: transform 0.2s ease;
-}
-
-.profile-section__caret.is-open {
-  transform: none;
 }
 
 .profile-section__count {

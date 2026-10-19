@@ -9,6 +9,7 @@ import NominationTitle from '@/components/nominations/NominationTitle.vue'
 import NomineeCard from '@/components/nominations/NomineeCard.vue'
 import type {CardState} from '@/components/nominations/cardState.ts'
 import {votedFirst} from '@/components/nominations/votedFirst.ts'
+import {plural} from '@/utils/countdown.ts'
 import PrimeButton from '@/components/ui/PrimeButton.vue'
 import NominationPlayer from '@/components/vote/NominationPlayer.vue'
 import {useAppConfig} from '@/composable/useAppConfig.ts'
@@ -219,6 +220,11 @@ function onKey(event: KeyboardEvent) {
 onMounted(() => window.addEventListener('keydown', onKey))
 onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
 
+const nomineeCountText = computed(() => {
+  const n = nomination.value?.nominees.length ?? 0
+  return `${n} ${plural(n, ['номинант', 'номинанта', 'номинантов'])}`
+})
+
 const actionHint = computed(() => (submitting.value ? 'Отправляем…' : undefined))
 </script>
 
@@ -257,6 +263,7 @@ const actionHint = computed(() => (submitting.value ? 'Отправляем…' 
           <template v-else-if="!votingOpen">Голосование завершено</template>
           <template v-else>Отдать голос:</template>
         </h2>
+        <p class="vote__count" data-testid="nominee-count">{{ nomineeCountText }}</p>
 
         <p v-if="notice" class="vote__notice" :class="`is-${notice.kind}`" role="status">{{ notice.text }}</p>
         <p v-else-if="voted !== null && !showChosen" class="vote__notice is-info">
@@ -368,8 +375,15 @@ const actionHint = computed(() => (submitting.value ? 'Отправляем…' 
 }
 
 .vote__subtitle {
-  margin: var(--space-8) 0 var(--space-4);
+  margin: var(--space-8) 0 0;
   font: 400 var(--type-subtitle) var(--font-serif);
+}
+
+/* «8 номинантов» под «Отдать голос:» */
+.vote__count {
+  margin: var(--space-1) 0 var(--space-4);
+  color: var(--muted-2);
+  font: var(--type-body-m) var(--font-text);
 }
 
 .vote__notice {
