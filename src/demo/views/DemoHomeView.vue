@@ -1,11 +1,10 @@
 <script setup>
-// Демо-экран отборочного этапа (до голосования). Сохранён как был, доступен по /demo.
-import MainBlock from '@/components/MainBlock.vue'
-import SponsorsSection from '@/components/SponsorsSection.vue'
-import ContactAs from '@/components/ContactAs.vue'
+// Демо-экран отборочного этапа — как в master (продакшен на /). Сайт голосования живёт на /test/.
+import MainBlock from '../components/DemoMainBlock.vue'
 import Carousel from '../components/Carousel.vue'
+import SponsorsSection from '../components/DemoSponsorsSection.vue'
+import ContactAs from '../components/DemoContactAs.vue'
 import DateBlock from '../components/DateBlock.vue'
-import MainButton from '../components/MainButton.vue'
 import {useHead} from "@unhead/vue";
 
 useHead({
@@ -17,7 +16,7 @@ useHead({
     },
   ],
   link: [
-    {rel: 'canonical', href: 'https://prime-award.ru/demo'},
+    {rel: 'canonical', href: 'https://prime-award.ru/'},
   ],
 })
 
@@ -25,14 +24,14 @@ useHead({
 
 <template>
   <main>
-    <MainBlock>
-      <template #actions>
-        <MainButton>Участвовать в отборе</MainButton>
-      </template>
-    </MainBlock>
+    <MainBlock/>
     <Carousel/>
     <DateBlock/>
     <SponsorsSection/>
     <ContactAs/>
   </main>
 </template>
+
+<style scoped>
+
+</style>

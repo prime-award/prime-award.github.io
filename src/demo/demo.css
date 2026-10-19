@@ -1,0 +1,18 @@
+@font-face {
+  font-family: 'Foglihten No06';
+  src: url('/fonts/FoglihtenNo06.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --bg: #08090B;
+  --text: #e5e7ea;
+  --font-display: 'Foglihten No06', 'Palatino Linotype', Palatino, Georgia, 'Times New Roman', serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); }
+body { color: var(--text); font-family: system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+img { display: block; }

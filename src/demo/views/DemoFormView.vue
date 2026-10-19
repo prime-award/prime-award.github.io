@@ -34,7 +34,7 @@ const isLoading = computed(() => activeId.value !== null && !loaded[activeId.val
 const navButton = computed(() =>
     activeId.value
         ? {label: 'Назад', action: () => (activeId.value = null)}
-        : {label: 'Главная', action: () => router.push('/demo')},
+        : {label: 'Главная', action: () => router.push('/')},
 )
 
 function openForm(id) {
@@ -50,7 +50,7 @@ useHead({
     },
   ],
   link: [
-    {rel: 'canonical', href: 'https://prime-award.ru/demo/form'},
+    {rel: 'canonical', href: 'https://prime-award.ru/form'},
   ],
 })
 
