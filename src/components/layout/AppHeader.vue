@@ -6,6 +6,7 @@ import {useAuth} from '@/composable/useAuth.ts'
 import {useHeroInView} from '@/composable/useHeroVisibility.ts'
 import {useLoginModal} from '@/composable/useLoginModal.ts'
 import UserMenu from '@/components/auth/UserMenu.vue'
+import SteamLvlUpLogo from '@/components/SteamLvlUpLogo.vue'
 
 const {isLoggedIn} = useAuth()
 const heroInView = useHeroInView()
@@ -31,10 +32,12 @@ const solid = computed(() => !heroInView.value)
       <img :src="primeLogo" alt="PRIME 2026"/>
     </RouterLink>
 
+    <!-- спонсор — по центру шапки на всех экранах -->
+    <SteamLvlUpLogo class="app-header__sponsor" variant="header"/>
+
     <div class="app-header__actions">
       <nav v-if="isLoggedIn && route.name !== 'home'" class="app-header__links" aria-label="Разделы">
         <RouterLink to="/">Главная</RouterLink>
-        <RouterLink to="/profile">Профиль</RouterLink>
       </nav>
       <UserMenu v-if="isLoggedIn"/>
       <button
@@ -51,14 +54,15 @@ const solid = computed(() => !heroInView.value)
 </template>
 
 <style scoped>
-/* Top app bar M3: высота 64dp, поля — отступ раскладки. */
+/* Top app bar M3: высота 64dp, поля — отступ раскладки.
+   Три колонки: логотип PRIME | спонсор строго по центру | вход или меню. */
 .app-header {
   position: fixed;
   inset: 0 0 auto;
   z-index: 100;
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
-  justify-content: space-between;
   gap: var(--space-4);
   height: var(--header-h);
   padding-inline: var(--layout-margin);
@@ -72,6 +76,7 @@ const solid = computed(() => !heroInView.value)
 }
 
 .app-header__logo {
+  justify-self: start;
   display: block;
   opacity: 0;
   transform: translateY(calc(-1 * var(--space-2)));
@@ -90,14 +95,20 @@ const solid = computed(() => !heroInView.value)
   height: var(--space-8);
 }
 
+.app-header__sponsor {
+  justify-self: center;
+}
+
 .app-header__actions {
+  justify-self: end;
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  margin-left: auto;
+  min-width: 0;
+  max-width: 100%;
 }
 
-/* текстовые ссылки «Главная / Профиль» — как text button M3 */
+/* текстовая ссылка «Главная» — как text button M3 */
 .app-header__links {
   display: flex;
   gap: var(--space-1);
@@ -134,10 +145,21 @@ const solid = computed(() => !heroInView.value)
   color: var(--text);
 }
 
-/* compact: только логотип и меню */
-@media (max-width: 599px) {
+/* до expanded ссылку «Главная» прячем: на главную ведёт логотип, а место нужно чипу пользователя */
+@media (max-width: 839px) {
   .app-header__links {
     display: none;
+  }
+}
+
+/* compact: логотип PRIME меньше — чтобы спонсор по центру и меню влезали в 360px */
+@media (max-width: 599px) {
+  .app-header {
+    gap: var(--space-2);
+  }
+
+  .app-header__logo img {
+    height: var(--space-6);
   }
 }
 </style>

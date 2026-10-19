@@ -107,13 +107,18 @@ const count = computed(() => props.items.length)
   margin-top: var(--space-4);
 }
 
-@media (min-width: 600px) {
+/* колонки — по ширине самой секции (рядом с визиткой она уже окна), карточка не уже ~272dp */
+.profile-section {
+  container-type: inline-size;
+}
+
+@container (min-width: 560px) {
   .profile-section__grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-@media (min-width: 840px) {
+@container (min-width: 864px) {
   .profile-section__grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }

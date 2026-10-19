@@ -2,13 +2,9 @@
 import {computed, onBeforeUnmount, ref} from 'vue'
 import {useRouter} from 'vue-router'
 import {useAuth} from '@/composable/useAuth.ts'
-import {useAppConfig} from '@/composable/useAppConfig.ts'
-import {useVoteNavigation} from '@/composable/useVoteNavigation.ts'
 import UserAvatar from './UserAvatar.vue'
 
 const {user, logout} = useAuth()
-const {config} = useAppConfig()
-const {openNextBallot} = useVoteNavigation()
 const router = useRouter()
 
 // Меню открывается наведением (desktop), кликом (тач) и с клавиатуры
@@ -43,11 +39,9 @@ function onFocusOut(event: FocusEvent) {
   if (!root.value?.contains(event.relatedTarget as Node | null)) open.value = false
 }
 
-async function go(action: 'profile' | 'ballot' | 'stats' | 'logout') {
+async function go(action: 'profile' | 'logout') {
   open.value = false
   if (action === 'profile') await router.push('/profile')
-  else if (action === 'ballot') await openNextBallot()
-  else if (action === 'stats') await router.push('/dev/stats')
   else {
     await logout()
     if (router.currentRoute.value.meta.requiresAuth) await router.push('/')
@@ -82,11 +76,12 @@ onBeforeUnmount(() => clearTimeout(closeTimer))
 
     <Transition name="menu">
       <ul v-show="open" class="user-menu__list" role="menu">
-        <li role="none"><button type="button" role="menuitem" @click="go('profile')">Профиль</button></li>
-        <li role="none"><button type="button" role="menuitem" @click="go('ballot')">Анкета</button></li>
-        <li v-if="config?.devLogin" role="none">
-          <button type="button" role="menuitem" @click="go('stats')">Статистика <small>dev</small></button>
+        <!-- заголовок меню: под каким аккаунтом вход (на телефоне ника в шапке нет) -->
+        <li class="user-menu__header" role="presentation">
+          <span class="user-menu__header-name" :style="{ color: nameColor }">{{ user.displayName }}</span>
+          <span class="user-menu__header-login">@{{ user.login }}</span>
         </li>
+        <li role="none"><button type="button" role="menuitem" @click="go('profile')">Профиль</button></li>
         <li role="none"><button type="button" role="menuitem" class="is-danger" @click="go('logout')">Выйти</button></li>
       </ul>
     </Transition>
@@ -96,6 +91,8 @@ onBeforeUnmount(() => clearTimeout(closeTimer))
 <style scoped>
 .user-menu {
   position: relative;
+  min-width: 0;
+  max-width: 100%;
 }
 
 /* «чип» пользователя: высота 40dp, аватар 32dp */
@@ -103,7 +100,7 @@ onBeforeUnmount(() => clearTimeout(closeTimer))
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  max-width: var(--chip-max-w);
+  max-width: min(var(--chip-max-w), 100%);
   min-height: var(--control-h);
   padding: var(--space-1) var(--space-3) var(--space-1) var(--space-1);
   border: 1px solid var(--line);
@@ -120,6 +117,7 @@ onBeforeUnmount(() => clearTimeout(closeTimer))
 }
 
 .user-menu__name {
+  min-width: 0;
   overflow: hidden;
   font: 500 var(--type-label-l) var(--font-text);
   white-space: nowrap;
@@ -152,6 +150,26 @@ onBeforeUnmount(() => clearTimeout(closeTimer))
   position: absolute;
   inset: calc(-1 * var(--space-2)) 0 auto;
   height: var(--space-2);
+}
+
+.user-menu__header {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-3) var(--space-3);
+  margin-bottom: var(--space-2);
+  border-bottom: 1px solid var(--line);
+}
+
+.user-menu__header-name {
+  overflow: hidden;
+  font: 500 var(--type-title-s) var(--font-text);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.user-menu__header-login {
+  color: var(--muted-2);
+  font: var(--type-body-s) var(--font-text);
 }
 
 .user-menu__list button {
@@ -195,10 +213,14 @@ onBeforeUnmount(() => clearTimeout(closeTimer))
   transform: translateY(calc(-1 * var(--space-1)));
 }
 
-/* compact: ник короче, чтобы шапка не переполнялась */
+/* compact: в шапке только аватар (ник — в заголовке меню), чтобы спонсор по центру и меню не пересекались */
 @media (max-width: 599px) {
+  .user-menu__trigger {
+    padding: var(--space-1) var(--space-2) var(--space-1) var(--space-1);
+  }
+
   .user-menu__name {
-    max-width: 30vw;
+    display: none;
   }
 }
 </style>
