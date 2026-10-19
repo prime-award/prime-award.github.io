@@ -5,7 +5,7 @@ import PrimeButton from '@/components/ui/PrimeButton.vue'
 import {downloadFile, safeFileName} from '@/utils/download.ts'
 import ShareCard from './ShareCard.vue'
 
-// «Поделиться»: превью картинки «Мой выбор» и сохранение в PNG целиком в браузере.
+// «Поделиться»: превью картинки «Мой выбор» и сохранение в JPEG целиком в браузере.
 const props = defineProps<{
   open: boolean
   user: User
@@ -26,7 +26,7 @@ const error = ref<string | null>(null)
 const canShareFiles = ref(false)
 let observer: ResizeObserver | null = null
 
-const fileName = computed(() => `prime-2026-${safeFileName(props.user.login)}.png`)
+const fileName = computed(() => `prime-2026-${safeFileName(props.user.login)}.jpg`)
 
 watch(() => props.open, async (open) => {
   error.value = null
@@ -37,7 +37,7 @@ watch(() => props.open, async (open) => {
   }
   document.body.style.overflow = 'hidden'
   canShareFiles.value = typeof navigator.canShare === 'function' &&
-      navigator.canShare({files: [new File([''], 'x.png', {type: 'image/png'})]})
+      navigator.canShare({files: [new File([''], 'x.jpg', {type: 'image/jpeg'})]})
   await nextTick()
   dialog.value?.querySelector<HTMLElement>('button')?.focus()
   // превью: карточка 1080 px уменьшается под ширину окна
@@ -58,15 +58,22 @@ onBeforeUnmount(() => {
 /** Снимок карточки: html-to-image рисует DOM в canvas. Библиотека грузится только по требованию. */
 async function render(): Promise<Blob> {
   if (!card.value) throw new Error('nothing to render')
-  const {toBlob} = await import('html-to-image')
+  const node = card.value
+  const {toCanvas} = await import('html-to-image')
   await document.fonts?.ready
-  const blob = await toBlob(card.value, {
+  // размер фиксированный: 1080 × высота карточки, без умножения на плотность экрана (иначе на Retina/телефоне ×2–×3)
+  const canvas = await toCanvas(node, {
     pixelRatio: 1,
     width: CARD_WIDTH,
+    height: node.offsetHeight,
+    canvasWidth: CARD_WIDTH,
+    canvasHeight: node.offsetHeight,
     backgroundColor: '#08090b',
     // невалидная картинка не должна ломать весь снимок
     imagePlaceholder: 'data:image/gif;base64,R0lGODlhAQABAAAAACw=',
   })
+  // JPEG: в ~5 раз легче PNG на фотографиях (≈400 КБ против 2 МБ при всех 50 голосах), принимается везде
+  const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/jpeg', 0.92))
   if (!blob) throw new Error('empty image')
   return blob
 }
@@ -91,7 +98,7 @@ async function share() {
   busy.value = true
   error.value = null
   try {
-    const file = new File([await render()], fileName.value, {type: 'image/png'})
+    const file = new File([await render()], fileName.value, {type: 'image/jpeg'})
     await navigator.share({files: [file], title: 'Мой выбор — PRIME 2026'})
   } catch (e) {
     if (!(e instanceof DOMException && e.name === 'AbortError')) error.value = 'Не получилось поделиться — сохраните картинку.'
@@ -125,8 +132,8 @@ async function share() {
           <p v-if="error" class="share__error" role="alert">{{ error }}</p>
 
           <footer class="share__actions">
-            <PrimeButton variant="light" :disabled="busy" data-testid="download-png" @click="save">
-              {{ busy ? 'Готовим…' : 'Скачать PNG' }}
+            <PrimeButton variant="light" :disabled="busy" data-testid="download-image" @click="save">
+              {{ busy ? 'Готовим…' : 'Скачать картинку' }}
             </PrimeButton>
             <PrimeButton v-if="canShareFiles" :disabled="busy" @click="share">Отправить</PrimeButton>
           </footer>
