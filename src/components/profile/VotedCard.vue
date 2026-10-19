@@ -17,14 +17,12 @@ defineProps<{ item: VotedNomination }>()
 </template>
 
 <style scoped>
-/* M3 card: фото 3:4 (момент — 16:9), номинация — headline, ник — title */
+/* M3 card: фото и задник — на всю ширину карточки (3:4, момент — 16:9), текст по центру под ним */
 .voted-card {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: var(--space-2);
   height: 100%;
-  padding: var(--space-6);
+  overflow: hidden;
   border: 1px solid var(--border);
   border-radius: var(--shape-lg);
   background: var(--bg);
@@ -40,16 +38,13 @@ defineProps<{ item: VotedNomination }>()
 
 .voted-card__photo {
   position: relative;
-  width: 60%;
+  width: 100%;
   aspect-ratio: 3 / 4;
-  margin-bottom: var(--space-2);
   overflow: hidden;
-  border-radius: var(--shape-md);
   background: radial-gradient(70% 60% at 50% 45%, rgba(104, 119, 137, 0.9) 0%, rgba(56, 64, 74, 0.45) 50%, transparent 100%);
 }
 
 .voted-card__photo.is-moment {
-  width: 100%;
   aspect-ratio: 16 / 9;
 }
 
@@ -60,20 +55,24 @@ defineProps<{ item: VotedNomination }>()
   object-position: top;
 }
 
+/* фото плавно переходит в фон карточки под текстом */
 .voted-card__photo::after {
   content: '';
   position: absolute;
   inset: auto 0 0;
-  height: 35%;
+  height: 40%;
   background: linear-gradient(to top, var(--bg), transparent);
 }
 
 .voted-card__nomination {
+  margin: 0;
+  padding: var(--space-2) var(--space-4) 0;
   font: 400 var(--type-headline-m) var(--font-display);
 }
 
 .voted-card__nominee {
   margin: 0;
+  padding: var(--space-1) var(--space-4) var(--space-5);
   color: var(--text-muted);
   font: 400 var(--type-title-l) var(--font-serif);
   text-transform: uppercase;

@@ -269,22 +269,24 @@ onMounted(load)
   background: var(--accent);
 }
 
-/* «Выйти» — небольшая текстовая кнопка под цветной полосой */
+/* «Выйти»: в покое — красный текст на лёгкой подложке, при наведении — ярче, с обводкой */
 .profile-card__logout {
   min-height: var(--control-h-sm);
-  padding: 0 var(--space-3);
-  border: 0;
+  padding: 0 var(--space-4);
+  border: 1px solid transparent;
   border-radius: var(--shape-full);
-  background: none;
-  color: var(--muted-2);
-  font: var(--type-label-l) var(--font-text);
+  background: var(--state-hover);
+  color: var(--danger);
+  font: 500 var(--type-label-l) var(--font-text);
   cursor: pointer;
-  transition: color 0.2s ease, background-color 0.2s ease;
+  transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
 }
 
-.profile-card__logout:hover {
-  color: var(--danger);
-  background: var(--state-hover);
+.profile-card__logout:hover,
+.profile-card__logout:focus-visible {
+  border-color: var(--danger);
+  background: color-mix(in srgb, var(--danger) 18%, transparent);
+  color: #ffd8d3;
 }
 
 .profile-card__continue {
