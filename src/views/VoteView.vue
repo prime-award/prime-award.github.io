@@ -266,10 +266,6 @@ const actionHint = computed(() => (submitting.value ? 'Отправляем…' 
         <p class="vote__count" data-testid="nominee-count">{{ nomineeCountText }}</p>
 
         <p v-if="notice" class="vote__notice" :class="`is-${notice.kind}`" role="status">{{ notice.text }}</p>
-        <p v-else-if="voted !== null && !showChosen" class="vote__notice is-info">
-          Голос в этой номинации учтён.
-          <button type="button" class="vote__link" @click="skip">Следующая анкета →</button>
-        </p>
 
         <ul
             class="vote__grid"
@@ -318,7 +314,8 @@ const actionHint = computed(() => (submitting.value ? 'Отправляем…' 
         data-testid="skip"
         @click="skip"
     >
-      Пропустить →
+      <!-- в проголосованной номинации та же кнопка ведёт дальше, к следующей непроголосованной -->
+      {{ voted !== null ? 'Дальше →' : 'Пропустить →' }}
     </PrimeButton>
 
   </main>
@@ -404,16 +401,6 @@ const actionHint = computed(() => (submitting.value ? 'Отправляем…' 
   color: var(--danger);
 }
 
-.vote__link {
-  padding: 0;
-  border: 0;
-  background: none;
-  color: var(--text);
-  font: inherit;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  cursor: pointer;
-}
 
 /* сетка номинантов: карточки фиксированной ширины, не больше 5 в ряд, ряды (и неполный последний) — по центру */
 .vote__grid {
@@ -496,7 +483,7 @@ const actionHint = computed(() => (submitting.value ? 'Отправляем…' 
   font-variant-numeric: tabular-nums;
 }
 
-/* «Пропустить» — extended FAB M3: 56dp, скругление 16dp, правый нижний угол */
+/* «Пропустить» / «Дальше» — extended FAB M3: 56dp, скругление 16dp, правый нижний угол */
 .vote .vote__skip {
   position: fixed;
   right: var(--layout-margin);
