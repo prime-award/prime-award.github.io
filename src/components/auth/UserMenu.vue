@@ -44,7 +44,8 @@ async function go(action: 'profile' | 'logout') {
   if (action === 'profile') await router.push('/profile')
   else {
     await logout()
-    if (router.currentRoute.value.meta.requiresAuth) await router.push('/')
+    // после выхода — всегда на главную
+    await router.push('/')
   }
 }
 
