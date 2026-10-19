@@ -45,7 +45,10 @@ const solid = computed(() => !heroInView.value)
       <nav v-if="isLoggedIn && route.name !== 'home'" class="app-header__links" aria-label="Разделы">
         <RouterLink to="/">Главная</RouterLink>
       </nav>
-      <UserMenu v-if="isLoggedIn"/>
+      <template v-if="isLoggedIn">
+        <!-- в профиле меню не нужно: визитка уже показывает пользователя и «Выйти» -->
+        <UserMenu v-if="route.name !== 'profile'"/>
+      </template>
       <button
           v-else
           type="button"

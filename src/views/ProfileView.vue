@@ -162,7 +162,7 @@ onMounted(load)
   padding-bottom: var(--space-16);
 }
 
-/* compact–expanded: визитка сверху по центру; large+: слева, номинации справа */
+/* compact–expanded: визитка сверху по центру; large+: список номинаций слева, визитка справа */
 .profile__layout {
   display: grid;
   gap: var(--space-12);
@@ -181,12 +181,12 @@ onMounted(load)
 
 @media (min-width: 1200px) {
   .profile__layout {
-    grid-template-columns: 320px minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) 320px;
     align-items: start;
-    gap: var(--space-12);
   }
 
   .profile__side {
+    order: 2;
     position: sticky;
     top: calc(var(--header-h) + var(--space-6));
     width: 100%;

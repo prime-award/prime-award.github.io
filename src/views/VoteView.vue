@@ -51,9 +51,15 @@ useHead({title: computed(() => (nomination.value ? `${nomination.value.name} —
 
 const voted = computed(() => (nomination.value ? votedNomineeId(nomination.value.id) : null))
 // в проголосованной номинации выбор — первым; сразу после голоса (статус «Выбрано») порядок не трогаем, чтобы карточка не прыгала
-const nominees = computed(() =>
-    nomination.value ? votedFirst(nomination.value.nominees, showChosen.value ? null : voted.value) : [],
-)
+// Порядок карточек фиксируется один раз при загрузке номинации (выбор пользователя — первым, если он уже голосовал)
+// и дальше не меняется: ни после голоса, ни пока анкета уходит к следующей — иначе карточка «перескакивает».
+const order = ref<number[]>([])
+const nominees = computed(() => {
+  const list = nomination.value?.nominees ?? []
+  const byId = new Map(list.map((n) => [n.id, n]))
+  const ordered = order.value.map((id) => byId.get(id)).filter((n) => n !== undefined)
+  return ordered.length === list.length ? ordered : list
+})
 const votingOpen = computed(() => config.value?.votingOpen ?? true)
 const readOnly = computed(() => voted.value !== null || !votingOpen.value)
 const isMoment = computed(() => nomination.value?.type === 'MOMENT')
@@ -70,12 +76,14 @@ async function load() {
   loading.value = !nomination.value || nomination.value.id !== target
   loadError.value = null
   activeId.value = null
-  showChosen.value = false
   notice.value = null
   playerOverride.value = null
   try {
     const [data] = await Promise.all([getNomination(target), loadVotes(), loadSummary(), loadConfig()])
     if (target !== nominationId.value) return
+    order.value = votedFirst(data.nominees, votedNomineeId(data.id)).map((n) => n.id)
+    // «Выбрано» сбрасываем, только когда пришла новая номинация: пока старая на экране, её вид не меняется
+    showChosen.value = false
     nomination.value = data
 
     // «Выбрать» на главной: сразу подсвечиваем выбранного номинанта
@@ -107,7 +115,6 @@ function stateOf(nomineeId: number): CardState {
  * второе по той же карточке — подтверждение и отправка голоса.
  */
 function select(nominee: Nominee) {
-  if (isMoment.value && activeId.value !== nominee.id) playMoment(nominee)
   if (readOnly.value || submitting.value) return
   notice.value = null
 
