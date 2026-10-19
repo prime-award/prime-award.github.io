@@ -52,6 +52,7 @@
   --space-8: 32px;
   --space-10: 40px;
   --space-12: 48px;
+  --space-14: 56px;
   --space-16: 64px;
   --space-20: 80px;
   --space-24: 96px;
@@ -98,7 +99,7 @@
 
   /* ---- раскладка (переключается по классам окна) ---- */
   --layout-margin: var(--space-4);
-  --layout-gutter: var(--space-4);
+  --layout-gutter: var(--space-2);
   --section-gap: var(--space-12);
 
   /* ---- ролевые типографские токены (compact) ---- */

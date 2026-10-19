@@ -54,6 +54,10 @@ function stateOf(nomineeId: number) {
 </template>
 
 <style scoped>
+.nomination-row {
+  margin: 0;
+}
+
 .nomination-row__strip {
   margin-top: var(--space-6);
 }

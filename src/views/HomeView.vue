@@ -60,29 +60,30 @@ loadVotes()
   <main class="home">
     <MainBlock :title-lines="['Кто станет', 'королём рунета 2026?']">
       <template #actions>
-        <PrimeButton variant="light" size="lg" data-testid="vote-cta" @click="openNextBallot">Проголосовать</PrimeButton>
+        <PrimeButton variant="light" size="lg" data-testid="vote-cta" @click="openNextBallot">Проголосовать
+        </PrimeButton>
       </template>
     </MainBlock>
 
-    <!-- подпись премии + спонсоры: не второй заголовок после главного экрана, а «подпись под гербом» -->
     <section class="home__partners">
-      <p class="home__tagline">Главная народная премия ру-стриминга</p>
       <SponsorsSection/>
     </section>
 
     <div class="home__list page-container" id="nominations" :aria-busy="loading">
       <h2 class="display home__list-title">Номинации</h2>
 
-      <NominationRow
-          v-for="nomination in items"
-          :key="nomination.id"
-          :nomination="nomination"
-          :voted-nominee-id="votedNomineeId(nomination.id)"
-          @choose="(nomineeId) => openBallot(nomination.id, nomineeId)"
-      />
+      <div v-if="items.length || loading" class="home__rows">
+        <NominationRow
+            v-for="nomination in items"
+            :key="nomination.id"
+            :nomination="nomination"
+            :voted-nominee-id="votedNomineeId(nomination.id)"
+            @choose="(nomineeId) => openBallot(nomination.id, nomineeId)"
+        />
 
-      <div v-if="!items.length && loading" class="home__skeleton" aria-hidden="true">
-        <div v-for="i in 2" :key="i" class="home__skeleton-row"/>
+        <div v-if="!items.length && loading" class="home__skeleton" aria-hidden="true">
+          <div v-for="i in 2" :key="i" class="home__skeleton-row"/>
+        </div>
       </div>
 
       <p v-if="error" class="home__error">
@@ -108,38 +109,11 @@ loadVotes()
   padding-top: var(--space-10);
 }
 
-/* подпись премии: капс с разрядкой и тонкими линиями по бокам */
-.home__tagline {
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
-  max-width: 720px;
-  margin: 0 auto var(--space-4);
-  padding-inline: var(--layout-margin);
-  color: var(--text-muted);
-  font: 400 var(--type-title-m) var(--font-serif);
-  letter-spacing: 0.24em;
-  text-align: center;
-  text-transform: uppercase;
-}
-
-.home__tagline::before,
-.home__tagline::after {
-  content: '';
-  flex: 1;
-  min-width: var(--space-6);
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--line-strong));
-}
-
-.home__tagline::after {
-  background: linear-gradient(90deg, var(--line-strong), transparent);
-}
 
 .home__list {
   display: grid;
-  gap: var(--section-gap);
-  padding-block: var(--space-12) var(--space-12);
+  gap: var(--space-4);
+  padding-block: var(--space-6) var(--space-2);
   scroll-margin-top: calc(var(--header-h) + var(--space-2));
 }
 
@@ -147,6 +121,12 @@ loadVotes()
 .home__list-title {
   font: 400 var(--type-page-title) var(--font-display);
   text-align: center;
+}
+
+/* строки номинаций: свой зазор между собой, независимый от отступов заголовка и кнопки */
+.home__rows {
+  display: grid;
+  gap: var(--space-8);
 }
 
 .home__more {
@@ -184,6 +164,8 @@ loadVotes()
 }
 
 @keyframes shimmer {
-  to { background-position: -200% 0; }
+  to {
+    background-position: -200% 0;
+  }
 }
 </style>

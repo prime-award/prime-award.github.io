@@ -17,7 +17,12 @@ import primeLogo from '@/assets/prime-logo-2026.webp'
 
 useHead({title: 'Профиль — PRIME 2026'})
 
-const PLATFORM_TITLE: Record<string, string> = {TWITCH: 'Twitch', KICK: 'Kick', VK: 'VK Video Live', DEV: 'тестовый аккаунт'}
+const PLATFORM_TITLE: Record<string, string> = {
+  TWITCH: 'Twitch',
+  KICK: 'Kick',
+  VK: 'VK Video Live',
+  DEV: 'тестовый аккаунт'
+}
 
 const route = useRoute()
 const {user} = useAuth()
@@ -61,16 +66,17 @@ onMounted(load)
           <div class="profile-card__who">
             <UserAvatar class="profile-card__avatar" :user="user" :size="88"/>
             <h1 class="profile-card__name">{{ user.displayName }}</h1>
-            <span class="profile-card__accent" :style="{ background: user.nameColor ?? 'var(--border)' }" aria-hidden="true"/>
-            <p class="profile-card__login">@{{ user.login }}</p>
+            <span class="profile-card__accent" :style="{ background: user.nameColor ?? 'var(--border)' }"
+                  aria-hidden="true"/>
           </div>
 
           <footer v-if="data" class="profile-card__progress" data-testid="progress">
             <div class="profile-card__progress-row">
-              <span>Голоса</span>
+              <span>Голосов</span>
               <span class="profile-card__count"><b>{{ votedCount }}</b> / {{ total }}</span>
             </div>
-            <div class="profile-card__bar" role="progressbar" :aria-valuenow="votedCount" aria-valuemin="0" :aria-valuemax="total">
+            <div class="profile-card__bar" role="progressbar" :aria-valuenow="votedCount" aria-valuemin="0"
+                 :aria-valuemax="total">
               <span :style="{ width: `${percent}%` }"/>
             </div>
           </footer>
@@ -88,14 +94,17 @@ onMounted(load)
         </p>
 
         <div v-if="error" class="profile__error" role="alert">
-          {{ error }} <PrimeButton size="sm" @click="load">Повторить</PrimeButton>
+          {{ error }}
+          <PrimeButton size="sm" @click="load">Повторить</PrimeButton>
         </div>
 
-        <div v-else-if="!data" class="profile__loading"><AppLoader/></div>
+        <div v-else-if="!data" class="profile__loading">
+          <AppLoader/>
+        </div>
 
         <template v-else>
           <ProfileSection
-              title="Ждут вашего голоса:"
+              title="Ждут вашего голоса"
               :items="data.unvoted"
               :item-key="(n) => n.id"
               empty-text="Вы проголосовали во всех номинациях."
@@ -107,7 +116,7 @@ onMounted(load)
           </ProfileSection>
 
           <ProfileSection
-              title="Ваш выбор:"
+              title="Ваш выбор"
               :items="data.voted"
               :item-key="(v) => v.nomination.id"
               empty-text="Здесь появятся номинанты, за которых вы проголосуете."
@@ -180,9 +189,8 @@ onMounted(load)
   padding: var(--space-5);
   border: 1px solid var(--border);
   border-radius: var(--shape-lg);
-  background:
-      radial-gradient(90% 70% at 50% 0%, rgba(104, 119, 137, 0.22) 0%, transparent 70%),
-      linear-gradient(160deg, var(--surface-2) 0%, var(--bg) 100%);
+  background: radial-gradient(90% 70% at 50% 0%, rgba(104, 119, 137, 0.22) 0%, transparent 70%),
+  linear-gradient(160deg, var(--surface-2) 0%, var(--bg) 100%);
   box-shadow: 0 4px 8px 3px rgba(0, 0, 0, 0.15), 0 1px 3px rgba(0, 0, 0, 0.3);
   text-align: center;
 }
@@ -245,11 +253,6 @@ onMounted(load)
   border-radius: var(--shape-full);
 }
 
-.profile-card__login {
-  margin: 0;
-  color: var(--muted-2);
-  font: var(--type-body-m) var(--font-serif);
-}
 
 .profile-card__progress {
   display: grid;

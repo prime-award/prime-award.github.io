@@ -69,7 +69,7 @@ onBeforeUnmount(() => resizeObserver?.disconnect())
   display: grid;
   grid-auto-flow: column;
   grid-auto-columns: calc((100% - (var(--per-view) - 1) * var(--layout-gutter)) / var(--per-view));
-  gap: var(--layout-gutter);
+  gap: var(--space-4);
   margin: 0;
   padding: var(--space-1) 0;
   list-style: none;

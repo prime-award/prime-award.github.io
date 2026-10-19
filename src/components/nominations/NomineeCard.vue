@@ -4,7 +4,6 @@ import type {Nominee} from '@/api'
 import {mediaUrl} from '@/utils/media.ts'
 import type {CardState} from './cardState.ts'
 
-// Карточка стримера (370×524 в макете): фото, ник внизу на градиенте.
 const props = withDefaults(defineProps<{
   nominee: Nominee
   state?: CardState
@@ -85,12 +84,12 @@ const photo = computed(() => mediaUrl(props.nominee.photoPath))
   border-radius: var(--shape-lg);
   background: var(--bg);
   isolation: isolate;
+  aspect-ratio: 3 / 4;
   transition: border-color 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
 }
 
 .nominee-card__media {
   position: relative;
-  aspect-ratio: 3 / 4;
   overflow: hidden;
   background: radial-gradient(70% 60% at 50% 45%, rgba(104, 119, 137, 0.9) 0%, rgba(56, 64, 74, 0.45) 50%, transparent 100%);
 }
@@ -281,6 +280,9 @@ const photo = computed(() => mediaUrl(props.nominee.photoPath))
 }
 
 @keyframes action-in {
-  from { opacity: 0; transform: scale(0.96); }
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
 }
 </style>

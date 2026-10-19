@@ -19,7 +19,11 @@ const remaining = computed(() => (endsAt.value === null ? null : formatRemaining
 const endDate = computed(() =>
     endsAt.value === null
         ? ''
-        : new Intl.DateTimeFormat('ru-RU', {day: 'numeric', month: 'long', timeZone: 'Europe/Moscow'}).format(endsAt.value),
+        : new Intl.DateTimeFormat('ru-RU', {
+          day: 'numeric',
+          month: 'long',
+          timeZone: 'Europe/Moscow'
+        }).format(endsAt.value),
 )
 </script>
 
@@ -43,12 +47,6 @@ const endDate = computed(() =>
   justify-content: center;
   width: 100%;
   padding: var(--space-8) var(--layout-margin);
-  background: linear-gradient(
-      rgba(104, 119, 137, 0.05) 0%,
-      transparent 40%,
-      transparent 60%,
-      rgba(104, 119, 137, 0.05) 100%
-  );
 }
 
 .countdown__text {
