@@ -3,10 +3,12 @@ import {computed, nextTick, ref, watch} from 'vue'
 import {useAuth} from '@/composable/useAuth.ts'
 import {useAppConfig} from '@/composable/useAppConfig.ts'
 import {useLoginModal} from '@/composable/useLoginModal.ts'
+import {API_URL} from '@/api'
 
 const {isOpen, redirectPath, close} = useLoginModal()
 const {login} = useAuth()
-const {config, load} = useAppConfig()
+const {config, status, load} = useAppConfig()
+const isDev = import.meta.env.DEV
 
 const dialog = ref<HTMLElement | null>(null)
 const pending = ref<string | null>(null)
@@ -31,7 +33,8 @@ watch(isOpen, async (value) => {
   if (value) {
     returnFocus = document.activeElement as HTMLElement | null
     pending.value = null
-    load()
+    // при каждом открытии сверяемся с сервером: его могли перезапустить с ключами провайдеров
+    load(true)
     document.body.style.overflow = 'hidden'
     await nextTick()
     dialog.value?.querySelector<HTMLElement>('button:not([disabled])')?.focus()
@@ -73,6 +76,12 @@ function trapFocus(event: KeyboardEvent) {
           <h2 id="login-title" class="display modal__title">Вход</h2>
           <p class="modal__text">Чтобы проголосовать, войдите через стриминговую платформу. Один аккаунт — один голос в каждой номинации.</p>
 
+          <div v-if="status === 'error' && !config" class="modal__error" role="alert">
+            Не удалось связаться с сервером входа.
+            <small v-if="isDev">API: {{ API_URL }} — бэкенд запущен?</small>
+            <button type="button" class="modal__retry" @click="load(true)">Повторить</button>
+          </div>
+
           <ul class="modal__providers">
             <li v-for="p in providers" :key="p.id">
               <button
@@ -85,7 +94,14 @@ function trapFocus(event: KeyboardEvent) {
               >
                 <svg class="provider__icon" viewBox="0 0 24 24" aria-hidden="true"><path :d="p.mark"/></svg>
                 <span class="provider__title">{{ p.title }}</span>
-                <small v-if="!p.enabled" class="provider__note">скоро</small>
+                <small v-if="!config && status !== 'error'" class="provider__note">…</small>
+                <small v-else-if="!config" class="provider__note">нет связи</small>
+                <!-- в разработке подсказываем причину: бэкенд запущен без ключей провайдера -->
+                <small
+                    v-else-if="!p.enabled"
+                    class="provider__note"
+                    :title="isDev ? `Бэкенд запущен без ${p.id.toUpperCase()}_CLIENT_ID / ${p.id.toUpperCase()}_CLIENT_SECRET` : undefined"
+                >{{ isDev ? 'нет ключей' : 'скоро' }}</small>
                 <small v-else-if="pending === p.id" class="provider__note">переходим…</small>
               </button>
             </li>
@@ -165,6 +181,33 @@ function trapFocus(event: KeyboardEvent) {
   font-size: 15px;
   line-height: 1.45;
   text-align: center;
+}
+
+.modal__error {
+  display: grid;
+  gap: 6px;
+  margin: 0 0 16px;
+  padding: 12px 14px;
+  border: 1px solid color-mix(in srgb, var(--danger) 45%, transparent);
+  border-radius: 12px;
+  color: var(--danger);
+  font-size: 14px;
+  text-align: center;
+}
+
+.modal__error small {
+  color: var(--muted-2);
+  overflow-wrap: anywhere;
+}
+
+.modal__retry {
+  justify-self: center;
+  padding: 6px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
 }
 
 .modal__providers {
