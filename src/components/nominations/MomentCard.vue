@@ -112,7 +112,7 @@ const timecode = computed(() =>
   object-fit: cover;
   object-position: 50% 20%;
   opacity: 0;
-  transition: opacity 0.4s ease, filter 0.3s ease, transform 0.4s ease;
+  transition: opacity 0.4s ease, filter 0.3s ease;
 }
 
 .moment-card__preview img.is-loaded {
@@ -248,10 +248,6 @@ const timecode = computed(() =>
     border-color: var(--text);
   }
 
-  .moment-card.is-idle:hover .moment-card__preview img {
-    transform: scale(1.03);
-  }
-
   .moment-card.has-hover-label.is-idle:hover .moment-card__hover-label {
     opacity: 1;
     transform: none;
@@ -298,8 +294,19 @@ const timecode = computed(() =>
   text-shadow: 0 1px 6px rgba(0, 0, 0, 0.8);
 }
 
+/* selected: толстая рамка — отдельным слоем поверх, чтобы не менялась геометрия карточки (иначе содержимое сдвигается) */
 .moment-card.is-selected {
-  border: 3px solid var(--text);
+  border-color: var(--text);
+}
+
+.moment-card.is-selected::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border: 2px solid var(--text);
+  border-radius: inherit;
+  pointer-events: none;
 }
 
 .moment-card.is-dimmed {

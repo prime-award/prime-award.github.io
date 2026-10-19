@@ -11,7 +11,6 @@ import geekText from '../assets/geek-text.png'
 
 <template>
   <section class="sponsors">
-    <h2 class="heading">При поддержкЕ</h2>
     <ul class="brands">
       <li>
         <SponsorButton
@@ -58,13 +57,6 @@ import geekText from '../assets/geek-text.png'
   margin: 0 0 var(--space-5);
   padding: 0 var(--layout-margin);
   background: var(--bg);
-}
-
-.heading {
-  margin: var(--space-4) 0 var(--space-2);
-  font: 400 var(--type-headline-s) var(--font-display);
-  color: var(--text);
-  text-align: center;
 }
 
 /* compact: спонсоры друг под другом */

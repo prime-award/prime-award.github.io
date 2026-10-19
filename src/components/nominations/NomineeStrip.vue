@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {nextTick, onBeforeUnmount, onMounted, ref, watch} from 'vue'
 
-// Горизонтальная лента карточек с треугольниками: стрелки сдвигают на одну карточку,
+// Горизонтальная лента карточек с треугольниками: стрелки листают по страницам (сколько карточек видно),
 // на тач-устройствах лента листается пальцем (нативный скролл со scroll-snap).
 const props = defineProps<{ count: number, label: string }>()
 
@@ -17,12 +17,12 @@ function update() {
   canNext.value = el.scrollLeft + el.clientWidth < el.scrollWidth - 2
 }
 
+/** Листаем страницами: на ширину видимой области; scroll-snap выравнивает по началу карточки. */
 function step(direction: 1 | -1) {
   const el = track.value
-  const card = el?.firstElementChild as HTMLElement | null
-  if (!el || !card) return
+  if (!el) return
   const gap = parseFloat(getComputedStyle(el).columnGap) || 0
-  el.scrollBy({left: direction * (card.offsetWidth + gap), behavior: 'smooth'})
+  el.scrollBy({left: direction * (el.clientWidth + gap), behavior: 'smooth'})
 }
 
 onMounted(() => {

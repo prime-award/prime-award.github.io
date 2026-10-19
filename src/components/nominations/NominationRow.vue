@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import {computed} from 'vue'
 import type {Nomination} from '@/api'
+import {votedFirst} from './votedFirst.ts'
 import MomentCard from './MomentCard.vue'
 import NominationTitle from './NominationTitle.vue'
 import NomineeCard from './NomineeCard.vue'
@@ -14,6 +16,11 @@ const props = defineProps<{
 
 const emit = defineEmits<{ choose: [nomineeId: number] }>()
 
+// за кого голос — тот первым в ленте
+const nominees = computed(() => votedFirst(props.nomination.nominees, props.votedNomineeId))
+// после голоса подпись при наведении не нужна: карточка ведёт в анкету только для просмотра
+const hoverLabel = computed(() => (props.votedNomineeId ? undefined : 'Выбрать'))
+
 function stateOf(nomineeId: number) {
   return props.votedNomineeId === nomineeId ? 'selected' : 'idle'
 }
@@ -24,13 +31,13 @@ function stateOf(nomineeId: number) {
     <NominationTitle :id="`nomination-${nomination.id}`" :nomination="nomination" year="2026"/>
 
     <NomineeStrip class="nomination-row__strip" :count="nomination.nominees.length" :label="`Номинанты: ${nomination.name}`">
-      <li v-for="nominee in nomination.nominees" :key="nominee.id">
+      <li v-for="nominee in nominees" :key="nominee.id">
         <MomentCard
             v-if="nomination.type === 'MOMENT'"
             :nominee="nominee"
             :state="stateOf(nominee.id)"
             :badge="votedNomineeId === nominee.id ? 'Ваш выбор' : undefined"
-            :hover-label="votedNomineeId ? 'Смотреть' : 'Выбрать'"
+            :hover-label="hoverLabel"
             @select="emit('choose', nominee.id)"
         />
         <NomineeCard
@@ -38,7 +45,7 @@ function stateOf(nomineeId: number) {
             :nominee="nominee"
             :state="stateOf(nominee.id)"
             :badge="votedNomineeId === nominee.id ? 'Ваш выбор' : undefined"
-            :hover-label="votedNomineeId ? 'Смотреть' : 'Выбрать'"
+            :hover-label="hoverLabel"
             @select="emit('choose', nominee.id)"
         />
       </li>

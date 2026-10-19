@@ -106,7 +106,7 @@ const photo = computed(() => mediaUrl(props.nominee.photoPath))
   object-fit: cover;
   object-position: top;
   opacity: 0;
-  transition: opacity 0.4s ease, filter 0.3s ease, transform 0.4s ease;
+  transition: opacity 0.4s ease, filter 0.3s ease;
 }
 
 .nominee-card__media img.is-loaded {
@@ -197,10 +197,6 @@ const photo = computed(() => mediaUrl(props.nominee.photoPath))
     border-color: var(--text);
   }
 
-  .nominee-card.is-idle:hover .nominee-card__media img {
-    transform: scale(1.02);
-  }
-
   .nominee-card.has-hover-label.is-idle:hover .nominee-card__hover-label {
     opacity: 1;
     transform: none;
@@ -255,8 +251,19 @@ const photo = computed(() => mediaUrl(props.nominee.photoPath))
   text-shadow: 0 1px 6px rgba(0, 0, 0, 0.8);
 }
 
+/* selected: толстая рамка — отдельным слоем поверх, чтобы не менялась геометрия карточки (иначе содержимое сдвигается) */
 .nominee-card.is-selected {
-  border: 3px solid var(--text);
+  border-color: var(--text);
+}
+
+.nominee-card.is-selected::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border: 2px solid var(--text);
+  border-radius: inherit;
+  pointer-events: none;
 }
 
 .nominee-card.is-dimmed {

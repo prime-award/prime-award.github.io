@@ -1,14 +1,12 @@
 <script setup lang="ts">
-import {computed, ref, watch} from 'vue'
-import {useRoute, useRouter} from 'vue-router'
+import {computed, ref} from 'vue'
 import {useHead} from '@unhead/vue'
-import {api, type Page, type Nomination} from '@/api'
+import {api, type Nomination} from '@/api'
 import MainBlock from '@/components/MainBlock.vue'
 import SponsorsSection from '@/components/SponsorsSection.vue'
 import ContactAs from '@/components/ContactAs.vue'
 import VotingInfo from '@/components/home/VotingInfo.vue'
 import NominationRow from '@/components/nominations/NominationRow.vue'
-import PageNav from '@/components/ui/PageNav.vue'
 import PrimeButton from '@/components/ui/PrimeButton.vue'
 import {useMyVotes} from '@/composable/useMyVotes.ts'
 import {useVoteNavigation} from '@/composable/useVoteNavigation.ts'
@@ -22,45 +20,40 @@ useHead({
   link: [{rel: 'canonical', href: 'https://prime-award.ru/'}],
 })
 
-const PAGE_SIZE = 4
+// номинации подгружаются порциями: сначала 3, «Показать ещё» добавляет по 3 снизу
+const CHUNK = 3
 
-const route = useRoute()
-const router = useRouter()
 const {openNextBallot, openBallot} = useVoteNavigation()
 const {votedNomineeId, load: loadVotes} = useMyVotes()
 
-const page = computed(() => {
-  const n = Number(route.query.page)
-  return Number.isInteger(n) && n >= 1 ? n : 1
-})
-
-const data = ref<Page<Nomination> | null>(null)
+const items = ref<Nomination[]>([])
+const total = ref<number | null>(null)
+const loadedPages = ref(0)
 const loading = ref(false)
 const error = ref<string | null>(null)
-const listTop = ref<HTMLElement | null>(null)
-let requestId = 0
 
-async function load() {
-  const id = ++requestId
+const hasMore = computed(() => total.value === null || items.value.length < total.value)
+
+async function loadMore() {
+  if (loading.value || !hasMore.value) return
   loading.value = true
   error.value = null
   try {
-    const result = await api.nominationsPage(page.value, PAGE_SIZE)
-    if (id === requestId) data.value = result
+    const page = await api.nominationsPage(loadedPages.value + 1, CHUNK)
+    // защита от дублей, если каталог поменялся между запросами
+    const known = new Set(items.value.map((n) => n.id))
+    items.value = [...items.value, ...page.items.filter((n) => !known.has(n.id))]
+    total.value = page.totalItems
+    loadedPages.value = page.page
   } catch (e) {
-    if (id === requestId) error.value = e instanceof Error ? e.message : 'Не удалось загрузить номинации'
+    error.value = e instanceof Error ? e.message : 'Не удалось загрузить номинации'
   } finally {
-    if (id === requestId) loading.value = false
+    loading.value = false
   }
 }
 
-watch(page, load, {immediate: true})
+loadMore()
 loadVotes()
-
-function changePage(next: number) {
-  router.push({query: {...route.query, page: next === 1 ? undefined : String(next)}})
-  listTop.value?.scrollIntoView({behavior: 'smooth', block: 'start'})
-}
 </script>
 
 <template>
@@ -71,79 +64,93 @@ function changePage(next: number) {
       </template>
     </MainBlock>
 
-    <section class="home__intro page-container">
-      <h2 class="display home__intro-title">Главная народная премия ру-&nbsp;стриминга</h2>
+    <!-- подпись премии + спонсоры: не второй заголовок после главного экрана, а «подпись под гербом» -->
+    <section class="home__partners">
+      <p class="home__tagline">Главная народная премия ру-стриминга</p>
+      <SponsorsSection/>
     </section>
 
-    <SponsorsSection/>
+    <div class="home__list page-container" id="nominations" :aria-busy="loading">
+      <NominationRow
+          v-for="nomination in items"
+          :key="nomination.id"
+          :nomination="nomination"
+          :voted-nominee-id="votedNomineeId(nomination.id)"
+          @choose="(nomineeId) => openBallot(nomination.id, nomineeId)"
+      />
 
-    <VotingInfo/>
+      <div v-if="!items.length && loading" class="home__skeleton" aria-hidden="true">
+        <div v-for="i in 2" :key="i" class="home__skeleton-row"/>
+      </div>
 
-    <div ref="listTop" class="home__list-anchor" id="nominations"/>
-
-    <div class="home__list page-container" :class="{ 'is-loading': loading && data }" :aria-busy="loading">
       <p v-if="error" class="home__error">
         {{ error }}
-        <PrimeButton size="sm" @click="load">Повторить</PrimeButton>
+        <PrimeButton size="sm" @click="loadMore">Повторить</PrimeButton>
       </p>
 
-      <template v-else-if="data">
-        <NominationRow
-            v-for="nomination in data.items"
-            :key="nomination.id"
-            :nomination="nomination"
-            :voted-nominee-id="votedNomineeId(nomination.id)"
-            @choose="(nomineeId) => openBallot(nomination.id, nomineeId)"
-        />
-      </template>
-
-      <div v-else class="home__skeleton" aria-hidden="true">
-        <div v-for="i in 2" :key="i" class="home__skeleton-row"/>
+      <div v-else-if="items.length && hasMore" class="home__more">
+        <PrimeButton :disabled="loading" data-testid="show-more" @click="loadMore">
+          {{ loading ? 'Загружаем…' : 'Показать ещё' }}
+        </PrimeButton>
       </div>
     </div>
 
-    <PageNav
-        v-if="data"
-        class="home__pages"
-        :page="page"
-        :total="data.totalPages"
-        label="Страницы номинаций"
-        @change="changePage"
-    />
+    <VotingInfo/>
 
     <ContactAs/>
   </main>
 </template>
 
 <style scoped>
-.home__intro {
-  padding-block: var(--space-6) var(--space-8);
+.home__partners {
+  padding-top: var(--space-10);
+}
+
+/* подпись премии: капс с разрядкой и тонкими линиями по бокам */
+.home__tagline {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  max-width: 720px;
+  margin: 0 auto var(--space-4);
+  padding-inline: var(--layout-margin);
+  color: var(--text-muted);
+  font: 400 var(--type-title-m) var(--font-serif);
+  letter-spacing: 0.24em;
   text-align: center;
+  text-transform: uppercase;
 }
 
-.home__intro-title {
-  font: 400 var(--type-display-s) var(--font-display);
+.home__tagline::before,
+.home__tagline::after {
+  content: '';
+  flex: 1;
+  min-width: var(--space-6);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--line-strong));
 }
 
-.home__list-anchor {
-  scroll-margin-top: calc(var(--header-h) + var(--space-2));
+.home__tagline::after {
+  background: linear-gradient(90deg, var(--line-strong), transparent);
 }
 
 .home__list {
   display: grid;
   gap: var(--section-gap);
-  padding-block: var(--space-8) var(--space-10);
-  transition: opacity 0.2s ease;
+  padding-block: var(--space-12) var(--space-12);
+  scroll-margin-top: calc(var(--header-h) + var(--space-2));
 }
 
-.home__list.is-loading {
-  opacity: 0.5;
+.home__more {
+  display: flex;
+  justify-content: center;
 }
 
 .home__error {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+  justify-content: center;
   gap: var(--space-4);
   color: var(--danger);
 }
@@ -153,7 +160,7 @@ function changePage(next: number) {
   gap: var(--space-12);
 }
 
-/* заглушка строки номинаций: высота карточки 3:4 при 4 колонках */
+/* заглушка строки номинаций, пока не пришли данные */
 .home__skeleton-row {
   aspect-ratio: 3 / 1;
   border-radius: var(--shape-lg);
@@ -161,23 +168,10 @@ function changePage(next: number) {
   animation: shimmer 1.4s linear infinite;
 }
 
-.home__pages {
-  padding-bottom: var(--space-12);
-}
-
-@media (min-width: 840px) {
-  .home__intro {
-    padding-block: var(--space-8) var(--space-10);
-  }
-
-  .home__intro-title {
-    font: 400 var(--type-display-m) var(--font-display);
-  }
-}
-
-@media (min-width: 1200px) {
-  .home__intro-title {
-    font: 400 var(--type-display-l) var(--font-display);
+@media (max-width: 599px) {
+  .home__tagline {
+    font: 400 var(--type-label-l) var(--font-serif);
+    letter-spacing: 0.16em;
   }
 }
 

@@ -1,50 +1,80 @@
 <script setup lang="ts">
-import {computed} from 'vue'
+import {computed, onBeforeUnmount, onMounted, ref} from 'vue'
 import {useAppConfig} from '@/composable/useAppConfig.ts'
+import {formatRemaining} from '@/utils/countdown.ts'
 
+// Обратный отсчёт до конца голосования (по оформлению — как DateBlock демо-экрана), обновляется в реальном времени.
 const {config} = useAppConfig()
 
-const deadline = computed(() => {
-  if (!config.value) return null
-  return new Intl.DateTimeFormat('ru-RU', {day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'Europe/Moscow'})
-      .format(new Date(config.value.votingEndsAt))
+const now = ref(Date.now())
+let timer: ReturnType<typeof setInterval> | undefined
+
+onMounted(() => {
+  timer = setInterval(() => (now.value = Date.now()), 1000)
 })
+onBeforeUnmount(() => clearInterval(timer))
+
+const endsAt = computed(() => (config.value ? new Date(config.value.votingEndsAt).getTime() : null))
+const remaining = computed(() => (endsAt.value === null ? null : formatRemaining(endsAt.value - now.value)))
+const endDate = computed(() =>
+    endsAt.value === null
+        ? ''
+        : new Intl.DateTimeFormat('ru-RU', {day: 'numeric', month: 'long', timeZone: 'Europe/Moscow'}).format(endsAt.value),
+)
 </script>
 
 <template>
-  <section class="voting-info page-container">
-    <h2 class="voting-info__title">
-      <template v-if="!config">Голосование</template>
-      <template v-else-if="config.votingOpen">Голосование открыто до {{ deadline }}</template>
-      <template v-else>Голосование завершено {{ deadline }}</template>
+  <section v-if="endsAt !== null" class="countdown" aria-live="polite">
+    <h2 v-if="remaining" class="countdown__text">
+      До завершения голосования<br/>
+      <span class="countdown__value" data-testid="countdown">{{ remaining }}</span>
     </h2>
-    <p class="voting-info__text">Выбирайте своих фаворитов среди главных имён года.</p>
+    <h2 v-else class="countdown__text">
+      Голосование завершено<br/>
+      <span class="countdown__value">{{ endDate }}</span>
+    </h2>
   </section>
 </template>
 
 <style scoped>
-.voting-info {
-  padding-block: var(--space-12) 0;
+.countdown {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: var(--space-8) var(--layout-margin);
+  background: linear-gradient(
+      rgba(104, 119, 137, 0.05) 0%,
+      transparent 40%,
+      transparent 60%,
+      rgba(104, 119, 137, 0.05) 100%
+  );
 }
 
-.voting-info__title {
+.countdown__text {
   margin: 0;
-  font: 700 var(--type-headline-s) var(--font-serif);
+  color: var(--text-muted);
+  font: 400 var(--type-headline-s) var(--font-display);
+  text-align: center;
 }
 
-.voting-info__text {
-  margin: var(--space-2) 0 0;
-  color: var(--text-muted);
-  font: var(--type-body-l) var(--font-serif);
+.countdown__value {
+  color: var(--text);
+  font: 400 var(--type-display-s) var(--font-display);
+  font-variant-numeric: tabular-nums;
 }
 
 @media (min-width: 840px) {
-  .voting-info__title {
-    font: 700 var(--type-headline-l) var(--font-serif);
+  .countdown {
+    padding-block: var(--space-12);
   }
 
-  .voting-info__text {
-    font: var(--type-title-l) var(--font-serif);
+  .countdown__text {
+    font: 400 var(--type-headline-l) var(--font-display);
+  }
+
+  .countdown__value {
+    font: 400 var(--type-display-m) var(--font-display);
   }
 }
 </style>

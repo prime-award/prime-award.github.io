@@ -8,6 +8,7 @@ import MomentCard from '@/components/nominations/MomentCard.vue'
 import NominationTitle from '@/components/nominations/NominationTitle.vue'
 import NomineeCard from '@/components/nominations/NomineeCard.vue'
 import type {CardState} from '@/components/nominations/cardState.ts'
+import {votedFirst} from '@/components/nominations/votedFirst.ts'
 import PrimeButton from '@/components/ui/PrimeButton.vue'
 import NominationPlayer from '@/components/vote/NominationPlayer.vue'
 import {useAppConfig} from '@/composable/useAppConfig.ts'
@@ -47,6 +48,10 @@ const playerOverride = ref<string | null>(null)
 useHead({title: computed(() => (nomination.value ? `${nomination.value.name} — анкета PRIME 2026` : 'Анкета — PRIME 2026'))})
 
 const voted = computed(() => (nomination.value ? votedNomineeId(nomination.value.id) : null))
+// в проголосованной номинации выбор — первым; сразу после голоса (статус «Выбрано») порядок не трогаем, чтобы карточка не прыгала
+const nominees = computed(() =>
+    nomination.value ? votedFirst(nomination.value.nominees, showChosen.value ? null : voted.value) : [],
+)
 const votingOpen = computed(() => config.value?.votingOpen ?? true)
 const readOnly = computed(() => voted.value !== null || !votingOpen.value)
 const isMoment = computed(() => nomination.value?.type === 'MOMENT')
@@ -268,7 +273,7 @@ const actionHint = computed(() =>
             :aria-label="`Номинанты: ${nomination.name}`"
             @click.self="activeId = null"
         >
-          <li v-for="nominee in nomination.nominees" :key="nominee.id">
+          <li v-for="nominee in nominees" :key="nominee.id">
             <MomentCard
                 v-if="isMoment"
                 :nominee="nominee"
