@@ -1,23 +1,35 @@
 <script setup lang="ts">
+import {computed} from 'vue'
 import type {VotedNomination} from '@/api'
 import {mediaUrl} from '@/utils/media.ts'
 
 // «Ваш выбор»: фото номинанта, номинация, ник. Клик — анкета в режиме просмотра.
-defineProps<{ item: VotedNomination }>()
+// Момент — по структуре карточки момента (MomentCard): превью 16:9 внутри карточки, под ним номинация,
+// название и участники.
+const props = defineProps<{ item: VotedNomination }>()
+const isMoment = computed(() => props.item.nominee.type === 'MOMENT')
 </script>
 
 <template>
-  <RouterLink :to="`/vote/${item.nomination.id}`" class="voted-card" :data-nomination-id="item.nomination.id">
-    <div class="voted-card__photo" :class="{ 'is-moment': item.nominee.type === 'MOMENT' }">
+  <RouterLink
+      :to="`/vote/${item.nomination.id}`"
+      class="voted-card"
+      :class="{ 'is-moment': isMoment }"
+      :data-nomination-id="item.nomination.id"
+  >
+    <div class="voted-card__photo">
       <img v-if="item.nominee.photoPath" :src="mediaUrl(item.nominee.photoPath)" alt="" loading="lazy"/>
     </div>
-    <h3 class="display voted-card__nomination">{{ item.nomination.name }}</h3>
-    <p class="voted-card__nominee">{{ item.nominee.name }}</p>
+    <div class="voted-card__body">
+      <h3 class="display voted-card__nomination">{{ item.nomination.name }}</h3>
+      <p class="voted-card__nominee">{{ item.nominee.name }}</p>
+      <p v-if="isMoment && item.nominee.participants" class="voted-card__participants">{{ item.nominee.participants }}</p>
+    </div>
   </RouterLink>
 </template>
 
 <style scoped>
-/* M3 card: фото и задник — на всю ширину карточки (3:4, момент — 16:9), текст по центру под ним */
+/* M3 card: фото и задник — на всю ширину карточки (3:4), текст по центру под ним */
 .voted-card {
   display: flex;
   flex-direction: column;
@@ -44,9 +56,6 @@ defineProps<{ item: VotedNomination }>()
   background: radial-gradient(70% 60% at 50% 45%, rgba(104, 119, 137, 0.9) 0%, rgba(56, 64, 74, 0.45) 50%, transparent 100%);
 }
 
-.voted-card__photo.is-moment {
-  aspect-ratio: 16 / 9;
-}
 
 .voted-card__photo img {
   width: 100%;
@@ -77,5 +86,56 @@ defineProps<{ item: VotedNomination }>()
   font: 400 var(--type-title-l) var(--font-serif);
   text-transform: uppercase;
   overflow-wrap: anywhere;
+}
+
+/*
+ * Момент — как MomentCard: поля 8dp, превью 16:9 со скруглением 12dp, текст под ним.
+ * Высота по содержимому; в ряду со стримерами текст встаёт по центру оставшегося места.
+ */
+.voted-card.is-moment {
+  aspect-ratio: auto;
+  padding: var(--space-2);
+}
+
+.voted-card.is-moment .voted-card__photo {
+  flex: none;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--shape-md);
+  background: var(--surface-2);
+}
+
+.voted-card.is-moment .voted-card__photo img {
+  object-position: 50% 20%;
+  opacity: 0.8;
+}
+
+.voted-card.is-moment .voted-card__photo::after {
+  height: 50%;
+}
+
+.voted-card.is-moment .voted-card__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-2) var(--space-4);
+  text-wrap: balance;
+}
+
+.voted-card.is-moment .voted-card__nomination,
+.voted-card.is-moment .voted-card__nominee {
+  padding: 0;
+}
+
+.voted-card.is-moment .voted-card__nominee {
+  color: var(--text);
+  text-transform: none;
+}
+
+.voted-card__participants {
+  margin: 0;
+  color: var(--text-subtle);
+  font: var(--type-body-m) var(--font-serif);
 }
 </style>
