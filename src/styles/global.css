@@ -158,6 +158,12 @@
 *, *::before, *::after { box-sizing: border-box; }
 html, body { margin: 0; background: var(--bg); }
 html { scroll-padding-top: var(--header-h); }
+
+/* Без лигатур: в Foglihten ~290 склеек (КО, ЖО, ОС, CS, AS…) — каждая буква рисуется отдельно.
+   На всех элементах и с !important: шорткат font: (у body и в компонентах) сбрасывает font-feature-settings. */
+*, *::before, *::after {
+  font-feature-settings: 'liga' 0, 'dlig' 0, 'clig' 0 !important;
+}
 body {
   color: var(--text);
   font: 400 var(--type-body-l) var(--font-text);
