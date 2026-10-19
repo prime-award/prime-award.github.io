@@ -71,6 +71,8 @@ loadVotes()
     </section>
 
     <div class="home__list page-container" id="nominations" :aria-busy="loading">
+      <h2 class="display home__list-title">Номинации</h2>
+
       <NominationRow
           v-for="nomination in items"
           :key="nomination.id"
@@ -139,6 +141,12 @@ loadVotes()
   gap: var(--section-gap);
   padding-block: var(--space-12) var(--space-12);
   scroll-margin-top: calc(var(--header-h) + var(--space-2));
+}
+
+/* заголовок раздела — на ступень крупнее названий номинаций */
+.home__list-title {
+  font: 400 var(--type-page-title) var(--font-display);
+  text-align: center;
 }
 
 .home__more {
