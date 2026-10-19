@@ -70,7 +70,7 @@ const site = window.location.host
     <!-- остальное: «номинация — за кого голос», портрет/превью растворяется в фоне строки -->
     <ol v-if="rest.length" class="share-card__list">
       <li v-for="item in rest" :key="item.nomination.id" class="share-card__row">
-        <img v-if="item.nominee.photoPath" class="share-card__row-bg" :src="mediaUrl(item.nominee.photoPath)" alt=""/>
+        <img v-if="item.nominee.photoPath" class="share-card__row-bg" :class="{ 'is-moment': item.nominee.type === 'MOMENT' }" :src="mediaUrl(item.nominee.photoPath)" alt=""/>
         <span class="share-card__row-nomination">{{ item.nomination.name }}</span>
         <span class="share-card__row-name">{{ item.nominee.name }}</span>
       </li>
@@ -249,11 +249,13 @@ const site = window.location.host
   width: 45%;
   height: 100%;
   object-fit: cover;
-  /* кадр — по верхней части портрета (лицо), как в крупных блоках; превью моментов — тоже */
-  object-position: 50% 15%;
+  object-position: 50% 20%;
   opacity: 0.55;
 }
 
+.share-card__row-bg.is-moment {
+  object-position: center;
+}
 
 .share-card__row::before {
   content: '';
