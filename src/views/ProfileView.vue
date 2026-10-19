@@ -49,7 +49,7 @@ onMounted(load)
 <template>
   <main class="profile page-container">
     <section v-if="user" class="profile__user">
-      <UserAvatar :user="user" :size="88"/>
+      <UserAvatar :user="user" :size="64"/>
       <div class="profile__who">
         <h1 class="profile__name" :style="{ color: user.nameColor ?? undefined }">{{ user.displayName }}</h1>
         <p class="profile__platform">@{{ user.login }} · {{ PLATFORM_TITLE[user.platform] ?? user.platform }}</p>
@@ -118,23 +118,25 @@ onMounted(load)
 <style scoped>
 .profile {
   min-height: 100dvh;
-  padding-top: calc(var(--header-h) + clamp(16px, 2vw, 32px));
-  padding-bottom: 64px;
+  padding-top: calc(var(--header-h) + var(--space-6));
+  padding-bottom: var(--space-16);
 }
 
+/* карточка пользователя (M3 card): поля 24dp, скругление 16dp */
 .profile__user {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-columns: auto minmax(0, 1fr);
   grid-template-areas:
-      'avatar who actions'
-      'progress progress progress';
+      'avatar who'
+      'progress progress'
+      'actions actions';
   align-items: center;
-  gap: 16px 24px;
-  margin-bottom: clamp(32px, 3vw, 56px);
-  padding: clamp(18px, 2vw, 28px);
+  gap: var(--space-4) var(--space-6);
+  margin-bottom: var(--space-12);
+  padding: var(--space-6);
   border: 1px solid var(--line);
-  border-radius: var(--radius-card);
-  background: radial-gradient(120% 140% at 0% 0%, #161a21 0%, var(--surface) 55%);
+  border-radius: var(--shape-lg);
+  background: var(--surface);
 }
 
 .profile__user > :first-child {
@@ -149,24 +151,26 @@ onMounted(load)
 .profile__name {
   margin: 0;
   overflow: hidden;
-  font-family: var(--font-display);
-  font-weight: 400;
-  font-size: clamp(28px, 3vw, 52px);
+  font: 400 var(--type-headline-m) var(--font-display);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .profile__platform {
-  margin: 4px 0 0;
+  margin: var(--space-1) 0 0;
   color: var(--muted-2);
+  font: var(--type-body-m) var(--font-text);
 }
 
 .profile__actions {
   grid-area: actions;
   display: flex;
   flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 10px;
+  gap: var(--space-2);
+}
+
+.profile__actions > * {
+  flex: 1;
 }
 
 .profile__progress {
@@ -174,41 +178,44 @@ onMounted(load)
 }
 
 .profile__progress-text {
-  margin-bottom: 8px;
+  margin-bottom: var(--space-2);
   color: var(--muted-2);
+  font: var(--type-body-m) var(--font-text);
 }
 
 .profile__progress-text b {
   color: var(--text);
 }
 
+/* linear progress M3: 4dp */
 .profile__bar {
-  height: 6px;
+  height: var(--space-1);
   overflow: hidden;
-  border-radius: 3px;
-  background: var(--surface-2);
+  border-radius: var(--shape-full);
+  background: var(--surface-3);
 }
 
 .profile__bar span {
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, #8a96a5, var(--text));
+  background: var(--text);
   transition: width 0.4s ease;
 }
 
 .profile__done {
-  margin: 0 0 32px;
-  padding: 14px 18px;
+  margin: 0 0 var(--space-8);
+  padding: var(--space-3) var(--space-4);
   border: 1px solid var(--line-strong);
-  border-radius: 14px;
+  border-radius: var(--shape-md);
   background: var(--surface);
+  font: var(--type-body-m) var(--font-text);
 }
 
 .profile__error {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: var(--space-4);
   color: var(--danger);
 }
 
@@ -218,21 +225,21 @@ onMounted(load)
   min-height: 40vh;
 }
 
-@media (max-width: 760px) {
+/* medium+: кнопки справа от имени */
+@media (min-width: 840px) {
   .profile__user {
-    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-columns: auto minmax(0, 1fr) auto;
     grid-template-areas:
-        'avatar who'
-        'progress progress'
-        'actions actions';
-  }
-
-  .profile__actions {
-    justify-content: stretch;
+        'avatar who actions'
+        'progress progress progress';
   }
 
   .profile__actions > * {
-    flex: 1;
+    flex: none;
+  }
+
+  .profile__name {
+    font: 400 var(--type-display-s) var(--font-display);
   }
 }
 </style>

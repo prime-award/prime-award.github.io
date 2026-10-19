@@ -26,42 +26,41 @@ function go(page: number) {
 </template>
 
 <style scoped>
+/* Пагинация «< 1/13 >»: иконочные кнопки 48dp (зона нажатия M3), счётчик — title-l. */
 .page-nav {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  font-family: var(--font-serif);
-  font-size: clamp(22px, 1.875vw, 36px);
-  letter-spacing: -0.03em;
+  gap: var(--space-2);
+  font: 400 var(--type-title-l) var(--font-serif);
 }
 
 .page-nav__arrow {
   display: grid;
   place-items: center;
-  width: 40px;
-  height: 40px;
-  padding: 0 0 2px;
+  width: var(--touch-target);
+  height: var(--touch-target);
+  padding: 0;
   border: 0;
-  border-radius: 50%;
+  border-radius: var(--shape-full);
   background: transparent;
-  font-size: 1em;
-  line-height: 1;
+  font: inherit;
   cursor: pointer;
-  transition: background-color 0.2s ease, opacity 0.2s ease;
+  transition: background-color 0.2s ease;
 }
 
 .page-nav__arrow:hover:not(:disabled) {
-  background: rgba(229, 231, 234, 0.08);
+  background: var(--state-hover);
 }
 
 .page-nav__arrow:disabled {
-  opacity: 0.25;
+  opacity: 0.38;
   cursor: default;
 }
 
 .page-nav__counter {
-  min-width: 3.2em;
+  min-width: 4em;
   text-align: center;
+  font-variant-numeric: tabular-nums;
 }
 </style>

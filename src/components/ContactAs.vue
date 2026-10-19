@@ -33,15 +33,11 @@ import MainDivider from "../components/MainDivider.vue";
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 10px 20px;
-  padding: 15px 30px 20px;
-  background: linear-gradient(180deg, #08090B 0%, #171a1f 100%);
-
-  font-family: 'Inter', sans-serif;
-  font-size: 20px;
-  font-weight: 400;
-  font-style: normal;
-  color: #687789;
+  gap: var(--space-2) var(--space-5);
+  padding: var(--space-4) var(--layout-margin) var(--space-6);
+  background: linear-gradient(180deg, var(--bg) 0%, var(--surface-2) 100%);
+  font: 400 var(--type-body-l) var(--font-text);
+  color: var(--muted);
 }
 
 .footer__copy {
@@ -49,37 +45,33 @@ import MainDivider from "../components/MainDivider.vue";
   white-space: pre-wrap;
 }
 
+/* ссылка: зона нажатия 48dp по высоте */
 .contact-link {
   display: inline-flex;
-  align-items: baseline; /* было: center */
+  align-items: center;
   justify-content: center;
-  gap: 5px;
-
+  gap: var(--space-2);
+  min-height: var(--touch-target);
   text-align: center;
   text-decoration-line: underline;
   text-transform: lowercase;
-  line-height: 1;
-
   color: inherit;
   cursor: pointer;
+  transition: color 0.2s ease;
+}
 
-  transition: opacity 0.2s ease;
+.contact-link:hover {
+  color: var(--text);
 }
 
 .contact-link__icon {
   display: block;
   flex: none;
-  width: 15px;
-  height: 12px;
+  width: var(--space-4);
+  height: auto;
 }
 
 .contact-link__text {
   display: block;
-}
-
-@media (max-width: 600px) {
-  .footer__bar {
-    padding: 15px 16px 24px;
-  }
 }
 </style>

@@ -76,28 +76,28 @@ const photo = computed(() => mediaUrl(props.nominee.photoPath))
 </template>
 
 <style scoped>
-/* Размеры и цвета — из макета (компонент «состояния карт», 295:153): карточка 370×524, фото 370×450 сверху,
-   ник Palatino 40 капсом в полосе 74 px снизу, обводка 1px #687789, при наведении #e5e7ea, выбранная — 3px. */
+/*
+ * Карточка стримера (M3 card): фото 3:4 + блок с ником под ним; скругление 16dp, обводка 1dp.
+ * Состояния: hover — светлая обводка и подпись «Выбрать»; active — фото размыто и кнопка подтверждения;
+ * selected — обводка 3dp; dimmed — приглушена.
+ */
 .nominee-card {
-  --photo-h: calc(450 / 524 * 100%);
   position: relative;
-  aspect-ratio: 370 / 524;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
   border: 1px solid var(--border);
-  border-radius: var(--radius-card);
+  border-radius: var(--shape-lg);
   background: var(--bg);
   isolation: isolate;
-  container-type: inline-size;
-  transition: border-color 0.25s ease, box-shadow 0.25s ease, opacity 0.25s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
 }
 
 .nominee-card__media {
-  position: absolute;
-  inset: 0 0 auto;
-  z-index: -1;
-  height: var(--photo-h);
-  /* «bg photo»: радиальный градиент #687789 -> прозрачный */
-  background: radial-gradient(67% 67% at 50% 50%, rgba(104, 119, 137, 1) 0%, rgba(56, 64, 74, 0.5) 50%, rgba(8, 9, 11, 0) 100%);
+  position: relative;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  background: radial-gradient(70% 60% at 50% 45%, rgba(104, 119, 137, 0.9) 0%, rgba(56, 64, 74, 0.45) 50%, transparent 100%);
 }
 
 .nominee-card__media img {
@@ -113,27 +113,19 @@ const photo = computed(() => mediaUrl(props.nominee.photoPath))
   opacity: 1;
 }
 
-/* «black gradient»: снизу #08090b -> прозрачный к 38.9% высоты фото */
+/* плавный переход фото в фон карточки под ником */
 .nominee-card__media::after {
   content: '';
   position: absolute;
-  inset: 0;
-  background: linear-gradient(to top, var(--bg) 0%, rgba(8, 9, 11, 0) 38.889%);
+  inset: auto 0 0;
+  height: 40%;
+  background: linear-gradient(to top, var(--bg), transparent);
 }
 
 .nominee-card__name {
-  position: absolute;
-  inset: auto 0 0;
-  display: grid;
-  place-items: center;
-  height: calc(74 / 524 * 100%);
   margin: 0;
-  padding: 0 10px 2%;
-  font-family: var(--font-serif);
-  font-weight: 400;
-  /* 40px при ширине карточки 370px */
-  font-size: clamp(15px, 10.8cqi, 40px);
-  line-height: 1;
+  padding: var(--space-2) var(--space-3) var(--space-4);
+  font: 400 var(--type-card-title) var(--font-serif);
   color: #fff;
   text-align: center;
   text-transform: uppercase;
@@ -143,15 +135,14 @@ const photo = computed(() => mediaUrl(props.nominee.photoPath))
 
 .nominee-card__badge {
   position: absolute;
-  top: 12px;
+  top: var(--space-3);
   left: 50%;
   translate: -50% 0;
-  padding: 6px 12px;
-  border-radius: var(--radius-pill);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--shape-full);
   background: var(--text);
   color: var(--bg);
-  font-size: 12px;
-  font-weight: 600;
+  font: 600 var(--type-label-m) var(--font-text);
   letter-spacing: 0.04em;
   text-transform: uppercase;
   white-space: nowrap;
@@ -178,29 +169,29 @@ const photo = computed(() => mediaUrl(props.nominee.photoPath))
   outline-offset: -4px;
 }
 
-/* «Подтвердить голос» (295:93): пилюля rgba(23,26,31,.2), 15/30, скругление 40, Palatino 32 */
+/* подписи-кнопки поверх фото: tonal button M3 (40dp, поля 24dp) */
 .nominee-card__hover-label,
 .nominee-card__action-button {
-  padding: 0.47em 0.94em;
-  border: 1px solid rgba(229, 231, 234, 0.25);
-  border-radius: 40px;
-  background: rgba(23, 26, 31, 0.45);
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--control-h);
+  padding: 0 var(--space-6);
+  border: 1px solid var(--line);
+  border-radius: var(--shape-full);
+  background: rgba(23, 26, 31, 0.72);
   backdrop-filter: blur(4px);
   color: #fff;
-  font-family: var(--font-serif);
-  font-size: clamp(14px, 8.6cqi, 32px);
-  line-height: 1.15;
+  font: 400 var(--type-title-m) var(--font-serif);
   white-space: nowrap;
 }
 
 .nominee-card__hover-label {
   opacity: 0;
-  transform: translateY(6px);
+  transform: translateY(var(--space-2));
   transition: opacity 0.2s ease, transform 0.2s ease;
   pointer-events: none;
 }
 
-/* ---- mouse enter (295:151): светлая обводка ---- */
 @media (hover: hover) {
   .nominee-card.is-idle:hover {
     border-color: var(--text);
@@ -221,7 +212,6 @@ const photo = computed(() => mediaUrl(props.nominee.photoPath))
   transform: none;
 }
 
-/* ---- active + button (295:152): содержимое размыто на 5px, обводка светлая, кнопка поверх ---- */
 .nominee-card.is-active {
   border-color: var(--text);
 }
@@ -239,43 +229,38 @@ const photo = computed(() => mediaUrl(props.nominee.photoPath))
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  padding: 12px;
+  gap: var(--space-2);
+  padding: var(--space-3);
   pointer-events: none;
   animation: action-in 0.2s ease both;
 }
 
 .nominee-card__action-button {
+  min-height: var(--touch-target);
   pointer-events: auto;
   /* двойной тап не должен масштабировать страницу (iOS) */
   touch-action: manipulation;
   cursor: pointer;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
 }
 
 .nominee-card__action-button:hover {
   border-color: var(--line-strong);
-  box-shadow: 0 0 18px rgba(229, 231, 234, 0.2);
-}
-
-.nominee-card__action-button:active {
-  transform: scale(0.97);
+  background: rgba(40, 45, 53, 0.85);
 }
 
 .nominee-card__action-hint {
   color: var(--text);
-  font-size: 13px;
+  font: var(--type-body-s) var(--font-text);
   text-shadow: 0 1px 6px rgba(0, 0, 0, 0.8);
 }
 
-/* ---- selected (295:213): обводка 3px #e5e7ea ---- */
 .nominee-card.is-selected {
   border: 3px solid var(--text);
 }
 
-/* ---- голос отдан за другого ---- */
 .nominee-card.is-dimmed {
-  opacity: 0.4;
+  opacity: 0.38;
   filter: grayscale(0.5);
 }
 

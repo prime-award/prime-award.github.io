@@ -17,50 +17,43 @@ defineProps<{ nomination: NominationBrief }>()
 </template>
 
 <style scoped>
+/* M3 card: поля 24dp, скругление 16dp; плашка 64dp высотой, название — headline */
 .unvoted-card {
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: var(--space-4);
   height: 100%;
-  /* макет: обводка 2px #687789, скругление 50, отступы 56/15 */
-  padding: clamp(24px, 2.9vw, 56px) clamp(12px, 1.2vw, 24px);
-  border: 2px solid var(--border);
-  border-radius: clamp(28px, 2.6vw, 50px);
+  padding: var(--space-6);
+  border: 1px solid var(--border);
+  border-radius: var(--shape-lg);
   background: var(--bg);
   text-align: center;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: border-color 0.2s ease;
 }
 
 .unvoted-card:hover {
   border-color: var(--text);
-  box-shadow: 0 0 22px rgba(229, 231, 234, 0.08);
 }
 
 .unvoted-card__icon {
-  width: min(70%, 400px);
-  height: auto;
-  aspect-ratio: 380 / 185;
-  object-fit: contain;
+  width: auto;
+  height: var(--space-16);
 }
 
 .unvoted-card__name {
-  margin-top: clamp(16px, 1.5vw, 29px);
-  font-size: clamp(26px, 3.07vw, 59px);
-  line-height: 1.05;
+  font: 400 var(--type-headline-m) var(--font-display);
   color: #fff;
-}
-
-.unvoted-card__cta {
-  padding: 0.62em 0.94em;
-  font-size: clamp(16px, 1.67vw, 32px);
 }
 
 .unvoted-card__description {
   flex: 1;
-  margin: 10px 0 20px;
-  color: rgba(229, 231, 234, 0.6);
-  font-family: var(--font-serif);
-  font-size: clamp(14px, 0.95vw, 18px);
-  line-height: 1.35;
+  margin: 0;
+  color: var(--text-muted);
+  font: var(--type-body-m) var(--font-serif);
+}
+
+.unvoted-card__cta {
+  margin-top: var(--space-2);
 }
 </style>

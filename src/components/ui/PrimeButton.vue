@@ -31,73 +31,84 @@ const tag = computed(() => (props.to ? 'RouterLink' : props.href ? 'a' : 'button
 </template>
 
 <style scoped>
+/* Кнопки по M3: высота 40dp (lg — 56dp), горизонтальные поля 24dp, скругление full, текст — label-l. */
 .prime-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5em;
+  gap: var(--space-2);
+  min-height: var(--control-h);
+  padding: 0 var(--space-6);
   border: 1px solid transparent;
-  border-radius: var(--radius-pill);
-  font-family: var(--font-display);
+  border-radius: var(--shape-full);
+  font: 400 var(--type-label-l) var(--font-serif);
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   text-decoration: none;
-  line-height: 1;
   white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.prime-button--sm {
+  min-height: var(--control-h-sm);
+  padding: 0 var(--space-4);
+  font: 400 var(--type-label-m) var(--font-serif);
+}
+
+/* крупная кнопка главного действия (на главном экране) */
+.prime-button--lg {
+  min-height: var(--control-h-lg);
+  padding: 0 var(--space-8);
+  font: 400 var(--type-headline-s) var(--font-display);
+  letter-spacing: 0;
   /* у Foglihten в капсе есть декоративные лигатуры (ОСО и т.п.) — на кнопках они мешают читать */
   font-variant-ligatures: none;
   font-feature-settings: 'liga' 0, 'dlig' 0;
-  cursor: pointer;
-  user-select: none;
-  transition: transform 0.2s ease, box-shadow 0.25s ease, background-color 0.2s ease, border-color 0.2s ease, opacity 0.2s;
 }
 
-.prime-button--sm { padding: 9px 16px; font-size: 15px; }
-.prime-button--md { padding: 12px 22px; font-size: clamp(16px, 1.25vw, 22px); }
-.prime-button--lg { padding: 0.31em 0.62em; font-size: clamp(22px, 2.5vw, 48px); }
-
-/* «Проголосовать» (макет 74:174): сплошная #e5e7ea, скругление 25, Foglihten */
+/* filled: светлая, главное действие */
 .prime-button--light {
   color: var(--bg);
   background: var(--text);
-  border-radius: 25px;
-}
-
-/* «Сделать выбор» (макет 367:500): полупрозрачная тёмная пилюля, Palatino капсом */
-.prime-button--dark {
-  color: rgba(255, 255, 255, 0.7);
-  background: rgba(23, 26, 31, 0.6);
-  border-color: rgba(229, 231, 234, 0.18);
-  font-family: var(--font-serif);
-  backdrop-filter: blur(6px);
-}
-
-.prime-button--ghost {
-  color: var(--muted-2);
-  background: transparent;
-  padding-inline: 6px;
-}
-
-.prime-button:hover:not(.is-disabled) {
-  transform: translateY(-1px);
 }
 
 .prime-button--light:hover:not(.is-disabled) {
-  opacity: 0.92;
-  box-shadow: 0 0 25px var(--accent-glow);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 4px 8px 3px rgba(0, 0, 0, 0.15);
+  background: #fff;
+}
+
+/* outlined: тёмная с обводкой */
+.prime-button--dark {
+  color: var(--text);
+  background: transparent;
+  border-color: var(--border);
 }
 
 .prime-button--dark:hover:not(.is-disabled) {
-  color: #fff;
+  background: var(--state-hover);
   border-color: var(--line-strong);
-  box-shadow: 0 0 14px rgba(229, 231, 234, 0.15);
+}
+
+/* text: без фона */
+.prime-button--ghost {
+  color: var(--text-muted);
+  background: transparent;
+  padding: 0 var(--space-3);
 }
 
 .prime-button--ghost:hover:not(.is-disabled) {
   color: var(--text);
+  background: var(--state-hover);
+}
+
+.prime-button:active:not(.is-disabled) {
+  background-image: linear-gradient(var(--state-pressed), var(--state-pressed));
 }
 
 .prime-button.is-disabled {
-  opacity: 0.45;
+  opacity: 0.38; /* M3: disabled content 38% */
   cursor: default;
 }
 </style>

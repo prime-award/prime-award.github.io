@@ -80,31 +80,30 @@ const timecode = computed(() =>
 </template>
 
 <style scoped>
-/* Из макета (415:367): карточка 405×363, обводка 1px #687789, скругление 20; превью 10px от краёв, высота 228,
-   скругление 10, картинка с opacity .7 и градиентом вниз в #08090b; название Palatino 36 (трекинг -3%),
-   участники/таймкод — 16px, rgba(229,231,234,.5). */
+/*
+ * Карточка момента (M3 card): превью 16:9 + название, участники и таймкод под ним.
+ * Высоту задаёт содержимое; скругление 16dp, у превью — 12dp, поля 8/16dp.
+ */
 .moment-card {
   position: relative;
   display: flex;
   flex-direction: column;
-  aspect-ratio: 405 / 363;
+  height: 100%;
   overflow: hidden;
-  padding: calc(10 / 405 * 100%);
+  padding: var(--space-2);
   border: 1px solid var(--border);
-  border-radius: var(--radius-card);
+  border-radius: var(--shape-lg);
   background: var(--bg);
   isolation: isolate;
-  container-type: inline-size;
-  transition: border-color 0.25s ease, box-shadow 0.25s ease, opacity 0.25s ease;
+  transition: border-color 0.2s ease, opacity 0.2s ease;
 }
 
 .moment-card__preview {
   position: relative;
-  flex: none;
-  height: calc(228 / 405 * 100cqi);
+  aspect-ratio: 16 / 9;
   overflow: hidden;
-  border-radius: 10px;
-  background: var(--bg);
+  border-radius: var(--shape-md);
+  background: var(--surface-2);
 }
 
 .moment-card__preview img {
@@ -117,14 +116,15 @@ const timecode = computed(() =>
 }
 
 .moment-card__preview img.is-loaded {
-  opacity: 0.7;
+  opacity: 0.8;
 }
 
 .moment-card__preview::after {
   content: '';
   position: absolute;
-  inset: 0;
-  background: linear-gradient(to bottom, rgba(8, 9, 11, 0) 0%, var(--bg) 100%);
+  inset: auto 0 0;
+  height: 50%;
+  background: linear-gradient(to top, var(--bg), transparent);
 }
 
 .moment-card__body {
@@ -132,10 +132,8 @@ const timecode = computed(() =>
   flex: 1;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 2px;
-  padding: 0 calc(11 / 405 * 100cqi) calc(30 / 405 * 100cqi);
-  font-family: var(--font-serif);
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-2) var(--space-12);
   text-align: center;
   text-wrap: balance;
   transition: filter 0.3s ease;
@@ -143,46 +141,42 @@ const timecode = computed(() =>
 
 .moment-card__title {
   margin: 0;
-  font-family: var(--font-serif);
-  font-weight: 400;
-  font-size: clamp(15px, 8.9cqi, 36px);
-  line-height: 1.1;
-  letter-spacing: -0.03em;
+  font: 400 var(--type-card-title) var(--font-serif);
   color: #fff;
   overflow-wrap: anywhere;
 }
 
-.moment-card__participants,
-.moment-card__timecode {
-  font-family: var(--font-serif);
-  font-size: clamp(11px, 4cqi, 16px);
-  letter-spacing: -0.03em;
-  color: rgba(229, 231, 234, 0.5);
-}
-
 .moment-card__participants {
   margin: 0;
-  line-height: 1.3;
+  color: var(--text-subtle);
+  font: var(--type-body-m) var(--font-serif);
 }
 
+/* таймкод — небольшая text button внизу карточки (зона нажатия 32dp + отступы карточки) */
 .moment-card__timecode {
   position: absolute;
-  bottom: calc(10 / 405 * 100cqi);
+  bottom: var(--space-2);
   left: 50%;
   z-index: 1;
   translate: -50% 0;
-  padding: 3px 10px;
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--control-h-sm);
+  padding: 0 var(--space-3);
   border: 1px solid transparent;
-  border-radius: var(--radius-pill);
+  border-radius: var(--shape-full);
   background: transparent;
+  color: var(--text-subtle);
+  font: var(--type-label-l) var(--font-serif);
   font-variant-numeric: tabular-nums;
   cursor: pointer;
-  transition: color 0.2s ease, border-color 0.2s ease;
+  transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
 }
 
 .moment-card__timecode:hover {
   color: var(--text);
   border-color: var(--line);
+  background: var(--state-hover);
 }
 
 .moment-card__timecode.is-static {
@@ -192,16 +186,15 @@ const timecode = computed(() =>
 
 .moment-card__badge {
   position: absolute;
-  top: 18px;
+  top: var(--space-4);
   left: 50%;
   z-index: 1;
   translate: -50% 0;
-  padding: 6px 12px;
-  border-radius: var(--radius-pill);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--shape-full);
   background: var(--text);
   color: var(--bg);
-  font-size: 12px;
-  font-weight: 600;
+  font: 600 var(--type-label-m) var(--font-text);
   letter-spacing: 0.04em;
   text-transform: uppercase;
   white-space: nowrap;
@@ -230,22 +223,22 @@ const timecode = computed(() =>
 
 .moment-card__hover-label,
 .moment-card__action-button {
-  padding: 0.47em 0.94em;
-  border: 1px solid rgba(229, 231, 234, 0.25);
-  border-radius: 40px;
-  background: rgba(23, 26, 31, 0.55);
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--control-h);
+  padding: 0 var(--space-6);
+  border: 1px solid var(--line);
+  border-radius: var(--shape-full);
+  background: rgba(23, 26, 31, 0.72);
   backdrop-filter: blur(4px);
   color: #fff;
-  font-family: var(--font-serif);
-  font-size: clamp(14px, 7.4cqi, 30px);
-  line-height: 1.15;
+  font: 400 var(--type-title-m) var(--font-serif);
   white-space: nowrap;
 }
 
 .moment-card__hover-label {
-  margin-bottom: 18%;
   opacity: 0;
-  transform: translateY(6px);
+  transform: translateY(var(--space-2));
   transition: opacity 0.2s ease, transform 0.2s ease;
   pointer-events: none;
 }
@@ -282,12 +275,13 @@ const timecode = computed(() =>
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: var(--space-2);
   pointer-events: none;
   animation: action-in 0.2s ease both;
 }
 
 .moment-card__action-button {
+  min-height: var(--touch-target);
   pointer-events: auto;
   /* двойной тап не должен масштабировать страницу (iOS) */
   touch-action: manipulation;
@@ -296,11 +290,11 @@ const timecode = computed(() =>
 
 .moment-card__action-button:hover {
   border-color: var(--line-strong);
-  box-shadow: 0 0 18px rgba(229, 231, 234, 0.2);
+  background: rgba(40, 45, 53, 0.85);
 }
 
 .moment-card__action-hint {
-  font-size: 13px;
+  font: var(--type-body-s) var(--font-text);
   text-shadow: 0 1px 6px rgba(0, 0, 0, 0.8);
 }
 
@@ -309,7 +303,7 @@ const timecode = computed(() =>
 }
 
 .moment-card.is-dimmed {
-  opacity: 0.4;
+  opacity: 0.38;
   filter: grayscale(0.5);
 }
 

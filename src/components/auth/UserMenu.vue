@@ -75,7 +75,7 @@ onBeforeUnmount(() => clearTimeout(closeTimer))
         data-testid="user-menu"
         @click="toggle"
     >
-      <UserAvatar :user="user" :size="36"/>
+      <UserAvatar :user="user" :size="32"/>
       <span class="user-menu__name" :style="{ color: nameColor }">{{ user.displayName }}</span>
       <span class="user-menu__caret" aria-hidden="true">▾</span>
     </button>
@@ -98,18 +98,20 @@ onBeforeUnmount(() => clearTimeout(closeTimer))
   position: relative;
 }
 
+/* «чип» пользователя: высота 40dp, аватар 32dp */
 .user-menu__trigger {
   display: flex;
   align-items: center;
-  gap: 10px;
-  max-width: min(320px, 55vw);
-  padding: 4px 12px 4px 4px;
+  gap: var(--space-2);
+  max-width: var(--chip-max-w);
+  min-height: var(--control-h);
+  padding: var(--space-1) var(--space-3) var(--space-1) var(--space-1);
   border: 1px solid var(--line);
-  border-radius: var(--radius-pill);
+  border-radius: var(--shape-full);
   background: rgba(14, 16, 20, 0.7);
   backdrop-filter: blur(8px);
   cursor: pointer;
-  transition: border-color 0.2s ease;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
 }
 
 .user-menu__trigger:hover,
@@ -119,62 +121,63 @@ onBeforeUnmount(() => clearTimeout(closeTimer))
 
 .user-menu__name {
   overflow: hidden;
-  font-size: 15px;
-  font-weight: 500;
+  font: 500 var(--type-label-l) var(--font-text);
   white-space: nowrap;
   text-overflow: ellipsis;
 }
 
 .user-menu__caret {
-  font-size: 11px;
+  font: var(--type-label-s) var(--font-text);
   color: var(--muted-2);
 }
 
+/* меню M3: контейнер со скруглением 4dp, пункты 48dp, поля 12dp */
 .user-menu__list {
   position: absolute;
-  top: calc(100% + 8px);
+  top: calc(100% + var(--space-1));
   right: 0;
   z-index: 10;
-  min-width: 200px;
+  min-width: var(--menu-min);
   margin: 0;
-  padding: 6px;
+  padding: var(--space-2) 0;
   list-style: none;
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  background: rgba(14, 16, 20, 0.96);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+  border-radius: var(--shape-xs);
+  background: var(--surface-3);
+  box-shadow: 0 2px 6px 2px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 /* «мостик», чтобы меню не закрывалось, пока курсор едет от кнопки к списку */
 .user-menu__list::before {
   content: '';
   position: absolute;
-  inset: -10px 0 auto;
-  height: 10px;
+  inset: calc(-1 * var(--space-2)) 0 auto;
+  height: var(--space-2);
 }
 
 .user-menu__list button {
   display: flex;
   justify-content: space-between;
-  align-items: baseline;
+  align-items: center;
+  gap: var(--space-3);
   width: 100%;
-  padding: 10px 12px;
+  min-height: var(--touch-target);
+  padding: 0 var(--space-3);
   border: 0;
-  border-radius: 9px;
   background: transparent;
-  font-size: 15px;
+  font: 400 var(--type-body-l) var(--font-text);
   text-align: left;
   cursor: pointer;
 }
 
 .user-menu__list button:hover,
 .user-menu__list button:focus-visible {
-  background: rgba(229, 231, 234, 0.08);
+  background: var(--state-hover);
   outline: none;
 }
 
 .user-menu__list small {
-  color: var(--muted);
+  color: var(--muted-2);
+  font: var(--type-label-m) var(--font-text);
 }
 
 .user-menu__list .is-danger {
@@ -189,13 +192,13 @@ onBeforeUnmount(() => clearTimeout(closeTimer))
 .menu-enter-from,
 .menu-leave-to {
   opacity: 0;
-  transform: translateY(-4px);
+  transform: translateY(calc(-1 * var(--space-1)));
 }
 
-@media (max-width: 480px) {
+/* compact: ник короче, чтобы шапка не переполнялась */
+@media (max-width: 599px) {
   .user-menu__name {
-    max-width: 34vw;
-    font-size: 14px;
+    max-width: 30vw;
   }
 }
 </style>

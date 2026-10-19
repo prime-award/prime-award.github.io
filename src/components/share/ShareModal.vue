@@ -137,6 +137,7 @@ async function share() {
 </template>
 
 <style scoped>
+/* Диалог M3 (скругление 28dp, поля 24dp); на compact — полноэкранный. */
 .share {
   position: fixed;
   inset: 0;
@@ -145,57 +146,58 @@ async function share() {
   /* трек не должен растягиваться под ширину карточки (1080 px внутри превью) */
   grid-template-columns: minmax(0, 1fr);
   place-items: center;
-  padding: 16px;
-  background: rgba(4, 5, 7, 0.75);
+  padding: var(--space-4);
+  background: var(--scrim);
   backdrop-filter: blur(6px);
 }
 
 .share__dialog {
   display: flex;
   flex-direction: column;
-  width: min(620px, 100%);
-  max-height: calc(100dvh - 32px);
-  padding: 20px;
-  border: 1px solid var(--line);
-  border-radius: 24px;
-  background: var(--surface);
-  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+  width: min(var(--dialog-max), 100%);
+  max-height: calc(100dvh - 2 * var(--space-4));
+  padding: var(--space-6);
+  border-radius: var(--shape-xl);
+  background: var(--surface-2);
+  box-shadow: 0 8px 12px 6px rgba(0, 0, 0, 0.3), 0 4px 4px rgba(0, 0, 0, 0.5);
 }
 
 .share__head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 14px;
+  margin-bottom: var(--space-4);
 }
 
 .share__title {
-  font-size: clamp(26px, 3vw, 36px);
+  font: 400 var(--type-headline-s) var(--font-display);
 }
 
 .share__close {
-  width: 36px;
-  height: 36px;
+  display: grid;
+  place-items: center;
+  width: var(--touch-target);
+  height: var(--touch-target);
+  margin-right: calc(-1 * var(--space-3));
   border: 0;
-  border-radius: 50%;
+  border-radius: var(--shape-full);
   background: transparent;
   color: var(--muted-2);
-  font-size: 26px;
+  font: 400 var(--type-headline-s) var(--font-text);
   cursor: pointer;
 }
 
 .share__close:hover {
   color: var(--text);
-  background: rgba(229, 231, 234, 0.08);
+  background: var(--state-hover);
 }
 
 .share__frame {
   flex: 0 1 auto;
   min-width: 0;
-  min-height: 120px;
-  max-height: 60dvh;
+  min-height: var(--space-24);
   overflow: hidden auto;
-  border-radius: 12px;
+  border-radius: var(--shape-md);
   background: var(--bg);
   overscroll-behavior: contain;
 }
@@ -212,16 +214,17 @@ async function share() {
 }
 
 .share__error {
-  margin: 12px 0 0;
+  margin: var(--space-3) 0 0;
   color: var(--danger);
+  font: var(--type-body-m) var(--font-text);
 }
 
 .share__actions {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
-  gap: 12px;
-  margin-top: 16px;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  margin-top: var(--space-6);
 }
 
 .share-enter-active,
@@ -232,5 +235,28 @@ async function share() {
 .share-enter-from,
 .share-leave-to {
   opacity: 0;
+}
+
+/* compact: полноэкранный диалог */
+@media (max-width: 599px) {
+  .share {
+    padding: 0;
+  }
+
+  .share__dialog {
+    width: 100%;
+    height: 100dvh;
+    max-height: none;
+    border-radius: 0;
+    padding: var(--space-4);
+  }
+
+  .share__frame {
+    flex: 1 1 auto;
+  }
+
+  .share__actions > * {
+    flex: 1;
+  }
 }
 </style>

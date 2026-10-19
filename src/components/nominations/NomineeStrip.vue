@@ -53,22 +53,25 @@ onBeforeUnmount(() => resizeObserver?.disconnect())
 </template>
 
 <style scoped>
+/*
+ * Лента карточек: число видимых карточек зависит от класса окна M3
+ * (compact — 1 с «подглядыванием» следующей, medium — 2, expanded — 3, large+ — 4).
+ */
 .strip {
-  --per-view: 4;
-  --gap: clamp(12px, 2.2vw, 70px);
+  --per-view: 1.25;
   display: grid;
-  grid-template-columns: 30px minmax(0, 1fr) 30px;
+  grid-template-columns: minmax(0, 1fr);
   align-items: center;
-  gap: clamp(8px, 1vw, 20px);
+  gap: var(--space-2);
 }
 
 .strip__track {
   display: grid;
   grid-auto-flow: column;
-  grid-auto-columns: calc((100% - (var(--per-view) - 1) * var(--gap)) / var(--per-view));
-  gap: var(--gap);
+  grid-auto-columns: calc((100% - (var(--per-view) - 1) * var(--layout-gutter)) / var(--per-view));
+  gap: var(--layout-gutter);
   margin: 0;
-  padding: 6px 2px;
+  padding: var(--space-1) 0;
   list-style: none;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
@@ -85,35 +88,36 @@ onBeforeUnmount(() => resizeObserver?.disconnect())
   min-width: 0;
 }
 
-/* треугольники из макета */
+/* треугольники — иконочные кнопки с зоной нажатия 48dp */
 .strip__arrow {
-  display: grid;
+  display: none;
   place-items: center;
-  width: 30px;
-  height: 60px;
+  width: var(--touch-target);
+  height: var(--touch-target);
   padding: 0;
   border: 0;
+  border-radius: var(--shape-full);
   background: transparent;
   cursor: pointer;
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition: opacity 0.2s ease, background-color 0.2s ease;
 }
 
 .strip__arrow span {
   width: 0;
   height: 0;
-  border-block: 9px solid transparent;
+  border-block: var(--space-2) solid transparent;
 }
 
 .strip__arrow--prev span {
-  border-right: 14px solid var(--text);
+  border-right: var(--space-3) solid var(--text);
 }
 
 .strip__arrow--next span {
-  border-left: 14px solid var(--text);
+  border-left: var(--space-3) solid var(--text);
 }
 
 .strip__arrow:hover:not(:disabled) {
-  transform: scale(1.15);
+  background: var(--state-hover);
 }
 
 .strip__arrow:disabled {
@@ -121,23 +125,23 @@ onBeforeUnmount(() => resizeObserver?.disconnect())
   cursor: default;
 }
 
-@media (max-width: 1280px) {
+/* medium: 2 карточки, появляются стрелки */
+@media (min-width: 600px) {
+  .strip {
+    --per-view: 2;
+    grid-template-columns: var(--touch-target) minmax(0, 1fr) var(--touch-target);
+  }
+
+  .strip__arrow {
+    display: grid;
+  }
+}
+
+@media (min-width: 840px) {
   .strip { --per-view: 3; }
 }
 
-@media (max-width: 900px) {
-  .strip { --per-view: 2.2; }
-}
-
-@media (max-width: 560px) {
-  .strip {
-    --per-view: 1.35;
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  /* на телефоне листаем пальцем, стрелки не нужны */
-  .strip__arrow {
-    display: none;
-  }
+@media (min-width: 1200px) {
+  .strip { --per-view: 4; }
 }
 </style>

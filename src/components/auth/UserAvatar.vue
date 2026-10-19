@@ -27,7 +27,7 @@ const initial = computed(() => props.user.displayName.trim().charAt(0).toUpperCa
   place-items: center;
   flex: none;
   overflow: hidden;
-  border-radius: 50%;
+  border-radius: var(--shape-full);
   background: color-mix(in srgb, var(--avatar-color) 35%, var(--surface-2));
   box-shadow: 0 0 0 1px var(--line);
 }

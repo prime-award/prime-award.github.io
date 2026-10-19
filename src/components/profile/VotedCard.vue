@@ -17,34 +17,35 @@ defineProps<{ item: VotedNomination }>()
 </template>
 
 <style scoped>
+/* M3 card: фото 3:4 (момент — 16:9), номинация — headline, ник — title */
 .voted-card {
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: var(--space-2);
   height: 100%;
-  /* макет: обводка 2px #687789, скругление 50, отступы 56/15 */
-  padding: clamp(24px, 2.9vw, 56px) clamp(12px, 1.2vw, 24px);
-  border: 2px solid var(--border);
-  border-radius: clamp(28px, 2.6vw, 50px);
+  padding: var(--space-6);
+  border: 1px solid var(--border);
+  border-radius: var(--shape-lg);
   background: var(--bg);
   color: inherit;
   text-align: center;
   text-decoration: none;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: border-color 0.2s ease;
 }
 
 .voted-card:hover {
   border-color: var(--text);
-  box-shadow: 0 0 22px rgba(229, 231, 234, 0.08);
 }
 
 .voted-card__photo {
   position: relative;
-  width: min(65%, 300px);
-  aspect-ratio: 370 / 450;
+  width: 60%;
+  aspect-ratio: 3 / 4;
+  margin-bottom: var(--space-2);
   overflow: hidden;
-  border-radius: 14px;
-  background: radial-gradient(circle at 50% 35%, #687789 0%, #1a1e24 45%, var(--bg) 100%);
+  border-radius: var(--shape-md);
+  background: radial-gradient(70% 60% at 50% 45%, rgba(104, 119, 137, 0.9) 0%, rgba(56, 64, 74, 0.45) 50%, transparent 100%);
 }
 
 .voted-card__photo.is-moment {
@@ -62,22 +63,19 @@ defineProps<{ item: VotedNomination }>()
 .voted-card__photo::after {
   content: '';
   position: absolute;
-  inset: 0;
-  background: linear-gradient(to top, rgba(8, 9, 11, 0.85) 0%, transparent 35%);
+  inset: auto 0 0;
+  height: 35%;
+  background: linear-gradient(to top, var(--bg), transparent);
 }
 
 .voted-card__nomination {
-  margin-top: clamp(14px, 1.5vw, 29px);
-  font-size: clamp(28px, 3.6vw, 70px);
-  line-height: 1.05;
+  font: 400 var(--type-headline-m) var(--font-display);
 }
 
-/* ник (367:282): Palatino 40 капсом, rgba(229,231,234,.7) */
 .voted-card__nominee {
-  margin: clamp(8px, 0.8vw, 15px) 0 0;
-  color: rgba(229, 231, 234, 0.7);
-  font-family: var(--font-serif);
-  font-size: clamp(18px, 2.08vw, 40px);
+  margin: 0;
+  color: var(--text-muted);
+  font: 400 var(--type-title-l) var(--font-serif);
   text-transform: uppercase;
   overflow-wrap: anywhere;
 }

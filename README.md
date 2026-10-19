@@ -45,6 +45,17 @@ npm run build     # vue-tsc (проверка типов) + сборка в dist
 Шрифты: заголовки — Foglihten (`public/fonts`), тексты — Palatino Linotype, как в макете (есть в Windows и macOS);
 на системах без него подставляется встроенный PT Serif (OFL, с кириллицей).
 
+## Размеры и стили
+
+Все размеры — дизайн-токены в `src/styles/global.css`, по Material Design 3:
+отступы `--space-*` (сетка 4/8dp), типографика `--type-*` (шкала M3: display / headline / title / body / label),
+скругления `--shape-*`, размеры контролов (`--control-h` 40dp, `--touch-target` 48dp, `--header-h` 64dp).
+Брейкпоинты — классы окна M3: compact < 600, medium 600–839, expanded 840–1199, large 1200–1599, extra-large ≥ 1600.
+Ролевые токены (`--type-page-title`, `--type-section-title`, `--layout-margin`, …) переключаются на брейкпоинтах
+в `global.css`, поэтому в компонентах только ссылки на токены, без подобранных под макет чисел.
+Исключения: `MainBlock` (главный экран) и `src/demo` (демо-экран) сохранены как были;
+`ShareCard` свёрстан в px картинки 1080 px для экспорта в PNG.
+
 ## Деплой (GitHub Pages)
 
 Workflow `.github/workflows/deploy.yml` собирает сайт при пуше в `master` (тесты + сборка) и публикует `dist`.

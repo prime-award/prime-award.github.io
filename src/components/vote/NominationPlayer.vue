@@ -64,16 +64,16 @@ defineExpose({seek})
 </template>
 
 <style scoped>
+/* Экран видео 16:9: не шире --player-max-w и не выше --player-max-h, чтобы под ним были видны карточки. */
 .player {
   position: relative;
-  /* не больше ~58% высоты окна: карточки должны быть видны под плеером */
-  width: min(100%, 1040px, calc(58vh * 16 / 9));
+  width: min(100%, var(--player-max-w), var(--player-max-h) * 16 / 9);
   aspect-ratio: 16 / 9;
   margin-inline: auto;
   overflow: hidden;
-  border-radius: var(--radius-card);
+  border-radius: var(--shape-lg);
   background: var(--surface-2);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 4px 8px 3px rgba(0, 0, 0, 0.15), 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 .player__media {
@@ -90,7 +90,6 @@ defineExpose({seek})
   place-items: center;
   height: 100%;
   color: var(--muted);
-  font-family: var(--font-display);
-  font-size: clamp(18px, 2vw, 32px);
+  font: 400 var(--type-headline-s) var(--font-display);
 }
 </style>

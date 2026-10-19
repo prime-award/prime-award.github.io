@@ -24,19 +24,27 @@ const deadline = computed(() => {
 
 <style scoped>
 .voting-info {
-  padding-block: clamp(24px, 3vw, 60px) clamp(8px, 1vw, 16px);
+  padding-block: var(--space-12) 0;
 }
 
 .voting-info__title {
   margin: 0;
-  font-family: var(--font-serif);
-  font-weight: 700;
-  font-size: clamp(22px, 2.5vw, 48px);
+  font: 700 var(--type-headline-s) var(--font-serif);
 }
 
 .voting-info__text {
-  margin: 8px 0 0;
-  font-family: var(--font-serif);
-  font-size: clamp(16px, 1.875vw, 36px);
+  margin: var(--space-2) 0 0;
+  color: var(--text-muted);
+  font: var(--type-body-l) var(--font-serif);
+}
+
+@media (min-width: 840px) {
+  .voting-info__title {
+    font: 700 var(--type-headline-l) var(--font-serif);
+  }
+
+  .voting-info__text {
+    font: var(--type-title-l) var(--font-serif);
+  }
 }
 </style>

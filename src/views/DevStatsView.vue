@@ -85,24 +85,25 @@ onMounted(load)
 
 <style scoped>
 .stats {
-  padding-top: calc(var(--header-h) + 24px);
-  padding-bottom: 64px;
+  padding-top: calc(var(--header-h) + var(--space-6));
+  padding-bottom: var(--space-16);
 }
 
 .stats__head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: var(--space-4);
 }
 
 .stats__title {
-  font-size: clamp(30px, 3vw, 52px);
+  font: 400 var(--type-headline-l) var(--font-display);
 }
 
 .stats__title small {
   color: var(--muted);
-  font-size: 0.45em;
+  font: var(--type-label-l) var(--font-text);
+  text-transform: none;
 }
 
 .stats__error {
@@ -118,41 +119,47 @@ onMounted(load)
 .stats__totals {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-  margin: 24px 0;
+  gap: var(--space-3);
+  margin: var(--space-6) 0;
 }
 
 .stats__totals div {
-  padding: 16px;
+  padding: var(--space-4);
   border: 1px solid var(--line);
-  border-radius: 14px;
+  border-radius: var(--shape-md);
   background: var(--surface);
 }
 
 .stats__totals dt {
   color: var(--muted-2);
-  font-size: 14px;
+  font: var(--type-label-l) var(--font-text);
 }
 
 .stats__totals dd {
-  margin: 6px 0 0;
-  font-family: var(--font-display);
-  font-size: clamp(26px, 2.6vw, 40px);
+  margin: var(--space-1) 0 0;
+  font: 400 var(--type-headline-m) var(--font-display);
   font-variant-numeric: tabular-nums;
 }
 
+/* текстовое поле M3 (outlined): 56dp, скругление 4dp */
 .stats__filter input {
-  width: min(420px, 100%);
-  padding: 12px 16px;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  background: var(--surface);
+  width: min(var(--field-max-w), 100%);
+  min-height: var(--control-h-lg);
+  padding: 0 var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--shape-xs);
+  background: transparent;
   color: var(--text);
-  font: inherit;
+  font: var(--type-body-l) var(--font-text);
+}
+
+.stats__filter input:focus {
+  outline: 2px solid var(--text);
+  outline-offset: -1px;
 }
 
 .stats__nomination {
-  margin-top: 28px;
+  margin-top: var(--space-8);
 }
 
 .stats__name {
@@ -160,39 +167,37 @@ onMounted(load)
   flex-wrap: wrap;
   align-items: baseline;
   justify-content: space-between;
-  gap: 4px 16px;
-  margin: 0 0 10px;
-  font-family: var(--font-display);
-  font-weight: 400;
-  font-size: clamp(20px, 1.8vw, 30px);
+  gap: var(--space-1) var(--space-4);
+  margin: 0 0 var(--space-2);
+  font: 400 var(--type-title-l) var(--font-display);
 }
 
 .stats__name small {
   color: var(--muted-2);
-  font-family: var(--font-text);
-  font-size: 14px;
+  font: var(--type-body-m) var(--font-text);
 }
 
 .stats__rows {
   display: grid;
-  gap: 6px;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
+/* строка списка M3: 48dp, аватар 32dp */
 .stats__row {
   display: grid;
-  grid-template-columns: 32px minmax(110px, 220px) minmax(0, 1fr) 110px;
+  grid-template-columns: var(--avatar-sm) minmax(0, 12rem) minmax(0, 1fr) 7rem;
   align-items: center;
-  gap: 12px;
-  font-size: 14px;
+  gap: var(--space-3);
+  min-height: var(--touch-target);
+  font: var(--type-body-m) var(--font-text);
 }
 
 .stats__row img {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
+  width: var(--avatar-sm);
+  height: var(--avatar-sm);
+  border-radius: var(--shape-full);
   object-fit: cover;
   object-position: top;
 }
@@ -204,10 +209,10 @@ onMounted(load)
 }
 
 .stats__bar {
-  height: 10px;
+  height: var(--space-2);
   overflow: hidden;
-  border-radius: 5px;
-  background: var(--surface-2);
+  border-radius: var(--shape-full);
+  background: var(--surface-3);
 }
 
 .stats__bar span {
@@ -226,13 +231,18 @@ onMounted(load)
   text-align: right;
 }
 
-@media (max-width: 560px) {
+@media (max-width: 599px) {
   .stats__row {
-    grid-template-columns: 28px minmax(0, 1fr) 90px;
+    grid-template-columns: var(--avatar-sm) minmax(0, 1fr) 6rem;
+    padding-block: var(--space-1);
   }
 
   .stats__bar {
     grid-column: 2 / -1;
+  }
+
+  .stats__totals dd {
+    font: 400 var(--type-headline-s) var(--font-display);
   }
 }
 </style>

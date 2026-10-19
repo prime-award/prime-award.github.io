@@ -6,49 +6,171 @@
   font-display: swap;
 }
 
+/*
+ * Дизайн-токены. Размеры — по Material Design 3:
+ * - отступы на сетке 4/8dp (--space-*);
+ * - типографика — шкала M3 (display / headline / title / body / label), размер/межстрочный;
+ * - скругления — шкала shape M3;
+ * - классы окна M3 (брейкпоинты): compact < 600, medium 600–839, expanded 840–1199,
+ *   large 1200–1599, extra-large ≥ 1600. В media-запросах используются только эти границы.
+ * Компоненты берут размеры только отсюда; «ролевые» токены (--type-page-title и т.п.) переключаются
+ * на брейкпоинтах ниже, поэтому в компонентах нет clamp() и подогнанных под макет чисел.
+ */
 :root {
-  /* цвета из макета */
-  --bg: #08090B;
+  /* ---- цвет ---- */
+  --bg: #08090b;
   --surface: #0e1014;
   --surface-2: #15181d;
+  --surface-3: #1c2027;
   --text: #e5e7ea;
+  --text-muted: rgba(229, 231, 234, 0.7);
+  --text-subtle: rgba(229, 231, 234, 0.5);
   --muted: #687789;
   --muted-2: #8a96a5;
-  /* обводка карточек и кнопок из макета */
   --border: #687789;
-  --line: rgba(229, 231, 234, 0.22);
+  --line: rgba(229, 231, 234, 0.16);
   --line-strong: rgba(229, 231, 234, 0.6);
-  --accent-glow: rgba(229, 231, 234, 0.35);
-  --danger: #ff8a8a;
+  --state-hover: rgba(229, 231, 234, 0.08);   /* M3 state layer: hover 8% */
+  --state-pressed: rgba(229, 231, 234, 0.12); /* pressed / focus 12% */
+  --scrim: rgba(4, 5, 7, 0.72);
+  --danger: #ffb4ab;                          /* M3 error (dark) */
   --success: #b4f08c;
 
+  /* ---- шрифты ---- */
   --font-display: 'Foglihten No06', 'Palatino Linotype', Palatino, Georgia, 'Times New Roman', serif;
   --font-text: 'Inter', system-ui, sans-serif;
-  /* текстовый шрифт макета — Palatino Linotype (есть в Windows/macOS); PT Serif встраивается как запасной с кириллицей */
+  /* Palatino Linotype есть в Windows/macOS; PT Serif встраивается как запасной с кириллицей */
   --font-serif: 'Palatino Linotype', Palatino, 'Book Antiqua', P052, 'URW Palladio L', 'PT Serif', Georgia, serif;
 
-  --radius-card: 20px;
-  --radius-pill: 999px;
-  --header-h: 64px;
-  --page-pad: clamp(16px, 3.2vw, 60px);
-  --content-max: 1800px;
+  /* ---- отступы: 4dp-шаг, 8dp-сетка ---- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+
+  /* ---- скругления (M3 shape) ---- */
+  --shape-xs: 4px;
+  --shape-sm: 8px;
+  --shape-md: 12px;
+  --shape-lg: 16px;
+  --shape-xl: 28px;
+  --shape-full: 9999px;
+
+  /* ---- типографика M3: размер/межстрочный ---- */
+  --type-display-l: 57px/64px;
+  --type-display-m: 45px/52px;
+  --type-display-s: 36px/44px;
+  --type-headline-l: 32px/40px;
+  --type-headline-m: 28px/36px;
+  --type-headline-s: 24px/32px;
+  --type-title-l: 22px/28px;
+  --type-title-m: 16px/24px;
+  --type-title-s: 14px/20px;
+  --type-body-l: 16px/24px;
+  --type-body-m: 14px/20px;
+  --type-body-s: 12px/16px;
+  --type-label-l: 14px/20px;
+  --type-label-m: 12px/16px;
+  --type-label-s: 11px/16px;
+
+  /* ---- размеры компонентов ---- */
+  --touch-target: 48px;      /* минимальная зона нажатия */
+  --control-h: 40px;         /* кнопки M3 */
+  --control-h-sm: 32px;      /* малые кнопки и чипы */
+  --control-h-lg: 56px;      /* крупные кнопки, extended FAB, текстовые поля */
+  --icon: 24px;
+  --avatar-sm: 32px;
+  --avatar-lg: 64px;
+  --header-h: 64px;          /* top app bar */
+  --content-max: 1440px;
+  --dialog-max: 560px;       /* M3 dialog: 280–560dp */
+  --menu-min: 200px;
+  --chip-max-w: 320px;
+  --field-max-w: 400px;
+
+  /* ---- раскладка (переключается по классам окна) ---- */
+  --layout-margin: var(--space-4);
+  --layout-gutter: var(--space-4);
+  --section-gap: var(--space-12);
+
+  /* ---- ролевые типографские токены (compact) ---- */
+  --type-page-title: var(--type-headline-l);     /* название номинации в анкете */
+  --type-section-title: var(--type-headline-m);  /* название номинации на главной, крупные заголовки */
+  --type-subtitle: var(--type-headline-s);       /* «Отдать голос:», заголовки секций */
+  --type-card-title: var(--type-title-l);        /* ник / название момента на карточке */
+  --type-lead: var(--type-body-l);               /* описание номинации */
+
+  /* ---- карточки и медиа ---- */
+  --badge-h: var(--space-10);    /* плашка номинации рядом с заголовком */
+  --player-max-w: 960px;
+  --player-max-h: 56vh;
+}
+
+/* medium */
+@media (min-width: 600px) {
+  :root {
+    --layout-margin: var(--space-6);
+    --layout-gutter: var(--space-6);
+    --section-gap: var(--space-16);
+    --type-page-title: var(--type-display-s);
+    --type-section-title: var(--type-display-s);
+    --badge-h: var(--space-12);
+  }
+}
+
+/* expanded */
+@media (min-width: 840px) {
+  :root {
+    --type-page-title: var(--type-display-m);
+    --type-lead: var(--type-title-l);
+  }
+}
+
+/* large */
+@media (min-width: 1200px) {
+  :root {
+    --layout-margin: var(--space-10);
+    --type-page-title: var(--type-display-l);
+    --type-section-title: var(--type-display-m);
+    --badge-h: var(--space-16);
+  }
+}
+
+/* extra-large */
+@media (min-width: 1600px) {
+  :root {
+    --layout-margin: var(--space-16);
+    --layout-gutter: var(--space-8);
+  }
 }
 
 *, *::before, *::after { box-sizing: border-box; }
 html, body { margin: 0; background: var(--bg); }
 html { scroll-padding-top: var(--header-h); }
-body { color: var(--text); font-family: var(--font-text); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+body {
+  color: var(--text);
+  font: 400 var(--type-body-l) var(--font-text);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
 img { display: block; }
 button { font: inherit; color: inherit; }
 
-/* Заголовки в стиле макета: Foglihten, капс */
+/* Заголовки в стиле проекта: Foglihten, капс */
 .display {
   margin: 0;
   font-family: var(--font-display);
   font-weight: 400;
   text-transform: uppercase;
-  line-height: 1.05;
-  letter-spacing: 0.01em;
+  letter-spacing: 0;
 }
 
 /* Обёртка контента страницы */
@@ -56,7 +178,7 @@ button { font: inherit; color: inherit; }
   width: 100%;
   max-width: var(--content-max);
   margin: 0 auto;
-  padding-inline: var(--page-pad);
+  padding-inline: var(--layout-margin);
 }
 
 .visually-hidden {
@@ -71,7 +193,7 @@ button { font: inherit; color: inherit; }
 
 :focus-visible {
   outline: 2px solid var(--text);
-  outline-offset: 3px;
+  outline-offset: 2px;
 }
 
 @media (prefers-reduced-motion: reduce) {

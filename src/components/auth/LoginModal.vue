@@ -127,128 +127,132 @@ function trapFocus(event: KeyboardEvent) {
 </template>
 
 <style scoped>
+/* Диалог M3: 280–560dp, поля 24dp, скругление 28dp, заголовок headline-s, текст body-m. */
 .modal {
   position: fixed;
   inset: 0;
   z-index: 200;
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   place-items: center;
-  padding: 16px;
-  background: rgba(4, 5, 7, 0.72);
+  padding: var(--space-4);
+  background: var(--scrim);
   backdrop-filter: blur(6px);
 }
 
 .modal__dialog {
   position: relative;
-  width: min(440px, 100%);
-  max-height: calc(100dvh - 32px);
+  width: min(var(--dialog-max), 100%);
+  max-height: calc(100dvh - 2 * var(--space-4));
   overflow: auto;
-  padding: clamp(24px, 4vw, 36px);
-  border: 1px solid var(--line);
-  border-radius: 24px;
-  background: radial-gradient(120% 80% at 50% 0%, #1a1e25 0%, var(--surface) 60%);
-  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+  padding: var(--space-6);
+  border-radius: var(--shape-xl);
+  background: var(--surface-2);
+  box-shadow: 0 8px 12px 6px rgba(0, 0, 0, 0.3), 0 4px 4px rgba(0, 0, 0, 0.5);
 }
 
 .modal__close {
   position: absolute;
-  top: 10px;
-  right: 12px;
-  width: 36px;
-  height: 36px;
+  top: var(--space-2);
+  right: var(--space-2);
+  display: grid;
+  place-items: center;
+  width: var(--touch-target);
+  height: var(--touch-target);
   border: 0;
-  border-radius: 50%;
+  border-radius: var(--shape-full);
   background: transparent;
-  font-size: 26px;
-  line-height: 1;
+  font: 400 var(--type-headline-s) var(--font-text);
   color: var(--muted-2);
   cursor: pointer;
 }
 
 .modal__close:hover {
   color: var(--text);
-  background: rgba(229, 231, 234, 0.08);
+  background: var(--state-hover);
 }
 
 .modal__title {
-  font-size: clamp(32px, 3vw, 44px);
+  font: 400 var(--type-headline-m) var(--font-display);
   text-align: center;
 }
 
 .modal__text {
-  margin: 12px 0 24px;
-  color: var(--muted-2);
-  font-size: 15px;
-  line-height: 1.45;
+  margin: var(--space-4) 0 var(--space-6);
+  color: var(--text-muted);
+  font: var(--type-body-m) var(--font-text);
   text-align: center;
 }
 
 .modal__error {
   display: grid;
-  gap: 6px;
-  margin: 0 0 16px;
-  padding: 12px 14px;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-4);
+  padding: var(--space-3) var(--space-4);
   border: 1px solid color-mix(in srgb, var(--danger) 45%, transparent);
-  border-radius: 12px;
+  border-radius: var(--shape-md);
   color: var(--danger);
-  font-size: 14px;
+  font: var(--type-body-m) var(--font-text);
   text-align: center;
 }
 
 .modal__error small {
   color: var(--muted-2);
+  font: var(--type-body-s) var(--font-text);
   overflow-wrap: anywhere;
 }
 
 .modal__retry {
   justify-self: center;
-  padding: 6px 14px;
+  min-height: var(--control-h-sm);
+  padding: 0 var(--space-4);
   border: 1px solid var(--line);
-  border-radius: var(--radius-pill);
+  border-radius: var(--shape-full);
   background: transparent;
   color: var(--text);
+  font: var(--type-label-l) var(--font-text);
   cursor: pointer;
 }
 
 .modal__providers {
   display: grid;
-  gap: 10px;
+  gap: var(--space-2);
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
+/* пункт выбора платформы: строка 56dp (M3 list item), иконка 24dp, поля 16dp */
 .provider {
   --brand: var(--text);
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: var(--space-4);
   width: 100%;
-  padding: 14px 18px;
+  min-height: var(--control-h-lg);
+  padding: 0 var(--space-4);
   border: 1px solid var(--line);
-  border-radius: 14px;
-  background: rgba(229, 231, 234, 0.03);
-  font-size: 17px;
-  font-weight: 500;
+  border-radius: var(--shape-md);
+  background: transparent;
+  font: 500 var(--type-body-l) var(--font-text);
   text-align: left;
   cursor: pointer;
-  transition: border-color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
 }
 
 .provider:hover:not(:disabled) {
   border-color: var(--brand);
-  background: color-mix(in srgb, var(--brand) 10%, transparent);
-  transform: translateY(-1px);
+  background: color-mix(in srgb, var(--brand) 8%, transparent);
 }
 
 .provider:disabled {
   cursor: default;
-  opacity: 0.5;
+  opacity: 0.38;
 }
 
 .provider__icon {
-  width: 24px;
-  height: 24px;
+  width: var(--icon);
+  height: var(--icon);
   flex: none;
   fill: var(--brand);
 }
@@ -259,8 +263,7 @@ function trapFocus(event: KeyboardEvent) {
 
 .provider__note {
   color: var(--muted-2);
-  font-size: 13px;
-  font-weight: 400;
+  font: 400 var(--type-label-m) var(--font-text);
 }
 
 .provider--dev {
@@ -271,10 +274,10 @@ function trapFocus(event: KeyboardEvent) {
 .modal__divider {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin: 20px 0 12px;
+  gap: var(--space-3);
+  margin: var(--space-6) 0 var(--space-3);
   color: var(--muted);
-  font-size: 12px;
+  font: 500 var(--type-label-s) var(--font-text);
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
@@ -304,6 +307,6 @@ function trapFocus(event: KeyboardEvent) {
 
 .modal-enter-from .modal__dialog,
 .modal-leave-to .modal__dialog {
-  transform: translateY(12px) scale(0.98);
+  transform: translateY(var(--space-3)) scale(0.98);
 }
 </style>

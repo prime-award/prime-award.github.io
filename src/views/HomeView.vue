@@ -117,23 +117,22 @@ function changePage(next: number) {
 
 <style scoped>
 .home__intro {
-  padding-block: clamp(8px, 1.5vw, 24px) clamp(16px, 2vw, 32px);
+  padding-block: var(--space-6) var(--space-8);
   text-align: center;
 }
 
 .home__intro-title {
-  font-size: clamp(32px, 5.2vw, 100px);
-  line-height: 1.12;
+  font: 400 var(--type-display-s) var(--font-display);
 }
 
 .home__list-anchor {
-  scroll-margin-top: calc(var(--header-h) + 8px);
+  scroll-margin-top: calc(var(--header-h) + var(--space-2));
 }
 
 .home__list {
   display: grid;
-  gap: clamp(36px, 4vw, 72px);
-  padding-block: clamp(8px, 1vw, 16px) clamp(24px, 2vw, 40px);
+  gap: var(--section-gap);
+  padding-block: var(--space-8) var(--space-10);
   transition: opacity 0.2s ease;
 }
 
@@ -145,24 +144,41 @@ function changePage(next: number) {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 16px;
+  gap: var(--space-4);
   color: var(--danger);
 }
 
 .home__skeleton {
   display: grid;
-  gap: 48px;
+  gap: var(--space-12);
 }
 
+/* заглушка строки номинаций: высота карточки 3:4 при 4 колонках */
 .home__skeleton-row {
-  height: clamp(320px, 32vw, 600px);
-  border-radius: var(--radius-card);
+  aspect-ratio: 3 / 1;
+  border-radius: var(--shape-lg);
   background: linear-gradient(90deg, var(--surface) 0%, var(--surface-2) 50%, var(--surface) 100%) 0 0 / 200% 100%;
   animation: shimmer 1.4s linear infinite;
 }
 
 .home__pages {
-  padding-bottom: clamp(24px, 3vw, 48px);
+  padding-bottom: var(--space-12);
+}
+
+@media (min-width: 840px) {
+  .home__intro {
+    padding-block: var(--space-8) var(--space-10);
+  }
+
+  .home__intro-title {
+    font: 400 var(--type-display-m) var(--font-display);
+  }
+}
+
+@media (min-width: 1200px) {
+  .home__intro-title {
+    font: 400 var(--type-display-l) var(--font-display);
+  }
 }
 
 @keyframes shimmer {

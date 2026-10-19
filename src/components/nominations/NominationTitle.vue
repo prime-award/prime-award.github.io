@@ -28,41 +28,38 @@ const suffix = computed(() => (props.year && !/года$/i.test(props.nomination
 </template>
 
 <style scoped>
+/* Название (ролевые токены section/page title) + плашка высотой --badge-h + описание (lead). */
 .nomination-title__row {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 8px clamp(12px, 1.2vw, 20px);
+  gap: var(--space-2) var(--space-4);
 }
 
 .nomination-title__name {
-  font-size: clamp(30px, 4.2vw, 80px);
+  font: 400 var(--type-section-title) var(--font-display);
   color: #fff;
 }
 
 .nomination-title--h1 .nomination-title__name {
-  font-size: clamp(34px, 5vw, 96px);
+  font: 400 var(--type-page-title) var(--font-display);
 }
 
+/* плашка: высота из токена, ширина — по собственным пропорциям картинки */
 .nomination-title__icon {
   width: auto;
-  height: clamp(40px, 4.4vw, 84px);
-  aspect-ratio: 380 / 185;
-  object-fit: contain;
+  height: var(--badge-h);
 }
 
 .nomination-title__description {
-  max-width: 70ch;
-  margin: clamp(4px, 0.6vw, 10px) 0 0;
-  color: rgba(229, 231, 234, 0.7);
-  font-family: var(--font-serif);
-  font-size: clamp(16px, 1.4vw, 28px);
-  line-height: 1.3;
+  max-width: 72ch;
+  margin: var(--space-2) 0 0;
+  color: var(--text-muted);
+  font: var(--type-body-l) var(--font-serif);
 }
 
 .nomination-title--h1 .nomination-title__description {
-  color: #fff;
-  font-size: clamp(18px, 2.5vw, 48px);
-  letter-spacing: -0.025em;
+  color: var(--text);
+  font: var(--type-lead) var(--font-serif);
 }
 </style>

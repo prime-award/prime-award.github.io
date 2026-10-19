@@ -49,78 +49,55 @@ import geekText from '../assets/geek-text.png'
 
 <style scoped>
 .sponsors {
-  margin-top: 0;
-  margin-bottom: 20px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-
   width: 100%;
-  background: #08090b;
+  margin: 0 0 var(--space-5);
+  padding: 0 var(--layout-margin);
+  background: var(--bg);
 }
 
 .heading {
-  font-family: var(--font-display), serif;
-  font-weight: 400;
-  font-size: clamp(26px, 2vw, 45px);
-  color: #e5e7ea;
+  margin: var(--space-4) 0 var(--space-2);
+  font: 400 var(--type-headline-s) var(--font-display);
+  color: var(--text);
   text-align: center;
-  margin-bottom: 10px;
 }
 
+/* compact: спонсоры друг под другом */
 .brands {
   box-sizing: border-box;
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  column-gap: 60px;
+  display: flex;
+  flex-direction: column;
   align-items: center;
+  gap: var(--space-2);
   width: 100%;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.brands li:nth-child(1) {
-  justify-self: end;
-}
-
-.brands li:nth-child(2) {
-  justify-self: center;
-}
-
-.brands li:nth-child(3) {
-  justify-self: start;
-}
-
-/* Планшеты: чуть уменьшаем расстояние между спонсорами */
-@media (max-width: 1024px) {
+/* expanded+: в ряд, средний по центру */
+@media (min-width: 840px) {
   .brands {
-    column-gap: 30px;
-  }
-}
-
-/* Мелкие экраны: спонсоры друг за другом, по центру */
-@media (max-width: 768px) {
-  .sponsors {
-    padding: 0 16px;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    column-gap: var(--space-12);
   }
 
-  .heading {
-    font-size: 26px;
-    margin-bottom: 16px;
+  .brands li:nth-child(1) {
+    justify-self: end;
   }
 
-  .brands {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
+  .brands li:nth-child(2) {
+    justify-self: center;
   }
 
-  .brands li:nth-child(n) {
-    justify-self: auto;
+  .brands li:nth-child(3) {
+    justify-self: start;
   }
 }
 </style>

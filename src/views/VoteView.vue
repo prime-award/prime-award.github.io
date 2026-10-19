@@ -307,7 +307,6 @@ const actionHint = computed(() =>
     <PrimeButton
         v-if="nomination && !showChosen"
         class="vote__skip"
-        size="sm"
         :disabled="skipping"
         data-testid="skip"
         @click="skip"
@@ -324,10 +323,12 @@ const actionHint = computed(() =>
 </template>
 
 <style scoped>
+/* нижняя панель: 56dp + отступ 16dp сверху и снизу — под неё оставляем место в конце страницы */
 .vote {
+  --bottom-bar: calc(var(--control-h-lg) + 2 * var(--space-4));
   min-height: 100dvh;
-  padding-top: calc(var(--header-h) + clamp(8px, 1.5vw, 24px));
-  padding-bottom: 120px;
+  padding-top: calc(var(--header-h) + var(--space-4));
+  padding-bottom: calc(var(--bottom-bar) + var(--space-8));
 }
 
 .vote__loading {
@@ -337,19 +338,19 @@ const actionHint = computed(() =>
 }
 
 .vote__error {
-  padding-block: 10vh;
+  padding-block: var(--space-24);
   text-align: center;
 }
 
 .vote__error h1 {
-  font-size: clamp(28px, 3vw, 52px);
+  font: 400 var(--type-headline-l) var(--font-display);
 }
 
 .vote__error-actions {
   display: flex;
   justify-content: center;
-  gap: 12px;
-  margin-top: 24px;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
 }
 
 .vote__head {
@@ -357,39 +358,36 @@ const actionHint = computed(() =>
   flex-wrap: wrap;
   align-items: flex-end;
   justify-content: space-between;
-  gap: 12px 32px;
+  gap: var(--space-3) var(--space-8);
 }
 
 .vote__progress {
   margin: 0;
   color: var(--muted-2);
-  font-size: 15px;
+  font: var(--type-body-m) var(--font-text);
   white-space: nowrap;
 }
 
 .vote__player {
-  margin-top: clamp(20px, 2vw, 32px);
+  margin-top: var(--space-6);
 }
 
 .vote__subtitle {
-  margin: clamp(24px, 2.6vw, 44px) 0 clamp(14px, 1.4vw, 24px);
-  font-family: var(--font-serif);
-  font-weight: 400;
-  font-size: clamp(22px, 2.1vw, 40px);
-  letter-spacing: -0.03em;
+  margin: var(--space-8) 0 var(--space-4);
+  font: 400 var(--type-subtitle) var(--font-serif);
 }
 
 .vote__notice {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 8px 16px;
-  margin: 0 0 20px;
-  padding: 12px 16px;
+  gap: var(--space-2) var(--space-4);
+  margin: 0 0 var(--space-5);
+  padding: var(--space-3) var(--space-4);
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: var(--shape-md);
   background: var(--surface);
-  font-size: 15px;
+  font: var(--type-body-m) var(--font-text);
 }
 
 .vote__notice.is-error {
@@ -402,98 +400,123 @@ const actionHint = computed(() =>
   border: 0;
   background: none;
   color: var(--text);
+  font: inherit;
   text-decoration: underline;
   text-underline-offset: 3px;
   cursor: pointer;
 }
 
+/* сетка номинантов: колонки по классам окна M3 */
 .vote__grid {
   display: grid;
-  gap: clamp(16px, 2.4vw, 60px) clamp(14px, 2.6vw, 90px);
+  gap: var(--layout-gutter);
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
 .vote__grid--people {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  padding-inline: clamp(0px, 1.5vw, 30px);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .vote__grid--moments {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: clamp(14px, 2vw, 56px);
+  grid-template-columns: minmax(0, 1fr);
 }
 
+@media (min-width: 600px) {
+  .vote__grid--people { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .vote__grid--moments { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (min-width: 840px) {
+  .vote__grid--moments { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (min-width: 1200px) {
+  .vote__grid--people,
+  .vote__grid--moments { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+/* навигация по анкетам: «< n/N >», 56dp */
 .vote__nav {
   position: fixed;
-  bottom: 16px;
+  bottom: var(--space-4);
   left: 50%;
   z-index: 50;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-1);
+  height: var(--control-h-lg);
   translate: -50% 0;
-  padding: 4px 8px;
+  padding: 0 var(--space-1);
   border: 1px solid var(--line);
-  border-radius: var(--radius-pill);
-  background: rgba(8, 9, 11, 0.85);
+  border-radius: var(--shape-full);
+  background: rgba(14, 16, 20, 0.92);
   backdrop-filter: blur(10px);
-  font-family: var(--font-serif);
-  font-size: clamp(22px, 1.875vw, 36px);
-  letter-spacing: -0.03em;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 4px 8px 3px rgba(0, 0, 0, 0.15);
+  font: 400 var(--type-title-l) var(--font-serif);
 }
 
 .vote__arrow {
-  width: 40px;
-  height: 40px;
-  padding: 0 0 2px;
+  display: grid;
+  place-items: center;
+  width: var(--touch-target);
+  height: var(--touch-target);
+  padding: 0;
   border: 0;
-  border-radius: 50%;
+  border-radius: var(--shape-full);
   background: transparent;
-  font-size: 1em;
-  line-height: 1;
+  font: inherit;
   cursor: pointer;
 }
 
 .vote__arrow:hover:not(:disabled) {
-  background: rgba(229, 231, 234, 0.1);
+  background: var(--state-hover);
 }
 
 .vote__arrow:disabled {
-  opacity: 0.25;
+  opacity: 0.38;
   cursor: default;
 }
 
 .vote__counter {
-  min-width: 3.6em;
+  min-width: 4.5em;
   text-align: center;
   font-variant-numeric: tabular-nums;
 }
 
-.vote__skip {
+/* «Пропустить» — extended FAB M3: 56dp, скругление 16dp, правый нижний угол */
+.vote .vote__skip {
   position: fixed;
-  right: var(--page-pad);
-  bottom: 20px;
+  right: var(--layout-margin);
+  bottom: var(--space-4);
   z-index: 50;
+  min-height: var(--control-h-lg);
+  padding: 0 var(--space-5);
+  border-radius: var(--shape-lg);
+  background: var(--surface-3);
+  border-color: var(--line);
+  font: 400 var(--type-label-l) var(--font-serif);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 4px 8px 3px rgba(0, 0, 0, 0.15);
 }
 
+/* «Выбрано» — snackbar M3: 48dp, скругление 4dp, инверсная поверхность, над нижней панелью */
 .vote__chosen {
   position: fixed;
   left: 50%;
-  bottom: 84px;
+  bottom: calc(var(--bottom-bar) + var(--space-2));
   z-index: 60;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-2);
+  min-height: var(--touch-target);
   translate: -50% 0;
-  padding: 14px 28px;
-  border-radius: var(--radius-pill);
+  padding: 0 var(--space-4);
+  border-radius: var(--shape-xs);
   background: var(--text);
   color: var(--bg);
-  font-family: var(--font-display);
-  font-size: clamp(22px, 2vw, 32px);
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(229, 231, 234, 0.3);
+  font: 500 var(--type-title-m) var(--font-text);
+  box-shadow: 0 2px 6px 2px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 .ballot-enter-active,
@@ -503,12 +526,12 @@ const actionHint = computed(() =>
 
 .ballot-enter-from {
   opacity: 0;
-  transform: translateX(24px);
+  transform: translateX(var(--space-6));
 }
 
 .ballot-leave-to {
   opacity: 0;
-  transform: translateX(-24px);
+  transform: translateX(calc(-1 * var(--space-6)));
 }
 
 .chosen-enter-active,
@@ -519,35 +542,28 @@ const actionHint = computed(() =>
 .chosen-enter-from,
 .chosen-leave-to {
   opacity: 0;
-  transform: translateY(10px);
+  transform: translateY(var(--space-2));
 }
 
-@media (max-width: 1200px) {
-  .vote__grid--people,
-  .vote__grid--moments {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 760px) {
-  .vote__grid--people,
-  .vote__grid--moments {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
+/* compact: навигация слева и компактнее, FAB справа — чтобы не перекрывались */
+@media (max-width: 599px) {
   .vote__nav {
-    left: var(--page-pad);
+    left: var(--layout-margin);
     translate: none;
-  }
-}
-
-@media (max-width: 520px) {
-  .vote__grid--moments {
-    grid-template-columns: minmax(0, 1fr);
+    font: 400 var(--type-title-m) var(--font-serif);
   }
 
-  .vote__grid {
-    gap: 12px;
+  .vote__arrow {
+    width: var(--control-h);
+    height: var(--control-h);
+  }
+
+  .vote__counter {
+    min-width: 3.5em;
+  }
+
+  .vote .vote__skip {
+    padding: 0 var(--space-4);
   }
 }
 </style>

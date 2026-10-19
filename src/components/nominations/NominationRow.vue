@@ -48,6 +48,6 @@ function stateOf(nomineeId: number) {
 
 <style scoped>
 .nomination-row__strip {
-  margin-top: clamp(14px, 1.4vw, 24px);
+  margin-top: var(--space-6);
 }
 </style>

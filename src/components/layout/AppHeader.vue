@@ -51,6 +51,7 @@ const solid = computed(() => !heroInView.value)
 </template>
 
 <style scoped>
+/* Top app bar M3: высота 64dp, поля — отступ раскладки. */
 .app-header {
   position: fixed;
   inset: 0 0 auto;
@@ -58,21 +59,22 @@ const solid = computed(() => !heroInView.value)
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: var(--space-4);
   height: var(--header-h);
-  padding-inline: var(--page-pad);
-  transition: background-color 0.3s ease, backdrop-filter 0.3s ease, box-shadow 0.3s ease;
+  padding-inline: var(--layout-margin);
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .app-header.is-solid {
-  background: rgba(8, 9, 11, 0.82);
-  backdrop-filter: blur(10px);
-  box-shadow: 0 1px 0 rgba(229, 231, 234, 0.06);
+  background: rgba(8, 9, 11, 0.86);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 1px 0 var(--line);
 }
 
 .app-header__logo {
   display: block;
   opacity: 0;
-  transform: translateY(-6px);
+  transform: translateY(calc(-1 * var(--space-2)));
   pointer-events: none;
   transition: opacity 0.3s ease, transform 0.3s ease;
 }
@@ -85,56 +87,57 @@ const solid = computed(() => !heroInView.value)
 
 .app-header__logo img {
   width: auto;
-  height: clamp(30px, 2.3vw, 44px);
+  height: var(--space-8);
 }
 
 .app-header__actions {
   display: flex;
   align-items: center;
-  gap: clamp(16px, 2vw, 40px);
+  gap: var(--space-2);
   margin-left: auto;
 }
 
-/* «Главная / Профиль» (макет 264:87): Palatino 24, rgba(229,231,234,.7) */
+/* текстовые ссылки «Главная / Профиль» — как text button M3 */
 .app-header__links {
   display: flex;
-  gap: clamp(16px, 2vw, 40px);
-  font-family: var(--font-serif);
-  font-size: clamp(17px, 1.25vw, 24px);
-  letter-spacing: -0.03em;
+  gap: var(--space-1);
 }
 
-.app-header__links a {
-  color: rgba(229, 231, 234, 0.7);
+.app-header__links a,
+.app-header__login {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--control-h);
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--shape-full);
+  background: none;
+  color: var(--text-muted);
+  font: 400 var(--type-title-m) var(--font-serif);
   text-decoration: none;
-  transition: color 0.2s ease;
+  cursor: pointer;
+  transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+.app-header__login {
+  color: var(--text);
+  font: 500 var(--type-title-m) var(--font-text);
 }
 
 .app-header__links a:hover,
+.app-header__login:hover {
+  color: var(--text);
+  background: var(--state-hover);
+}
+
 .app-header__links a.router-link-exact-active {
   color: var(--text);
 }
 
-@media (max-width: 760px) {
+/* compact: только логотип и меню */
+@media (max-width: 599px) {
   .app-header__links {
     display: none;
   }
-}
-
-/* «Войти» (макет 74:8): Inter Medium 24, без капса */
-.app-header__login {
-  padding: 6px 4px;
-  border: 0;
-  background: none;
-  color: var(--text);
-  font-family: var(--font-text);
-  font-size: clamp(17px, 1.25vw, 24px);
-  font-weight: 500;
-  cursor: pointer;
-  transition: opacity 0.2s ease;
-}
-
-.app-header__login:hover {
-  opacity: 0.75;
 }
 </style>

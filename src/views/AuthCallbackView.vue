@@ -66,24 +66,25 @@ function retry() {
   display: grid;
   place-items: center;
   min-height: 100dvh;
-  padding: var(--header-h) var(--page-pad) 0;
+  padding: var(--header-h) var(--layout-margin) 0;
   text-align: center;
 }
 
 .auth-callback__title {
-  font-size: clamp(32px, 4vw, 64px);
+  font: 400 var(--type-headline-l) var(--font-display);
 }
 
 .auth-callback__error p {
-  color: var(--muted-2);
-  font-size: 18px;
+  margin: var(--space-4) 0 0;
+  color: var(--text-muted);
+  font: var(--type-body-l) var(--font-text);
 }
 
 .auth-callback__actions {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 12px;
-  margin-top: 24px;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
 }
 </style>

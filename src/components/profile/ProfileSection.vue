@@ -43,32 +43,32 @@ const count = computed(() => props.items.length)
 
 <style scoped>
 .profile-section + .profile-section {
-  margin-top: clamp(40px, 4vw, 70px);
+  margin-top: var(--space-12);
 }
 
 .profile-section__head {
-  margin: 0 0 clamp(16px, 1.6vw, 24px);
+  margin: 0 0 var(--space-4);
 }
 
+/* заголовок-переключатель: зона нажатия 48dp, текст — subtitle */
 .profile-section__toggle {
   display: inline-flex;
   align-items: center;
-  gap: 14px;
-  padding: 0;
+  gap: var(--space-3);
+  min-height: var(--touch-target);
+  padding: 0 var(--space-2) 0 0;
   border: 0;
   background: none;
-  font-family: var(--font-serif);
-  font-weight: 700;
-  font-size: clamp(22px, 1.8vw, 34px);
+  font: 700 var(--type-subtitle) var(--font-serif);
   cursor: pointer;
 }
 
-/* треугольник из макета: ▼ открыто, ▶ свёрнуто */
+/* треугольник: ▼ открыто, ▶ свёрнуто */
 .profile-section__caret {
   width: 0;
   height: 0;
-  border-inline: 9px solid transparent;
-  border-top: 14px solid var(--text);
+  border-inline: var(--space-2) solid transparent;
+  border-top: var(--space-3) solid var(--text);
   transform: rotate(-90deg);
   transition: transform 0.2s ease;
 }
@@ -78,45 +78,44 @@ const count = computed(() => props.items.length)
 }
 
 .profile-section__count {
-  padding: 3px 10px;
+  padding: 0 var(--space-2);
   border: 1px solid var(--line);
-  border-radius: var(--radius-pill);
+  border-radius: var(--shape-full);
   color: var(--muted-2);
-  font-family: var(--font-text);
-  font-size: 14px;
+  font: var(--type-label-m) var(--font-text);
 }
 
 .profile-section__empty {
   margin: 0;
-  padding: 28px;
+  padding: var(--space-6);
   border: 1px dashed var(--line);
-  border-radius: var(--radius-card);
+  border-radius: var(--shape-lg);
   color: var(--muted-2);
   text-align: center;
 }
 
 .profile-section__grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: clamp(14px, 2vw, 36px);
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--layout-gutter);
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
 .profile-section__pages {
-  margin-top: 20px;
+  margin-top: var(--space-4);
 }
 
-@media (max-width: 1000px) {
+@media (min-width: 600px) {
   .profile-section__grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-@media (max-width: 560px) {
+@media (min-width: 840px) {
   .profile-section__grid {
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 </style>
