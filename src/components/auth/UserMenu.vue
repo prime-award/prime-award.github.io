@@ -77,13 +77,12 @@ onBeforeUnmount(() => clearTimeout(closeTimer))
 
     <Transition name="menu">
       <ul v-show="open" class="user-menu__list" role="menu">
-        <!-- заголовок меню: под каким аккаунтом вход (на телефоне ника в шапке нет) -->
-        <li class="user-menu__header" role="presentation">
-          <span class="user-menu__header-name" :style="{ color: nameColor }">{{ user.displayName }}</span>
-          <span class="user-menu__header-login">@{{ user.login }}</span>
+        <li role="none">
+          <button type="button" role="menuitem" @click="go('profile')">Профиль</button>
         </li>
-        <li role="none"><button type="button" role="menuitem" @click="go('profile')">Профиль</button></li>
-        <li role="none"><button type="button" role="menuitem" class="is-danger" @click="go('logout')">Выйти</button></li>
+        <li role="none">
+          <button type="button" role="menuitem" class="is-danger" @click="go('logout')">Выйти</button>
+        </li>
       </ul>
     </Transition>
   </div>
@@ -151,26 +150,6 @@ onBeforeUnmount(() => clearTimeout(closeTimer))
   position: absolute;
   inset: calc(-1 * var(--space-2)) 0 auto;
   height: var(--space-2);
-}
-
-.user-menu__header {
-  display: grid;
-  gap: var(--space-1);
-  padding: var(--space-2) var(--space-3) var(--space-3);
-  margin-bottom: var(--space-2);
-  border-bottom: 1px solid var(--line);
-}
-
-.user-menu__header-name {
-  overflow: hidden;
-  font: 500 var(--type-title-s) var(--font-text);
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.user-menu__header-login {
-  color: var(--muted-2);
-  font: var(--type-body-s) var(--font-text);
 }
 
 .user-menu__list button {
