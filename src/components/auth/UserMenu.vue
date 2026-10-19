@@ -135,7 +135,8 @@ onBeforeUnmount(() => clearTimeout(closeTimer))
   top: calc(100% + var(--space-1));
   right: 0;
   z-index: 10;
-  min-width: var(--menu-min);
+  /* ширина — по самому длинному пункту */
+  width: max-content;
   margin: 0;
   padding: var(--space-2) 0;
   list-style: none;
@@ -164,6 +165,7 @@ onBeforeUnmount(() => clearTimeout(closeTimer))
   background: transparent;
   font: 400 var(--type-body-l) var(--font-text);
   text-align: left;
+  white-space: nowrap;
   cursor: pointer;
 }
 
@@ -193,7 +195,7 @@ onBeforeUnmount(() => clearTimeout(closeTimer))
   transform: translateY(calc(-1 * var(--space-1)));
 }
 
-/* compact: в шапке только аватар (ник — в заголовке меню), чтобы спонсор по центру и меню не пересекались */
+/* compact: в шапке только аватар, чтобы спонсор по центру и меню не пересекались */
 @media (max-width: 599px) {
   .user-menu__trigger {
     padding: var(--space-1) var(--space-2) var(--space-1) var(--space-1);
