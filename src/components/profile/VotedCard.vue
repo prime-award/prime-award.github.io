@@ -30,6 +30,7 @@ defineProps<{ item: VotedNomination }>()
   text-align: center;
   text-decoration: none;
   transition: border-color 0.2s ease;
+  aspect-ratio: 3 / 4;
 }
 
 .voted-card:hover {
@@ -39,7 +40,6 @@ defineProps<{ item: VotedNomination }>()
 .voted-card__photo {
   position: relative;
   width: 100%;
-  aspect-ratio: 3 / 4;
   overflow: hidden;
   background: radial-gradient(70% 60% at 50% 45%, rgba(104, 119, 137, 0.9) 0%, rgba(56, 64, 74, 0.45) 50%, transparent 100%);
 }

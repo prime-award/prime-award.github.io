@@ -273,6 +273,7 @@ onMounted(load)
 .profile-card__logout {
   min-height: var(--control-h-sm);
   padding: 0 var(--space-4);
+  margin-top: var(--space-1);
   border: 1px solid transparent;
   border-radius: var(--shape-full);
   background: var(--state-hover);
