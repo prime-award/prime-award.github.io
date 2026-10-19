@@ -25,11 +25,8 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm test
+      # адрес API берётся из .env.production (VITE_API_URL)
       - run: npm run build
-        env:
-          # адрес API: Settings → Secrets and variables → Actions → Variables → VITE_API_URL
-          # (если не задан — берётся из .env.production)
-          VITE_API_URL: ${{ vars.VITE_API_URL || 'https://api.prime-award.ru' }}
       # GitHub Pages отдаёт 404.html на неизвестные адреса,
       # поэтому копируем index.html: так Vue Router обработает путь
       - run: cp dist/index.html dist/404.html

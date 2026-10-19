@@ -52,9 +52,9 @@ Workflow `.github/workflows/deploy.yml` собирает сайт при пуш�
 ## Что осталось сделать вручную
 
 1. Settings → Pages → Source: **GitHub Actions**; при своём домене — добавить `public/CNAME`.
-2. Settings → Secrets and variables → Actions → Variables: `VITE_API_URL` = публичный адрес API
-   (по умолчанию `https://api.prime-award.ru`). Если сайт открывается из подпапки
-   (`https://user.github.io/repo/`), задать ещё `VITE_BASE=/repo/` в шаге сборки.
+2. Адрес API для прода — в файле `.env.production` (`VITE_API_URL`, сейчас `https://api.prime-award.ru`).
+   Настраивать переменные на GitHub не нужно. Если сайт открывается из подпапки (`https://user.github.io/repo/`),
+   добавьте в тот же файл `VITE_BASE=/repo/`.
 3. На бэкенде добавить адрес сайта в `APP_FRONTEND_URLS` (CORS и возврат после входа).
 4. Заменить тестовые данные настоящими: плашки и фото в `public/media`, номинации и номинанты — в базе;
    видео моментов — ссылки YouTube/Twitch или файлы (`video_url` у номинации, `timecode_seconds` у моментов).
