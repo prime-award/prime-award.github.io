@@ -13,14 +13,13 @@ import PrimeButton from '@/components/ui/PrimeButton.vue'
 import NominationPlayer from '@/components/vote/NominationPlayer.vue'
 import {useAppConfig} from '@/composable/useAppConfig.ts'
 import {useCatalog} from '@/composable/useCatalog.ts'
-import {useDoubleConfirm} from '@/composable/useDoubleConfirm.ts'
 import {useLoginModal} from '@/composable/useLoginModal.ts'
 import {useMyVotes} from '@/composable/useMyVotes.ts'
 
 /*
  * Анкета номинации:
- * клик по карточке -> active (фото размыто, «Подтвердить голос») -> двойное нажатие -> POST /votes ->
- * статус «Выбрано» минимум STATUS_MS и пока не загрузится следующая -> следующая непроголосованная справа.
+ * нажатие на карточку -> active (фото размыто, надпись «Подтвердить голос») -> ещё одно нажатие по ней же -> POST /votes ->
+ * карточка «Выбрано» минимум STATUS_MS и пока не загрузится следующая -> следующая непроголосованная справа.
  */
 const STATUS_MS = 1200
 
@@ -30,7 +29,9 @@ const {getNomination, loadSummary, summary, remember} = useCatalog()
 const {votedNomineeId, votedCount, totalNominations, load: loadVotes, record} = useMyVotes()
 const {config, load: loadConfig} = useAppConfig()
 const loginModal = useLoginModal()
-const confirm = useDoubleConfirm(500)
+// второе нажатие раньше этого срока после выбора — случайный двойной клик, а не подтверждение
+const CONFIRM_GUARD_MS = 300
+let activatedAt = 0
 
 const nominationId = computed(() => Number(route.params.id))
 const nomination = ref<Nomination | null>(null)
@@ -71,7 +72,6 @@ async function load() {
   showChosen.value = false
   notice.value = null
   playerOverride.value = null
-  confirm.reset()
   try {
     const [data] = await Promise.all([getNomination(target), loadVotes(), loadSummary(), loadConfig()])
     if (target !== nominationId.value) return
@@ -101,12 +101,21 @@ function stateOf(nomineeId: number): CardState {
   return activeId.value === nomineeId ? 'active' : 'idle'
 }
 
+/**
+ * Нажатие на карточку: первое — выбор (карточка в состоянии «Подтвердить голос»),
+ * второе по той же карточке — подтверждение и отправка голоса.
+ */
 function select(nominee: Nominee) {
-  if (isMoment.value) playMoment(nominee)
+  if (isMoment.value && activeId.value !== nominee.id) playMoment(nominee)
   if (readOnly.value || submitting.value) return
-  activeId.value = activeId.value === nominee.id ? null : nominee.id
-  confirm.reset()
   notice.value = null
+
+  if (activeId.value === nominee.id) {
+    if (Date.now() - activatedAt >= CONFIRM_GUARD_MS) submit(nominee.id)
+    return
+  }
+  activeId.value = nominee.id
+  activatedAt = Date.now()
 }
 
 function playMoment(nominee: Nominee) {
@@ -120,12 +129,6 @@ function playMoment(nominee: Nominee) {
 
 function seek(nominee: Nominee) {
   playMoment(nominee)
-}
-
-/** Кнопка «Подтвердить голос»: голос уходит только со второго нажатия. */
-function onConfirmPress() {
-  if (submitting.value || activeId.value === null) return
-  if (confirm.press()) submit(activeId.value)
 }
 
 async function submit(nomineeId: number) {
@@ -167,7 +170,6 @@ function handleVoteError(e: unknown) {
       return
     }
   }
-  confirm.reset()
   notice.value = {kind: 'error', text: e instanceof Error ? e.message : 'Не удалось отправить голос. Попробуйте ещё раз.'}
 }
 
@@ -211,18 +213,13 @@ function onKey(event: KeyboardEvent) {
   if (el && (el.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(el.tagName))) return
   if (event.key === 'ArrowLeft') go(prevId.value)
   else if (event.key === 'ArrowRight') go(nextId.value)
-  else if (event.key === 'Escape') {
-    activeId.value = null
-    confirm.reset()
-  }
+  else if (event.key === 'Escape') activeId.value = null
 }
 
 onMounted(() => window.addEventListener('keydown', onKey))
 onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
 
-const actionHint = computed(() =>
-    submitting.value ? 'Отправляем…' : confirm.armed.value ? 'Ещё раз — и голос засчитан' : 'Нажмите дважды',
-)
+const actionHint = computed(() => (submitting.value ? 'Отправляем…' : undefined))
 </script>
 
 <template>
@@ -284,7 +281,6 @@ const actionHint = computed(() =>
                 seekable
                 eager
                 @select="select(nominee)"
-                @action="onConfirmPress"
                 @seek="seek(nominee)"
             />
             <NomineeCard
@@ -296,7 +292,6 @@ const actionHint = computed(() =>
                 :action-hint="actionHint"
                 eager
                 @select="select(nominee)"
-                @action="onConfirmPress"
             />
           </li>
         </ul>
@@ -319,11 +314,6 @@ const actionHint = computed(() =>
       Пропустить →
     </PrimeButton>
 
-    <Transition name="chosen">
-      <div v-if="showChosen" class="vote__chosen" role="status" data-testid="vote-status">
-        <span aria-hidden="true">✓</span> Выбрано
-      </div>
-    </Transition>
   </main>
 </template>
 
@@ -411,35 +401,37 @@ const actionHint = computed(() =>
   cursor: pointer;
 }
 
-/* сетка номинантов: колонки по классам окна M3 */
+/* сетка номинантов: карточки фиксированной ширины, не больше 5 в ряд, ряды (и неполный последний) — по центру */
 .vote__grid {
-  display: grid;
+  --card-w: var(--ballot-card-w);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: var(--layout-gutter);
-  margin: 0;
+  max-width: calc(5 * var(--card-w) + 4 * var(--layout-gutter));
+  margin: 0 auto;
   padding: 0;
   list-style: none;
 }
 
-.vote__grid--people {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
 .vote__grid--moments {
-  grid-template-columns: minmax(0, 1fr);
+  --card-w: var(--ballot-moment-w);
 }
 
-@media (min-width: 600px) {
-  .vote__grid--people { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .vote__grid--moments { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.vote__grid > li {
+  flex: 0 0 var(--card-w);
+  min-width: 0;
 }
 
-@media (min-width: 840px) {
-  .vote__grid--moments { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-}
+/* compact: люди — по 2 в ряд на всю ширину, моменты — по одному */
+@media (max-width: 599px) {
+  .vote__grid--people > li {
+    flex-basis: calc((100% - var(--layout-gutter)) / 2);
+  }
 
-@media (min-width: 1200px) {
-  .vote__grid--people,
-  .vote__grid--moments { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .vote__grid--moments > li {
+    flex-basis: 100%;
+  }
 }
 
 /* навигация по анкетам: «< n/N >», 56dp */
@@ -505,24 +497,6 @@ const actionHint = computed(() =>
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 4px 8px 3px rgba(0, 0, 0, 0.15);
 }
 
-/* «Выбрано» — snackbar M3: 48dp, скругление 4dp, инверсная поверхность, над нижней панелью */
-.vote__chosen {
-  position: fixed;
-  left: 50%;
-  bottom: calc(var(--bottom-bar) + var(--space-2));
-  z-index: 60;
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  min-height: var(--touch-target);
-  translate: -50% 0;
-  padding: 0 var(--space-4);
-  border-radius: var(--shape-xs);
-  background: var(--text);
-  color: var(--bg);
-  font: 500 var(--type-title-m) var(--font-text);
-  box-shadow: 0 2px 6px 2px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.5);
-}
 
 .ballot-enter-active,
 .ballot-leave-active {
@@ -539,16 +513,6 @@ const actionHint = computed(() =>
   transform: translateX(calc(-1 * var(--space-6)));
 }
 
-.chosen-enter-active,
-.chosen-leave-active {
-  transition: opacity 0.2s ease, transform 0.2s ease;
-}
-
-.chosen-enter-from,
-.chosen-leave-to {
-  opacity: 0;
-  transform: translateY(var(--space-2));
-}
 
 /* compact: навигация слева и компактнее, FAB справа — чтобы не перекрывались */
 @media (max-width: 599px) {

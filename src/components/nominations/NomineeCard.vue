@@ -19,7 +19,7 @@ const props = withDefaults(defineProps<{
   eager?: boolean
 }>(), {state: 'idle'})
 
-const emit = defineEmits<{ select: [], action: [event: MouseEvent | KeyboardEvent] }>()
+const emit = defineEmits<{ select: [] }>()
 
 const loaded = ref(false)
 const photo = computed(() => mediaUrl(props.nominee.photoPath))
@@ -53,7 +53,7 @@ const photo = computed(() => mediaUrl(props.nominee.photoPath))
     <button
         type="button"
         class="nominee-card__hit"
-        :aria-label="hoverLabel ? `${hoverLabel}: ${nominee.name}` : nominee.name"
+        :aria-label="state === 'active' && actionLabel ? `${actionLabel}: ${nominee.name}` : hoverLabel ? `${hoverLabel}: ${nominee.name}` : nominee.name"
         :aria-pressed="state === 'active' || state === 'selected'"
         :disabled="state === 'dimmed'"
         @click="emit('select')"
@@ -61,15 +61,9 @@ const photo = computed(() => mediaUrl(props.nominee.photoPath))
       <span v-if="hoverLabel" class="nominee-card__hover-label" aria-hidden="true">{{ hoverLabel }}</span>
     </button>
 
-    <div v-if="state === 'active' && actionLabel" class="nominee-card__action">
-      <button
-          type="button"
-          class="nominee-card__action-button"
-          data-testid="confirm-vote"
-          @click.stop="emit('action', $event)"
-      >
-        {{ actionLabel }}
-      </button>
+    <!-- в состоянии active подпись — только визуальная: подтверждает голос клик по всей карточке -->
+    <div v-if="state === 'active' && actionLabel" class="nominee-card__action" aria-hidden="true">
+      <span class="nominee-card__action-label" data-testid="confirm-vote">{{ actionLabel }}</span>
       <small v-if="actionHint" class="nominee-card__action-hint">{{ actionHint }}</small>
     </div>
   </article>
@@ -85,6 +79,7 @@ const photo = computed(() => mediaUrl(props.nominee.photoPath))
   position: relative;
   display: flex;
   flex-direction: column;
+  container-type: inline-size;
   overflow: hidden;
   border: 1px solid var(--border);
   border-radius: var(--shape-lg);
@@ -151,6 +146,7 @@ const photo = computed(() => mediaUrl(props.nominee.photoPath))
 .nominee-card__hit {
   position: absolute;
   inset: 0;
+  touch-action: manipulation;
   display: grid;
   place-items: center;
   padding: 0;
@@ -171,7 +167,7 @@ const photo = computed(() => mediaUrl(props.nominee.photoPath))
 
 /* подписи-кнопки поверх фото: tonal button M3 (40dp, поля 24dp) */
 .nominee-card__hover-label,
-.nominee-card__action-button {
+.nominee-card__action-label {
   display: inline-flex;
   align-items: center;
   min-height: var(--control-h);
@@ -231,18 +227,17 @@ const photo = computed(() => mediaUrl(props.nominee.photoPath))
   animation: action-in 0.2s ease both;
 }
 
-.nominee-card__action-button {
-  min-height: var(--touch-target);
-  pointer-events: auto;
-  /* двойной тап не должен масштабировать страницу (iOS) */
-  touch-action: manipulation;
-  cursor: pointer;
-  transition: border-color 0.2s ease, background-color 0.2s ease;
+
+.nominee-card__action-label {
+  transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
 }
 
-.nominee-card__action-button:hover {
-  border-color: var(--line-strong);
-  background: rgba(40, 45, 53, 0.85);
+/* подпись «Подтвердить голос» подсвечивается вместе с карточкой */
+.nominee-card.is-active:hover .nominee-card__action-label,
+.nominee-card.is-active:has(.nominee-card__hit:focus-visible) .nominee-card__action-label {
+  border-color: var(--text);
+  background: var(--text);
+  color: var(--bg);
 }
 
 .nominee-card__action-hint {
@@ -269,6 +264,20 @@ const photo = computed(() => mediaUrl(props.nominee.photoPath))
 .nominee-card.is-dimmed {
   opacity: 0.38;
   filter: grayscale(0.5);
+}
+
+/* узкая карточка (анкета, до ~240dp): шрифты и поля на ступень меньше */
+@container (max-width: 240px) {
+  .nominee-card__name {
+    font: 400 var(--type-title-m) var(--font-serif);
+  }
+
+  .nominee-card__hover-label,
+  .nominee-card__action-label {
+    min-height: var(--control-h-sm);
+    padding: 0 var(--space-3);
+    font: 400 var(--type-label-l) var(--font-serif);
+  }
 }
 
 @keyframes action-in {

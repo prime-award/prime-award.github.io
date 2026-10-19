@@ -17,7 +17,7 @@ const props = withDefaults(defineProps<{
   eager?: boolean
 }>(), {state: 'idle'})
 
-const emit = defineEmits<{ select: [], action: [event: MouseEvent | KeyboardEvent], seek: [seconds: number] }>()
+const emit = defineEmits<{ select: [], seek: [seconds: number] }>()
 
 const loaded = ref(false)
 const preview = computed(() => mediaUrl(props.nominee.photoPath))
@@ -51,7 +51,7 @@ const timecode = computed(() =>
     <button
         type="button"
         class="moment-card__hit"
-        :aria-label="hoverLabel ? `${hoverLabel}: ${nominee.name}` : nominee.name"
+        :aria-label="state === 'active' && actionLabel ? `${actionLabel}: ${nominee.name}` : hoverLabel ? `${hoverLabel}: ${nominee.name}` : nominee.name"
         :aria-pressed="state === 'active' || state === 'selected'"
         :disabled="state === 'dimmed'"
         @click="emit('select')"
@@ -70,10 +70,9 @@ const timecode = computed(() =>
     </button>
     <span v-else-if="timecode" class="moment-card__timecode is-static">{{ timecode }}</span>
 
-    <div v-if="state === 'active' && actionLabel" class="moment-card__action">
-      <button type="button" class="moment-card__action-button" data-testid="confirm-vote" @click.stop="emit('action', $event)">
-        {{ actionLabel }}
-      </button>
+    <!-- в состоянии active подпись — только визуальная: подтверждает голос клик по всей карточке -->
+    <div v-if="state === 'active' && actionLabel" class="moment-card__action" aria-hidden="true">
+      <span class="moment-card__action-label" data-testid="confirm-vote">{{ actionLabel }}</span>
       <small v-if="actionHint" class="moment-card__action-hint">{{ actionHint }}</small>
     </div>
   </article>
@@ -88,6 +87,7 @@ const timecode = computed(() =>
   position: relative;
   display: flex;
   flex-direction: column;
+  container-type: inline-size;
   height: 100%;
   overflow: hidden;
   padding: var(--space-2);
@@ -203,6 +203,7 @@ const timecode = computed(() =>
 .moment-card__hit {
   position: absolute;
   inset: 0;
+  touch-action: manipulation;
   display: grid;
   place-items: center;
   padding: 0;
@@ -222,7 +223,7 @@ const timecode = computed(() =>
 }
 
 .moment-card__hover-label,
-.moment-card__action-button {
+.moment-card__action-label {
   display: inline-flex;
   align-items: center;
   min-height: var(--control-h);
@@ -276,17 +277,17 @@ const timecode = computed(() =>
   animation: action-in 0.2s ease both;
 }
 
-.moment-card__action-button {
-  min-height: var(--touch-target);
-  pointer-events: auto;
-  /* двойной тап не должен масштабировать страницу (iOS) */
-  touch-action: manipulation;
-  cursor: pointer;
+
+.moment-card__action-label {
+  transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
 }
 
-.moment-card__action-button:hover {
-  border-color: var(--line-strong);
-  background: rgba(40, 45, 53, 0.85);
+/* подпись «Подтвердить голос» подсвечивается вместе с карточкой */
+.moment-card.is-active:hover .moment-card__action-label,
+.moment-card.is-active:has(.moment-card__hit:focus-visible) .moment-card__action-label {
+  border-color: var(--text);
+  background: var(--text);
+  color: var(--bg);
 }
 
 .moment-card__action-hint {
@@ -312,6 +313,20 @@ const timecode = computed(() =>
 .moment-card.is-dimmed {
   opacity: 0.38;
   filter: grayscale(0.5);
+}
+
+/* узкая карточка (анкета, до ~240dp): шрифты и поля на ступень меньше */
+@container (max-width: 240px) {
+  .moment-card__title {
+    font: 400 var(--type-title-m) var(--font-serif);
+  }
+
+  .moment-card__hover-label,
+  .moment-card__action-label {
+    min-height: var(--control-h-sm);
+    padding: 0 var(--space-3);
+    font: 400 var(--type-label-l) var(--font-serif);
+  }
 }
 
 @keyframes action-in {
