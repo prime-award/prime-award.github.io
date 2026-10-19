@@ -12,12 +12,12 @@ const props = withDefaults(defineProps<{
   actionLabel?: string
   actionHint?: string
   badge?: string
-  /** показывать таймкод кнопкой «перемотать» (анкета с плеером) */
+  /** таймкод показывается снаружи, кнопкой под карточкой (анкета с плеером) — внутри его не рисуем */
   seekable?: boolean
   eager?: boolean
 }>(), {state: 'idle'})
 
-const emit = defineEmits<{ select: [], seek: [seconds: number] }>()
+const emit = defineEmits<{ select: [] }>()
 
 const loaded = ref(false)
 const preview = computed(() => mediaUrl(props.nominee.photoPath))
@@ -27,7 +27,7 @@ const timecode = computed(() =>
 </script>
 
 <template>
-  <article class="moment-card" :class="[`is-${state}`, { 'has-hover-label': hoverLabel }]" :data-nominee-id="nominee.id" :data-state="state">
+  <article class="moment-card" :class="[`is-${state}`, { 'has-hover-label': hoverLabel, 'has-timecode': timecode && !seekable }]" :data-nominee-id="nominee.id" :data-state="state">
     <div class="moment-card__preview">
       <img
           v-if="preview"
@@ -59,16 +59,8 @@ const timecode = computed(() =>
       <span v-if="hoverLabel" class="moment-card__hover-label" aria-hidden="true">{{ hoverLabel }}</span>
     </button>
 
-    <button
-        v-if="timecode && seekable"
-        type="button"
-        class="moment-card__timecode"
-        :aria-label="`Смотреть момент с ${timecode}`"
-        @click.stop="emit('seek', nominee.timecodeSeconds!)"
-    >
-      ▶ {{ timecode }}
-    </button>
-    <span v-else-if="timecode" class="moment-card__timecode is-static">{{ timecode }}</span>
+    <!-- в анкете (seekable) таймкод — отдельная кнопка под карточкой, здесь только подпись -->
+    <span v-if="timecode && !seekable" class="moment-card__timecode">{{ timecode }}</span>
 
     <!-- в состоянии active подпись — только визуальная: подтверждает голос клик по всей карточке -->
     <div v-if="state === 'active' && actionLabel" class="moment-card__action" aria-hidden="true">
@@ -133,10 +125,14 @@ const timecode = computed(() =>
   flex-direction: column;
   align-items: center;
   gap: var(--space-1);
-  padding: var(--space-3) var(--space-2) var(--space-12);
+  padding: var(--space-3) var(--space-2) var(--space-4);
   text-align: center;
   text-wrap: balance;
   transition: filter 0.3s ease;
+}
+
+.moment-card.has-timecode .moment-card__body {
+  padding-bottom: var(--space-12);
 }
 
 .moment-card__title {
@@ -152,35 +148,15 @@ const timecode = computed(() =>
   font: var(--type-body-m) var(--font-serif);
 }
 
-/* таймкод — небольшая text button внизу карточки (зона нажатия 32dp + отступы карточки) */
 .moment-card__timecode {
   position: absolute;
-  bottom: var(--space-2);
+  bottom: var(--space-3);
   left: 50%;
   z-index: 1;
   translate: -50% 0;
-  display: inline-flex;
-  align-items: center;
-  min-height: var(--control-h-sm);
-  padding: 0 var(--space-3);
-  border: 1px solid transparent;
-  border-radius: var(--shape-full);
-  background: transparent;
   color: var(--text-subtle);
   font: var(--type-label-l) var(--font-serif);
   font-variant-numeric: tabular-nums;
-  cursor: pointer;
-  transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
-}
-
-.moment-card__timecode:hover {
-  color: var(--text);
-  border-color: var(--line);
-  background: var(--state-hover);
-}
-
-.moment-card__timecode.is-static {
-  cursor: default;
   pointer-events: none;
 }
 

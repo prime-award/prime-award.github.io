@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed, onBeforeUnmount, onMounted, ref, watch} from 'vue'
+import {computed, nextTick, onBeforeUnmount, onMounted, ref, watch} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import {useHead} from '@unhead/vue'
 import {api, ApiError, type Nomination, type Nominee, type Vote} from '@/api'
@@ -7,7 +7,7 @@ import AppLoader from '@/components/AppLoader.vue'
 import MomentCard from '@/components/nominations/MomentCard.vue'
 import NominationTitle from '@/components/nominations/NominationTitle.vue'
 import NomineeCard from '@/components/nominations/NomineeCard.vue'
-import type {CardState} from '@/components/nominations/cardState.ts'
+import {type CardState, formatTimecode} from '@/components/nominations/cardState.ts'
 import {votedFirst} from '@/components/nominations/votedFirst.ts'
 import {plural} from '@/utils/countdown.ts'
 import PrimeButton from '@/components/ui/PrimeButton.vue'
@@ -128,7 +128,20 @@ function playMoment(nominee: Nominee) {
   }
 }
 
-function seek(nominee: Nominee) {
+const PLAYER_OPEN_KEY = 'prime.player.open'
+const playerOpen = ref(localStorage.getItem(PLAYER_OPEN_KEY) === '1')
+
+function setPlayerOpen(open: boolean) {
+  playerOpen.value = open
+  localStorage.setItem(PLAYER_OPEN_KEY, open ? '1' : '0')
+}
+
+/** Кнопка таймкода под карточкой момента: раскрыть видео (если свёрнуто) и перемотать на момент. */
+async function seek(nominee: Nominee) {
+  if (!playerOpen.value) {
+    setPlayerOpen(true)
+    await nextTick()
+  }
   playMoment(nominee)
 }
 
@@ -249,14 +262,20 @@ const actionHint = computed(() => (submitting.value ? 'Отправляем…' 
           </p>
         </header>
 
-        <NominationPlayer
-            v-if="showPlayer"
-            ref="player"
-            class="vote__player"
-            :url="playerUrl"
-            :poster="nomination.videoPosterPath"
-            :title="nomination.name"
-        />
+        <!-- видео свёрнуто по умолчанию; раскрыто/свёрнуто — запоминается и действует в следующих номинациях -->
+        <section v-if="showPlayer" class="vote__video" :class="{ 'is-open': playerOpen }">
+          <NominationPlayer
+              v-if="playerOpen"
+              ref="player"
+              class="vote__player"
+              :url="playerUrl"
+              :poster="nomination.videoPosterPath"
+              :title="nomination.name"
+          />
+          <PrimeButton class="vote__video-toggle" :aria-expanded="playerOpen" data-testid="video-toggle" @click="setPlayerOpen(!playerOpen)">
+            {{ playerOpen ? 'Свернуть видео' : '▶ Смотреть видео номинации' }}
+          </PrimeButton>
+        </section>
 
         <h2 class="vote__subtitle">
           <template v-if="voted !== null">Ваш выбор:</template>
@@ -284,8 +303,18 @@ const actionHint = computed(() => (submitting.value ? 'Отправляем…' 
                 seekable
                 eager
                 @select="select(nominee)"
-                @seek="seek(nominee)"
             />
+            <!-- таймкод — отдельной кнопкой под карточкой: раскрывает видео и перематывает на момент -->
+            <PrimeButton
+                v-if="isMoment && nominee.timecodeSeconds != null"
+                class="vote__seek"
+                size="sm"
+                variant="ghost"
+                :aria-label="`Смотреть момент с ${formatTimecode(nominee.timecodeSeconds)}`"
+                @click="seek(nominee)"
+            >
+              ▶ {{ formatTimecode(nominee.timecodeSeconds) }}
+            </PrimeButton>
             <NomineeCard
                 v-else
                 :nominee="nominee"
@@ -367,8 +396,31 @@ const actionHint = computed(() => (submitting.value ? 'Отправляем…' 
   white-space: nowrap;
 }
 
-.vote__player {
+/* блок видео: свёрнут — только кнопка по центру; раскрыт — плеер и под ним кнопка «Свернуть» */
+.vote__video {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
   margin-top: var(--space-6);
+}
+
+.vote__player {
+  margin: 0;
+}
+
+/* карточка момента и её кнопка таймкода — столбиком, кнопка по центру */
+.vote__grid--moments > li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.vote__grid--moments > li > .moment-card {
+  align-self: stretch;
+  flex: 1 1 auto;
+  height: auto; /* вместо 100%: место под кнопкой таймкода */
 }
 
 .vote__subtitle {

@@ -26,6 +26,9 @@ const CHUNK = 3
 const {openNextBallot, openBallot} = useVoteNavigation()
 const {votedNomineeId, load: loadVotes} = useMyVotes()
 
+// строки показываем, когда известны голоса пользователя: иначе выбранный номинант на глазах «перескакивает» в начало ленты
+const votesReady = ref(false)
+
 const items = ref<Nomination[]>([])
 const total = ref<number | null>(null)
 const loadedPages = ref(0)
@@ -53,7 +56,7 @@ async function loadMore() {
 }
 
 loadMore()
-loadVotes()
+loadVotes().finally(() => (votesReady.value = true))
 </script>
 
 <template>
@@ -73,15 +76,17 @@ loadVotes()
       <h2 class="display home__list-title">Номинации</h2>
 
       <div v-if="items.length || loading" class="home__rows">
-        <NominationRow
-            v-for="nomination in items"
-            :key="nomination.id"
-            :nomination="nomination"
-            :voted-nominee-id="votedNomineeId(nomination.id)"
-            @choose="(nomineeId) => openBallot(nomination.id, nomineeId)"
-        />
+        <template v-if="votesReady">
+          <NominationRow
+              v-for="nomination in items"
+              :key="nomination.id"
+              :nomination="nomination"
+              :voted-nominee-id="votedNomineeId(nomination.id)"
+              @choose="(nomineeId) => openBallot(nomination.id, nomineeId)"
+          />
+        </template>
 
-        <div v-if="!items.length && loading" class="home__skeleton" aria-hidden="true">
+        <div v-if="(!items.length && loading) || !votesReady" class="home__skeleton" aria-hidden="true">
           <div v-for="i in 2" :key="i" class="home__skeleton-row"/>
         </div>
       </div>

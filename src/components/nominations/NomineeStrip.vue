@@ -58,6 +58,8 @@ onBeforeUnmount(() => resizeObserver?.disconnect())
  * (compact — 1 с «подглядыванием» следующей, medium — 2, expanded — 3, large+ — 4).
  */
 .strip {
+  /* ЗАЗОР МЕЖДУ КАРТОЧКАМИ НА ГЛАВНОЙ — меняется только здесь (и в расчёте ширины, и в gap) */
+  --strip-gap: var(--space-4);
   --per-view: 1.25;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -68,8 +70,8 @@ onBeforeUnmount(() => resizeObserver?.disconnect())
 .strip__track {
   display: grid;
   grid-auto-flow: column;
-  grid-auto-columns: calc((100% - (var(--per-view) - 1) * var(--layout-gutter)) / var(--per-view));
-  gap: var(--space-4);
+  grid-auto-columns: calc((100% - (var(--per-view) - 1) * var(--strip-gap)) / var(--per-view));
+  gap: var(--strip-gap);
   margin: 0;
   padding: var(--space-1) 0;
   list-style: none;

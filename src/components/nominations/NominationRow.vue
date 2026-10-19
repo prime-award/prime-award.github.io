@@ -30,7 +30,13 @@ function stateOf(nomineeId: number) {
   <section class="nomination-row" :aria-labelledby="`nomination-${nomination.id}`" :data-nomination-id="nomination.id">
     <NominationTitle :id="`nomination-${nomination.id}`" :nomination="nomination" year="2026"/>
 
-    <NomineeStrip class="nomination-row__strip" :count="nomination.nominees.length" :label="`Номинанты: ${nomination.name}`">
+    <!-- key: при смене голоса лента пересоздаётся и начинается с начала (scroll-snap иначе держит в кадре прежнюю первую карточку) -->
+    <NomineeStrip
+        :key="votedNomineeId ?? 'none'"
+        class="nomination-row__strip"
+        :count="nomination.nominees.length"
+        :label="`Номинанты: ${nomination.name}`"
+    >
       <li v-for="nominee in nominees" :key="nominee.id">
         <MomentCard
             v-if="nomination.type === 'MOMENT'"

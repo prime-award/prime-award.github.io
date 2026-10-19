@@ -28,10 +28,15 @@ async function seek(seconds: number) {
   start.value = seconds
   autoplay.value = true
   await nextTick()
-  if (video.value) {
-    video.value.currentTime = seconds
-    video.value.play().catch(() => {})
+  const el = video.value
+  if (!el) return
+  const go = () => {
+    el.currentTime = seconds
+    el.play().catch(() => {})
   }
+  // плеер мог только что открыться: до загрузки метаданных перемотка игнорируется браузером
+  if (el.readyState >= HTMLMediaElement.HAVE_METADATA) go()
+  else el.addEventListener('loadedmetadata', go, {once: true})
 }
 
 defineExpose({seek})

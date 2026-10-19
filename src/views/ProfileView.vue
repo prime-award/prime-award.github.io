@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {computed, onMounted, ref} from 'vue'
-import {useRoute} from 'vue-router'
+import {useRoute, useRouter} from 'vue-router'
 import {useHead} from '@unhead/vue'
 import {api, type MyNominations} from '@/api'
 import AppLoader from '@/components/AppLoader.vue'
@@ -25,7 +25,14 @@ const PLATFORM_TITLE: Record<string, string> = {
 }
 
 const route = useRoute()
-const {user} = useAuth()
+const {user, logout} = useAuth()
+const router = useRouter()
+
+/** «Выйти» на визитке — как в меню: выход и на главную. */
+async function signOut() {
+  await logout()
+  await router.push('/')
+}
 const {record} = useMyVotes()
 const {openNextBallot} = useVoteNavigation()
 
@@ -57,17 +64,22 @@ onMounted(load)
     <div class="profile__layout">
       <aside v-if="user" class="profile__side">
         <!-- визитка участника: квадрат, ник — шрифтом названий номинаций -->
-        <section class="profile-card" aria-label="Профиль участника" data-testid="profile-card">
+        <section
+            class="profile-card"
+            aria-label="Профиль участника"
+            data-testid="profile-card"
+            :style="{ '--accent': user.nameColor ?? 'var(--border)' }"
+        >
           <header class="profile-card__top">
             <img class="profile-card__mark" :src="primeLogo" alt="PRIME 2026"/>
             <span class="profile-card__platform">{{ PLATFORM_TITLE[user.platform] ?? user.platform }}</span>
           </header>
 
           <div class="profile-card__who">
-            <UserAvatar class="profile-card__avatar" :user="user" :size="88"/>
+            <UserAvatar class="profile-card__avatar" :user="user" :size="72"/>
             <h1 class="profile-card__name">{{ user.displayName }}</h1>
-            <span class="profile-card__accent" :style="{ background: user.nameColor ?? 'var(--border)' }"
-                  aria-hidden="true"/>
+            <span class="profile-card__accent" aria-hidden="true"/>
+            <button type="button" class="profile-card__logout" data-testid="profile-logout" @click="signOut">Выйти</button>
           </div>
 
           <footer v-if="data" class="profile-card__progress" data-testid="progress">
@@ -79,12 +91,14 @@ onMounted(load)
                  :aria-valuemax="total">
               <span :style="{ width: `${percent}%` }"/>
             </div>
+            <PrimeButton v-if="!allDone" class="profile-card__continue" variant="light" size="sm" @click="openNextBallot">
+              Продолжить голосование
+            </PrimeButton>
           </footer>
         </section>
 
-        <div v-if="data" class="profile__actions">
-          <PrimeButton v-if="!allDone" variant="light" @click="openNextBallot">Продолжить голосование</PrimeButton>
-          <PrimeButton v-if="votedCount > 0" data-testid="share" @click="shareOpen = true">Поделиться</PrimeButton>
+        <div v-if="data && votedCount > 0" class="profile__actions">
+          <PrimeButton data-testid="share" @click="shareOpen = true">Поделиться результатом</PrimeButton>
         </div>
       </aside>
 
@@ -227,18 +241,19 @@ onMounted(load)
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-2);
+  gap: var(--space-1);
   min-width: 0;
 }
 
 .profile-card__avatar {
-  box-shadow: 0 0 0 1px var(--line-strong), 0 0 0 4px var(--bg), 0 0 0 5px var(--line);
+  /* рамка вокруг аватара — цвет ника с платформы, через тонкий зазор */
+  box-shadow: 0 0 0 3px var(--bg), 0 0 0 5px var(--accent);
 }
 
 /* ник — шрифтом названий номинаций (Foglihten, капс) */
 .profile-card__name {
   max-width: 100%;
-  margin: var(--space-2) 0 0;
+  margin: var(--space-3) 0 0;
   overflow: hidden;
   font: 400 var(--type-headline-m) var(--font-display);
   text-transform: uppercase;
@@ -251,6 +266,29 @@ onMounted(load)
   width: var(--space-8);
   height: 2px;
   border-radius: var(--shape-full);
+  background: var(--accent);
+}
+
+/* «Выйти» — небольшая текстовая кнопка под цветной полосой */
+.profile-card__logout {
+  min-height: var(--control-h-sm);
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--shape-full);
+  background: none;
+  color: var(--muted-2);
+  font: var(--type-label-l) var(--font-text);
+  cursor: pointer;
+  transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+.profile-card__logout:hover {
+  color: var(--danger);
+  background: var(--state-hover);
+}
+
+.profile-card__continue {
+  margin-top: var(--space-2);
 }
 
 
