@@ -51,7 +51,7 @@ const solid = computed(() => !heroInView.value)
           type="button"
           class="app-header__login"
           data-testid="login-button"
-          @click="loginModal.open(route.fullPath)"
+          @click="loginModal.open('/profile')"
       >
         Войти
       </button>

@@ -43,7 +43,7 @@ onMounted(async () => {
 
 function retry() {
   router.replace('/')
-  loginModal.open('/')
+  loginModal.open('/profile')
 }
 </script>
 
