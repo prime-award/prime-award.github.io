@@ -11,8 +11,6 @@ const mainScreenVideo = mediaUrl('media/video/main-background.mp4')
 defineProps({
   // строки заголовка под логотипом (каждая появляется своей анимацией)
   titleLines: {type: Array, default: () => ['Главная народная', 'премия ру-стриминга']},
-  // логотип спонсора сверху; на страницах с шапкой он уже есть в шапке
-  showSponsor: {type: Boolean, default: true},
 })
 
 const {videoRef, onRevealEnd, isEnded, isLoaded, isRevealStarted, onLoaderLeave} = useMainBackground()
@@ -46,8 +44,8 @@ const {heroRef} = useHeroVisibility()
         aria-hidden="true"
     ></div>
 
-    <div v-if="showSponsor" class="main-screen__top reveal" style="--reveal-index: 4">
-      <SteamLvlUpLogo/>
+    <div class="main-screen__top reveal" style="--reveal-index: 4">
+      <SteamLvlUpLogo :height="40"/>
     </div>
 
     <div class="main-screen__content">

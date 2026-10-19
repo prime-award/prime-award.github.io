@@ -95,7 +95,7 @@ onBeforeUnmount(() => clearTimeout(closeTimer))
   max-width: 100%;
 }
 
-/* «чип» пользователя: высота 40dp, аватар 32dp */
+/* кнопка пользователя: высота 40dp, аватар 32dp, скругление 4dp */
 .user-menu__trigger {
   display: flex;
   align-items: center;
@@ -104,7 +104,7 @@ onBeforeUnmount(() => clearTimeout(closeTimer))
   min-height: var(--control-h);
   padding: var(--space-1) var(--space-3) var(--space-1) var(--space-1);
   border: 1px solid var(--line);
-  border-radius: var(--shape-full);
+  border-radius: var(--shape-xs);
   background: rgba(14, 16, 20, 0.7);
   backdrop-filter: blur(8px);
   cursor: pointer;

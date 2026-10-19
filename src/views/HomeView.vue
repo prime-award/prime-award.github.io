@@ -65,7 +65,7 @@ function changePage(next: number) {
 
 <template>
   <main class="home">
-    <MainBlock :title-lines="['Кто станет', 'королём рунета 2026?']" :show-sponsor="false">
+    <MainBlock :title-lines="['Кто станет', 'королём рунета 2026?']">
       <template #actions>
         <PrimeButton variant="light" size="lg" data-testid="vote-cta" @click="openNextBallot">Проголосовать</PrimeButton>
       </template>

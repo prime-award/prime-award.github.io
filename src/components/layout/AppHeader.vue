@@ -13,7 +13,7 @@ const heroInView = useHeroInView()
 const loginModal = useLoginModal()
 const route = useRoute()
 
-// Логотип слева виден, когда большой логотип главного экрана ушёл из вида (на остальных страницах — всегда)
+// Логотипы PRIME и спонсора видны, когда главный экран (с их крупными версиями) ушёл из вида; на остальных страницах — всегда
 const showLogo = computed(() => !heroInView.value)
 // Фон появляется вместе с логотипом, чтобы над главным экраном шапка была прозрачной
 const solid = computed(() => !heroInView.value)
@@ -32,8 +32,14 @@ const solid = computed(() => !heroInView.value)
       <img :src="primeLogo" alt="PRIME 2026"/>
     </RouterLink>
 
-    <!-- спонсор — по центру шапки на всех экранах -->
-    <SteamLvlUpLogo class="app-header__sponsor" variant="header"/>
+    <!-- спонсор — по центру шапки; как и логотип PRIME, появляется, когда главный экран (там свой логотип) ушёл из вида -->
+    <SteamLvlUpLogo
+        class="app-header__sponsor"
+        :class="{ 'is-visible': showLogo }"
+        :tabindex="showLogo ? 0 : -1"
+        :aria-hidden="!showLogo"
+        variant="header"
+    />
 
     <div class="app-header__actions">
       <nav v-if="isLoggedIn && route.name !== 'home'" class="app-header__links" aria-label="Разделы">
@@ -75,8 +81,8 @@ const solid = computed(() => !heroInView.value)
   box-shadow: 0 1px 0 var(--line);
 }
 
-.app-header__logo {
-  justify-self: start;
+.app-header__logo,
+.app-header__sponsor {
   display: block;
   opacity: 0;
   transform: translateY(calc(-1 * var(--space-2)));
@@ -84,7 +90,12 @@ const solid = computed(() => !heroInView.value)
   transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-.app-header__logo.is-visible {
+.app-header__logo {
+  justify-self: start;
+}
+
+.app-header__logo.is-visible,
+.app-header__sponsor.is-visible {
   opacity: 1;
   transform: none;
   pointer-events: auto;
@@ -97,6 +108,12 @@ const solid = computed(() => !heroInView.value)
 
 .app-header__sponsor {
   justify-self: center;
+}
+
+/* пока логотип скрыт, он не должен перехватывать клики по главному экрану */
+.app-header__sponsor:not(.is-visible) {
+  visibility: hidden;
+  transition: opacity 0.3s ease, transform 0.3s ease, visibility 0s 0.3s;
 }
 
 .app-header__actions {
