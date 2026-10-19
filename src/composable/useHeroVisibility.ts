@@ -12,10 +12,11 @@ export function useHeroVisibility() {
     onMounted(() => {
         if (!heroRef.value) return
         heroInView.value = true
-        // логотип в header появляется, когда от главного экрана осталось меньше ~20% высоты
+        // логотипы в header появляются, когда нижний край главного экрана поднялся выше 30% высоты окна
+        // (на 10% раньше, чем при полном уходе экрана наверх: шапка «готова» до конца прокрутки)
         observer = new IntersectionObserver(([entry]) => {
             heroInView.value = entry.isIntersecting
-        }, {threshold: 0, rootMargin: '0px 0px -80% 0px'})
+        }, {threshold: 0, rootMargin: '0px 0px -70% 0px'})
         observer.observe(heroRef.value)
     })
 
