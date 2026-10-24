@@ -304,7 +304,7 @@ const actionHint = computed(() => (submitting.value ? 'Отправляем…' 
                 v-if="isMoment"
                 :nominee="nominee"
                 :state="stateOf(nominee.id)"
-                :badge="voted === nominee.id ? (showChosen ? 'Выбрано' : 'Ваш выбор') : undefined"
+                :badge="voted === nominee.id ? (showChosen ? 'Выбран' : 'Ваш выбор') : undefined"
                 action-label="Подтвердить голос"
                 :action-hint="actionHint"
                 seekable
@@ -326,7 +326,7 @@ const actionHint = computed(() => (submitting.value ? 'Отправляем…' 
                 v-else
                 :nominee="nominee"
                 :state="stateOf(nominee.id)"
-                :badge="voted === nominee.id ? (showChosen ? 'Выбрано' : 'Ваш выбор') : undefined"
+                :badge="voted === nominee.id ? (showChosen ? 'Выбран' : 'Ваш выбор') : undefined"
                 action-label="Подтвердить голос"
                 :action-hint="actionHint"
                 eager
