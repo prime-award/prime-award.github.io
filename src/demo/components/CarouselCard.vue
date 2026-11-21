@@ -28,7 +28,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <RouterLink v-slot="{ href, navigate }" :to="to ?? '/form'" custom>
+  <RouterLink v-slot="{ href, navigate }" :to="to ?? '/demo/form'" custom>
     <a
         ref="card"
         class="card"

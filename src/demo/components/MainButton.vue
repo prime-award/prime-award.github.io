@@ -2,7 +2,7 @@
 import {RouterLink} from 'vue-router'
 
 defineProps({
-  to: {type: [String, Object], default: '/form'},
+  to: {type: [String, Object], default: '/demo/form'},
 })
 </script>
 
