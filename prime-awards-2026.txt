@@ -1,7 +1,7 @@
 
 Обычные наминации:
 
-Король Рунета:
+Король Рунета - Мужчина года в ру-стримминге.
 Мэддисон
 Arrowwoods
 Vanomas
@@ -16,12 +16,12 @@ WELOVEGAMES
 Sasavot
 leva2k
 Buster
-serega_pirta
+serega_pirat
 elwycco
 Kuplinov_Play
 bratishkinoff
 
-Королева Рунета:
+Королева Рунета - Девушка года в ру-стримминге.
 Nenormova 
 AlinaRinRin
 Zanuda
@@ -34,7 +34,7 @@ Karachenskaya
 GENSYXA
 Бабушка Ольга (i_olga)
 
-Принц Рунета:
+Принц Рунета - Достойный преемник короля.
 KhovanskyToday
 Praden
 Archiedos
@@ -50,7 +50,7 @@ kolyanus
 qeqoqeq
 
 
-Принцесса Рунета:
+Принцесса Рунета - Достойная преемница королевы.
 arina_gp
 Charmy_Games
 Faridysha
@@ -68,7 +68,7 @@ trixie_vox
 
 
 
-Восходящая звезда года:
+Восходящая звезда года - Начинающий стример, ярко заявивший о себе в этом году.
 Alter_Gnosis
 SanyaMutant
 FurryMogger
@@ -79,7 +79,7 @@ blxcknoise
 Charmy_Games
 
 
-Игровик года:
+Игровик года - Стример с выдающимся скиллом в компьютерных играх.
 Dunduk
 F1ashko 
 Arthas
@@ -96,7 +96,7 @@ Rekvizit8bit
 AlinaRinRin
 iLame
 
-Hidden gem года:
+Hidden gem года - Малоизвестный стример, который заслуживает большего.
 Ehchobyah
 Dokenz
 HvorostDump
@@ -112,7 +112,7 @@ blxknoise
 pokosshachii
 Sofushkq
 
-Изгнанник года:
+Изгнанник года - Перманентно забаненный на твич стример, лучше всего показавший себя на сторонних платформах.
 GLADVALAKASPWNZ
 Arthas 
 Zhmil
@@ -124,7 +124,7 @@ Vanomas
 Kill4pill
 
 
-Харизма года:
+Харизма года - Стример с самой яркой и запоминающейся личностью. 
 Maddyson
 Arrowwoods
 Dawgonosik
@@ -133,14 +133,14 @@ DeadP47
 yui2d
 Dokenz
 
-Марамойка года:
+Марамойка года - Стримерша с самой сомнительной репутацией.
 Nenormova
 LOTA
 Karachenskaya
 6nevil
 liz0n
 
-Пиздабол года:
+Пиздабол года - Стример, особенно преуспевший в своих обещаниях.
 Arrowwoods
 Maddyson
 Archiedos
@@ -149,7 +149,7 @@ DeadP47
 itpedia
 citinez501
 
-Альтернативное мышление года:
+Альтернативное мышление года  - Стример, цепляющий своим специфическим восприятием мира.
 Arthas
 Usya
 Vanomas
@@ -162,7 +162,7 @@ Sofushkq
 mira_ostrolist
 NRosov
 
-Толстяк года:
+Толстяк года - Стример, использующий свои большие габариты как преимущество.
 T2x2 
 Arrowwoods
 KhovanskyToday
@@ -173,7 +173,7 @@ iLame
 arolfish
 mister_magog
 
-Пенсионер года:
+Пенсионер года - Стример с большой выслугой лет в этом ремесле, особенно отличившийся в этом году.
 Maddyson
 GLADVALAKASPWNZ
 WELOVEGAMES 
@@ -187,7 +187,7 @@ ozon689games
 Just_NS
 
 
-V-tuber года:
+V-tuber года - Стример, использующий виртуальную модель на своих трансляциях.
 GLADVALAKASPWNZ (Пенот)
 conway671
 Nostoro
@@ -203,7 +203,7 @@ akane_iwawwa
 TheBurntPeanut
 
 
-Гик года:
+Гик года - Стример, знающий супер-геройскую культуру как свои пять пальцев.
 Praden
 DeadP47
 Qewbite
@@ -214,24 +214,6 @@ Dokenz
 Nuke73
 uebermarginal
 
-
-Сообщество года:
-Подсосов Мэда тред
-BotovodX 
-17 лет на YouTube
-Гик Новости
-Stream Inside
-sigmacringek
-sky_trash
-
-
-Ивент года:
-Nassal 2026
-Тянукус 3
-Самый потный турик 4
-KUKON
-NASRAL 2026
-RGG Land 
 
 
 Видео-номинации:
@@ -248,7 +230,7 @@ melharucos - попал в "Миротворец"
 Muhanjan - файлы Муханжана
 Ozon689games - попал во Вьетамский плен
 Vanomas - задавил женщину на самокате
-Бондаренко - получил арест после разговора со Жмилём
+Zhmil - арест Бондаренко
 
 
 Игровой момент года:
@@ -315,9 +297,29 @@ LOTA
 segall
 
 
-Особые блоки:
+Особые блоки вне статистики:
 
-Пара года:
+
+Сообщество года - Телеграм канал, уделяющий большое внимание деятельности стримеров.
+Подсосов Мэда тред
+BotovodX 
+17 лет на YouTube
+Гик Новости
+Stream Inside
+sigmacringek
+sky_trash
+
+
+Ивент года:
+Nassal 2026
+Тянукус 3
+Самый потный турик 4
+KUKON
+NASRAL 2026
+RGG Land 
+
+
+Пара года - Самый романтичный дуэт
 Maddyson + Джамбо
 liz0n + Alter_Gnosis
 Тихон + Nenormova 
