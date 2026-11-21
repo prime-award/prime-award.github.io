@@ -1,5 +1,4 @@
 import {API_URL, apiFetch} from './client.ts'
-import {APP_ROOT} from '@/appBase.ts'
 import type {AppConfig, MyNominations, MyVotes, Nomination, NominationBrief, Page, Session, Stats, User, Vote} from './types.ts'
 
 export * from './client.ts'
@@ -34,8 +33,7 @@ export const api = {
  * origin — адрес сайта (с base, если сайт в подпапке), куда вернуть; бэкенд проверяет его по белому списку.
  */
 export function loginUrl(provider: string, redirectPath: string): string {
-    // адрес сайта голосования (с /test), куда бэкенд вернёт после входа: {origin}/auth/callback
-    const origin = window.location.origin + APP_ROOT
+    const origin = window.location.origin + import.meta.env.BASE_URL.replace(/\/+$/, '')
     const params = new URLSearchParams({redirect: redirectPath, origin})
     return `${API_URL}/prime/auth/${encodeURIComponent(provider)}/login?${params}`
 }

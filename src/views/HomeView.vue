@@ -17,7 +17,7 @@ useHead({
     name: 'description',
     content: 'Главная народная премия ру-стриминга. Голосуйте за лучших стримеров и моменты года с платформ Twitch, Kick и VK Live.',
   }],
-  link: [{rel: 'canonical', href: 'https://prime-award.ru/test/'}],
+  link: [{rel: 'canonical', href: 'https://prime-award.ru/'}],
 })
 
 // номинации подгружаются порциями: сначала 3, «Показать ещё» добавляет по 3 снизу
