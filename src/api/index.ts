@@ -1,5 +1,5 @@
 import {API_URL, apiFetch} from './client.ts'
-import type {AppConfig, MyNominations, MyVotes, Nomination, NominationBrief, Page, Session, Stats, User, Vote} from './types.ts'
+import type {AppConfig, LoginProviderId, MyNominations, MyVotes, Nomination, NominationBrief, Page, Session, Stats, User, Vote} from './types.ts'
 
 export * from './client.ts'
 export type * from './types.ts'
@@ -32,7 +32,7 @@ export const api = {
  * Начало OAuth-входа: браузер уходит на бэкенд, оттуда на провайдера и обратно на /auth/callback.
  * origin — адрес сайта (с base, если сайт в подпапке), куда вернуть; бэкенд проверяет его по белому списку.
  */
-export function loginUrl(provider: string, redirectPath: string): string {
+export function loginUrl(provider: LoginProviderId, redirectPath: string): string {
     const origin = window.location.origin + import.meta.env.BASE_URL.replace(/\/+$/, '')
     const params = new URLSearchParams({redirect: redirectPath, origin})
     return `${API_URL}/prime/auth/${encodeURIComponent(provider)}/login?${params}`

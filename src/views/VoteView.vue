@@ -4,11 +4,11 @@ import {useRoute, useRouter} from 'vue-router'
 import {useHead} from '@unhead/vue'
 import {api, ApiError, type Nomination, type Nominee, type Vote} from '@/api'
 import AppLoader from '@/components/AppLoader.vue'
-import MomentCard from '@/components/nominations/MomentCard.vue'
 import NominationTitle from '@/components/nominations/NominationTitle.vue'
 import NomineeCard from '@/components/nominations/NomineeCard.vue'
-import {type CardState, formatTimecode} from '@/components/nominations/cardState.ts'
-import {votedFirst} from '@/components/nominations/votedFirst.ts'
+import type {CardState} from '@/components/nominations/cardState.ts'
+import {ballotNominees} from '@/components/vote/ballotNominees.ts'
+import {useAuth} from '@/composable/useAuth.ts'
 import {plural} from '@/utils/countdown.ts'
 import PrimeButton from '@/components/ui/PrimeButton.vue'
 import NominationPlayer from '@/components/vote/NominationPlayer.vue'
@@ -29,6 +29,7 @@ const router = useRouter()
 const {getNomination, loadSummary, summary, remember} = useCatalog()
 const {votedNomineeId, votedCount, totalNominations, load: loadVotes, record} = useMyVotes()
 const {config, load: loadConfig} = useAppConfig()
+const {voteSeed} = useAuth()
 const loginModal = useLoginModal()
 // второе нажатие раньше этого срока после выбора — случайный двойной клик, а не подтверждение
 const CONFIRM_GUARD_MS = 300
@@ -49,21 +50,20 @@ const player = ref<InstanceType<typeof NominationPlayer> | null>(null)
 useHead({title: computed(() => (nomination.value ? `${nomination.value.name} — анкета PRIME 2026` : 'Анкета — PRIME 2026'))})
 
 const voted = computed(() => (nomination.value ? votedNomineeId(nomination.value.id) : null))
-// в проголосованной номинации выбор — первым; сразу после голоса (статус «Выбрано») порядок не трогаем, чтобы карточка не прыгала
-// Порядок карточек фиксируется один раз при загрузке номинации (выбор пользователя — первым, если он уже голосовал)
-// и дальше не меняется: ни после голоса, ни пока анкета уходит к следующей — иначе карточка «перескакивает».
-const order = ref<number[]>([])
-const nominees = computed(() => {
-  const list = nomination.value?.nominees ?? []
-  const byId = new Map(list.map((n) => [n.id, n]))
-  const ordered = order.value.map((id) => byId.get(id)).filter((n) => n !== undefined)
-  return ordered.length === list.length ? ordered : list
-})
+const nominees = computed(() => nomination.value ? ballotNominees(nomination.value, voteSeed.value) : [])
 const votingOpen = computed(() => config.value?.votingOpen ?? true)
 const readOnly = computed(() => voted.value !== null || !votingOpen.value)
 const isMoment = computed(() => nomination.value?.type === 'MOMENT')
-const showPlayer = computed(() => isMoment.value || !!nomination.value?.videoUrl)
-const playerUrl = computed(() => nomination.value?.videoUrl ?? null)
+const videoSegment = computed(() => {
+  const item = nomination.value
+  if (!item?.videoUrl || item.videoStartSeconds == null || item.videoEndSeconds == null) return null
+  return {url: item.videoUrl, start: item.videoStartSeconds, end: item.videoEndSeconds}
+})
+
+function momentTiming(seconds: number | null) {
+  const clip = videoSegment.value
+  return isMoment.value && clip && seconds != null && seconds >= clip.start && seconds < clip.end ? seconds : null
+}
 
 // место в общем списке номинаций: счётчик и стрелки
 const index = computed(() => summary.value?.findIndex((n) => n.id === nominationId.value) ?? -1)
@@ -79,7 +79,6 @@ async function load() {
   try {
     const [data] = await Promise.all([getNomination(target), loadVotes(), loadSummary(), loadConfig()])
     if (target !== nominationId.value) return
-    order.value = votedFirst(data.nominees, votedNomineeId(data.id)).map((n) => n.id)
     // «Выбрано» сбрасываем, только когда пришла новая номинация: пока старая на экране, её вид не меняется
     showChosen.value = false
     nomination.value = data
@@ -259,13 +258,13 @@ const actionHint = computed(() => (submitting.value ? 'Отправляем…' 
         </header>
 
         <!-- видео свёрнуто по умолчанию; раскрыто/свёрнуто — запоминается и действует в следующих номинациях -->
-        <section v-if="showPlayer" class="vote__video" :class="{ 'is-open': playerOpen }">
+        <section v-if="videoSegment" class="vote__video" :class="{ 'is-open': playerOpen }">
           <NominationPlayer
               v-if="playerOpen"
               ref="player"
               class="vote__player"
-              :url="playerUrl"
-              :poster="nomination.videoPosterPath"
+              :key="nomination.id"
+              v-bind="videoSegment"
               :title="nomination.name"
           />
           <PrimeButton class="vote__video-toggle" :aria-expanded="playerOpen" data-testid="video-toggle" @click="setPlayerOpen(!playerOpen)">
@@ -284,35 +283,14 @@ const actionHint = computed(() => (submitting.value ? 'Отправляем…' 
 
         <ul
             class="vote__grid"
-            :class="{'vote__grid--moments': isMoment, 'vote__grid--pairs': nomination.type === 'PAIR', 'vote__grid--people': nomination.type === 'STREAMER'}"
+            :class="{'vote__grid--pairs': nomination.type === 'PAIR', 'vote__grid--people': nomination.type !== 'PAIR'}"
             :aria-label="`Номинанты: ${nomination.name}`"
             @click.self="activeId = null"
         >
           <li v-for="nominee in nominees" :key="nominee.id">
-            <MomentCard
-                v-if="isMoment"
-                :nominee="nominee"
-                :state="stateOf(nominee.id)"
-                :badge="voted === nominee.id ? (showChosen ? 'Выбран' : 'Ваш выбор') : undefined"
-                action-label="Подтвердить голос"
-                :action-hint="actionHint"
-                seekable
-                eager
-                @select="select(nominee)"
-            />
-            <!-- таймкод — отдельной кнопкой под карточкой: раскрывает видео и перематывает на момент -->
-            <PrimeButton
-                v-if="isMoment && playerUrl && nominee.timecodeSeconds != null"
-                class="vote__seek"
-                size="sm"
-                variant="ghost"
-                :aria-label="`Смотреть момент с ${formatTimecode(nominee.timecodeSeconds)}`"
-                @click="seek(nominee.timecodeSeconds)"
-            >
-              ▶ {{ formatTimecode(nominee.timecodeSeconds) }}
-            </PrimeButton>
             <NomineeCard
-                v-if="!isMoment"
+                :timing="momentTiming(nominee.timecodeSeconds)"
+                @seek="seek"
                 :nominee="nominee"
                 :state="stateOf(nominee.id)"
                 :badge="voted === nominee.id ? (showChosen ? 'Выбран' : 'Ваш выбор') : undefined"
@@ -467,23 +445,15 @@ const actionHint = computed(() => (submitting.value ? 'Отправляем…' 
   --card-w: min(100%, calc(2 * var(--ballot-card-w)));
 }
 
-.vote__grid--moments {
-  --card-w: var(--ballot-moment-w);
-}
-
 .vote__grid > li {
   flex: 0 0 var(--card-w);
   min-width: 0;
 }
 
-/* compact: люди — по 2 в ряд на всю ширину, моменты — по одному */
+/* compact: одиночные карточки — по 2 в ряд */
 @media (max-width: 599px) {
   .vote__grid--people > li {
     flex-basis: calc((100% - var(--layout-gutter)) / 2);
-  }
-
-  .vote__grid--moments > li {
-    flex-basis: 100%;
   }
 }
 

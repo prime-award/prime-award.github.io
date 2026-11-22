@@ -1,70 +1,61 @@
 <script setup lang="ts">
-import {computed, nextTick, ref, watch} from 'vue'
-import {mediaUrl} from '@/utils/media.ts'
-import {embedUrl, parseVideoSource} from './videoSource.ts'
+import {onBeforeUnmount, onMounted, ref} from 'vue'
+import createPlayer from 'youtube-player'
 
-// Большой экран с видео над номинантами: файл — через <video>, YouTube/Twitch — через iframe.
-const props = defineProps<{
-  url: string | null
-  poster?: string | null
-  title: string
-}>()
+const props = defineProps<{url: string, start: number, end: number, title: string}>()
+const container = ref<HTMLDivElement>()
+const failed = ref(false)
+let player: ReturnType<typeof createPlayer> | undefined
+let timer: number | undefined
 
-const source = computed(() => parseVideoSource(props.url))
-const video = ref<HTMLVideoElement | null>(null)
-const start = ref(0)
-const autoplay = ref(false)
-const iframeSrc = computed(() =>
-    source.value && source.value.kind !== 'file' ? embedUrl(source.value, start.value, autoplay.value) : null,
-)
-
-watch(() => props.url, () => {
-  start.value = 0
-  autoplay.value = false
-})
-
-/** Перемотать на момент и запустить (таймкод на карточке момента). */
-async function seek(seconds: number) {
-  start.value = seconds
-  autoplay.value = true
-  await nextTick()
-  const el = video.value
-  if (!el) return
-  const go = () => {
-    el.currentTime = seconds
-    el.play().catch(() => {})
-  }
-  // плеер мог только что открыться: до загрузки метаданных перемотка игнорируется браузером
-  if (el.readyState >= HTMLMediaElement.HAVE_METADATA) go()
-  else el.addEventListener('loadedmetadata', go, {once: true})
+function segment(startSeconds = props.start) {
+  return {videoId: new URL(props.url).pathname.slice(1), startSeconds, endSeconds: props.end}
 }
 
+function reset() {
+  window.clearInterval(timer)
+  // cueVideoById возвращает фрагмент к началу и ждёт следующего нажатия Play.
+  void player?.cueVideoById(segment())
+}
+
+function seek(seconds: number) {
+  if (seconds >= props.start && seconds < props.end) void player?.loadVideoById(segment(seconds))
+}
+
+onMounted(() => {
+  const target = document.createElement('div')
+  container.value!.append(target)
+  const api = createPlayer(target, {
+    width: '100%', height: '100%', videoId: segment().videoId,
+    playerVars: {start: props.start, end: props.end, playsinline: 1, origin: location.origin, rel: 0},
+  })
+  player = api
+  api.on('error', () => { failed.value = true })
+  api.on('stateChange', ({data}) => {
+    if (!player) return
+    window.clearInterval(timer)
+    if (data === 0) reset()
+    if (data === 1) {
+      timer = window.setInterval(async () => {
+        const time = await api.getCurrentTime()
+        if (player && (time >= props.end || time < props.start - 1)) reset()
+      }, 200)
+    }
+  })
+})
+
+onBeforeUnmount(() => {
+  window.clearInterval(timer)
+  void player?.destroy()
+  player = undefined
+})
 defineExpose({seek})
 </script>
 
 <template>
   <div class="player" :aria-label="`Видео: ${title}`">
-    <video
-        v-if="source?.kind === 'file'"
-        ref="video"
-        class="player__media"
-        :src="source.src"
-        :poster="mediaUrl(poster)"
-        controls
-        playsinline
-        preload="metadata"
-    />
-    <iframe
-        v-else-if="iframeSrc"
-        class="player__media"
-        :src="iframeSrc"
-        :title="title"
-        allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
-        allowfullscreen
-    />
-    <div v-else class="player__placeholder">
-      <span>Видео появится позже</span>
-    </div>
+    <div v-show="!failed" ref="container" class="player__media" />
+    <div v-if="failed" class="player__placeholder">Не удалось загрузить видео</div>
   </div>
 </template>
 

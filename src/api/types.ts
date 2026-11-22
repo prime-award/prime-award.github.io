@@ -36,6 +36,8 @@ export interface NominationBrief {
 
 export interface Nomination extends NominationBrief {
     videoUrl: string | null
+    videoStartSeconds: number | null
+    videoEndSeconds: number | null
     videoPosterPath: string | null
     nominees: Nominee[]
 }
@@ -47,6 +49,9 @@ export interface Page<T> {
     totalPages: number
     items: T[]
 }
+
+export type OAuthProviderId = 'twitch' | 'kick'
+export type LoginProviderId = OAuthProviderId | 'dev'
 
 export interface Provider {
     id: string

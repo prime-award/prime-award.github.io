@@ -1,16 +1,18 @@
 <script setup lang="ts">
+import NomineePortrait from './NomineePortrait.vue'
 import type {Nominee} from '@/api'
 import {mediaUrl} from '@/utils/media'
 
-defineProps<{ nominee: Nominee, captions?: boolean, eager?: boolean }>()
+defineProps<{ nominee: Nominee, active?: boolean, captions?: boolean, eager?: boolean }>()
 </script>
 
 <template>
   <div class="pair-portraits">
     <div v-for="(member, index) in [nominee.firstNominee, nominee.secondNominee]" :key="index" class="pair-portraits__member">
-      <img v-if="member?.photoPath" :src="mediaUrl(member.photoPath)" alt="" draggable="false"
+      <NomineePortrait v-if="captions" :name="member?.name" :photo-path="member?.photoPath" :eager="eager"
+                       :mirrored="index === 1" :class="{'is-active': active}"/>
+      <img v-else-if="member?.photoPath" :src="mediaUrl(member.photoPath)" alt="" draggable="false"
            :loading="eager ? 'eager' : 'lazy'" :class="{ mirrored: index === 1 }"/>
-      <span v-if="captions" class="pair-portraits__name">{{ member?.name }}</span>
     </div>
     <span class="pair-portraits__emoji" aria-hidden="true">{{ nominee.emoji }}</span>
   </div>
@@ -27,12 +29,12 @@ defineProps<{ nominee: Nominee, captions?: boolean, eager?: boolean }>()
 .pair-portraits__member {
   display: flex;
   min-height: 0;
+  min-width: 0;
   flex-direction: column;
   align-items: stretch;
-  background: radial-gradient(ellipse at center, #687789, var(--bg));
 }
 .pair-portraits__member + .pair-portraits__member {
-  border-left: 1px solid var(--border);
+  border-left: 1px solid var(--bg);
 }
 .pair-portraits__member img {
   flex: 1;
@@ -44,21 +46,12 @@ defineProps<{ nominee: Nominee, captions?: boolean, eager?: boolean }>()
 .mirrored {
   transform: scaleX(-1);
 }
-.pair-portraits__name {
-  margin-top: auto;
-  padding: var(--space-2);
-  background: var(--bg);
-  color: var(--text);
-  font: 400 var(--type-title-m) var(--font-serif);
-  text-align: center;
-  overflow-wrap: anywhere;
-}
 .pair-portraits__emoji {
   position: absolute;
   top: 50%;
   left: 50%;
   translate: -50% -50%;
-  font-size: 64px;
+  font-size: 36px;
   line-height: 1;
   pointer-events: none;
 }

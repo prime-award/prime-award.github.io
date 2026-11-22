@@ -4,7 +4,7 @@ import {useAuth} from '@/composable/useAuth.ts'
 import {useAppConfig} from '@/composable/useAppConfig.ts'
 import {useLoginModal} from '@/composable/useLoginModal.ts'
 import {PLATFORM_STYLE} from '@/utils/platforms'
-import {API_URL} from '@/api'
+import {API_URL, type LoginProviderId, type OAuthProviderId, type Provider} from '@/api'
 
 const {isOpen, redirectPath, close} = useLoginModal()
 const {login} = useAuth()
@@ -12,15 +12,16 @@ const {config, status, load} = useAppConfig()
 const isDev = import.meta.env.DEV
 
 const dialog = ref<HTMLElement | null>(null)
-const pending = ref<string | null>(null)
+const pending = ref<LoginProviderId | null>(null)
 let returnFocus: HTMLElement | null = null
 
 const providers = computed(() =>
     (config.value?.providers ?? [
       {id: 'twitch', title: 'Twitch', enabled: false},
       {id: 'kick', title: 'Kick', enabled: false},
-      {id: 'vk', title: 'VK Video Live', enabled: false},
-    ]).map((p) => ({...p, ...PLATFORM_STYLE[p.id]})),
+    ])
+        .filter((p): p is Provider & { id: OAuthProviderId } => p.id === 'twitch' || p.id === 'kick')
+        .map((p) => ({...p, ...PLATFORM_STYLE[p.id]})),
 )
 
 watch(isOpen, async (value) => {
@@ -38,7 +39,7 @@ watch(isOpen, async (value) => {
   }
 })
 
-function choose(provider: string) {
+function choose(provider: LoginProviderId) {
   pending.value = provider
   login(provider, redirectPath.value)
 }

@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import PairPortraits from '@/components/nominations/PairPortraits.vue'
-import {computed, ref} from 'vue'
+import NomineePortrait from './NomineePortrait.vue'
+import PrimeButton from '@/components/ui/PrimeButton.vue'
+import {computed} from 'vue'
 import type {Nominee} from '@/api'
 import {channelPlatform} from '@/utils/platforms'
-import {mediaUrl} from '@/utils/media.ts'
-import type {CardState} from './cardState.ts'
+import {formatTimecode, type CardState} from './cardState.ts'
 
 const props = withDefaults(defineProps<{
   nominee: Nominee
@@ -17,14 +18,13 @@ const props = withDefaults(defineProps<{
   actionHint?: string
   /** плашка сверху (например, «Ваш выбор») */
   badge?: string
+  timing?: number | null
   eager?: boolean
 }>(), {state: 'idle'})
 
-const emit = defineEmits<{ select: [] }>()
+const emit = defineEmits<{ select: [], seek: [seconds: number] }>()
 
 const channel = computed(() => channelPlatform(props.nominee.link))
-const loaded = ref(false)
-const photo = computed(() => mediaUrl(props.nominee.photoPath))
 </script>
 
 <template>
@@ -34,34 +34,21 @@ const photo = computed(() => mediaUrl(props.nominee.photoPath))
       :data-nominee-id="nominee.id"
       :data-state="state"
   >
-    <PairPortraits v-if="nominee.type === 'PAIR'" :nominee="nominee" :eager="eager" captions/>
-    <div v-else class="nominee-card__media">
-      <img
-          v-if="photo"
-          :src="photo"
-          :class="{ 'is-loaded': loaded }"
-          alt=""
-          draggable="false"
-          decoding="async"
-          :loading="eager ? 'eager' : 'lazy'"
-          @load="loaded = true"
-      />
-    </div>
+    <PairPortraits v-if="nominee.type === 'PAIR'" :nominee="nominee" :eager="eager" :active="state === 'active'" captions/>
+    <NomineePortrait v-else :name="nominee.name" :photo-path="nominee.photoPath" :eager="eager"
+                     :participants="nominee.participants" :class="{'is-active': state === 'active'}"/>
 
-    <div v-if="nominee.type !== 'PAIR'" class="nominee-card__caption">
-      <h3 class="nominee-card__name">{{ nominee.name }}</h3>
-      <a v-if="channel" class="nominee-card__channel" :href="channel.href"
-         target="_blank" rel="noopener noreferrer"
-         :aria-label="`Открыть канал ${nominee.name} на ${channel.name} в новой вкладке`">
-        <svg v-if="channel.mark" viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
-          <path :d="channel.mark" fill-rule="evenodd"/>
-        </svg>
-        <span v-else>{{ channel.name }}</span>
-        <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-          <path d="M9 2h5v5M14 2 7 9M6 3H3a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h9a1 1 0 0 0 1-1v-3"/>
-        </svg>
-      </a>
-    </div>
+    <a v-if="channel && nominee.type !== 'PAIR'" class="nominee-card__channel" :href="channel.href"
+       target="_blank" rel="noopener noreferrer"
+       :aria-label="`Открыть канал ${nominee.name} на ${channel.name} в новой вкладке`">
+      <svg v-if="channel.mark" viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
+        <path :d="channel.mark" fill-rule="evenodd"/>
+      </svg>
+      <span v-else>{{ channel.name }}</span>
+      <svg viewBox="0 0 16 16" width="10" height="10" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+        <path d="M9 2h5v5M14 2 7 9M6 3H3a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h9a1 1 0 0 0 1-1v-3"/>
+      </svg>
+    </a>
 
     <span v-if="badge" class="nominee-card__badge">{{ badge }}</span>
 
@@ -83,6 +70,13 @@ const photo = computed(() => mediaUrl(props.nominee.photoPath))
       <small v-if="actionHint" class="nominee-card__action-hint">{{ actionHint }}</small>
     </div>
   </article>
+  <PrimeButton v-if="timing != null" class="nominee-card__timing" size="sm" variant="ghost"
+               :aria-label="`Смотреть момент с ${formatTimecode(timing)}`" @click="emit('seek', timing)">
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
+      <path d="M3 1.5 10 6l-7 4.5z"/>
+    </svg>
+    <span>{{ formatTimecode(timing) }}</span>
+  </PrimeButton>
 </template>
 
 <style scoped>
@@ -106,52 +100,21 @@ const photo = computed(() => mediaUrl(props.nominee.photoPath))
 }
 
 .nominee-card.is-pair {
-  aspect-ratio: auto;
+  aspect-ratio: 3 / 2;
 }
 
-.nominee-card.is-active .pair-portraits {
-  filter: blur(5px);
-}
-
-.nominee-card__media {
-  position: relative;
-  overflow: hidden;
-  background: radial-gradient(70% 60% at 50% 45%, rgba(104, 119, 137, 0.9) 0%, rgba(56, 64, 74, 0.45) 50%, transparent 100%);
-}
-
-.nominee-card__media img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: top;
-  opacity: 0;
-  transition: opacity 0.4s ease, filter 0.3s ease;
-}
-
-.nominee-card__media img.is-loaded {
-  opacity: 1;
-}
-
-/* плавный переход фото в фон карточки под ником */
-.nominee-card__media::after {
-  content: '';
-  position: absolute;
-  inset: auto 0 0;
-  height: 40%;
-  background: linear-gradient(to top, var(--bg), transparent);
-}
-
-.nominee-card__caption {
+.nominee-card__timing {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-1) var(--space-2);
-  padding: var(--space-2) var(--space-3) var(--space-4);
+  width: fit-content;
+  margin: var(--space-1) auto 0;
+  font-variant-numeric: tabular-nums;
 }
 
 .nominee-card__channel {
-  position: relative;
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  justify-content: center;
   z-index: 2;
   display: inline-flex;
   align-items: center;
@@ -171,16 +134,6 @@ const photo = computed(() => mediaUrl(props.nominee.photoPath))
 .nominee-card__channel:focus-visible {
   background: var(--text);
   color: var(--bg);
-}
-
-.nominee-card__name {
-  margin: 0;
-  font: 400 var(--type-card-title) var(--font-serif);
-  color: #fff;
-  text-align: center;
-  text-transform: uppercase;
-  overflow-wrap: anywhere;
-  transition: filter 0.3s ease;
 }
 
 .nominee-card__badge {
@@ -263,11 +216,6 @@ const photo = computed(() => mediaUrl(props.nominee.photoPath))
   border-color: var(--text);
 }
 
-.nominee-card.is-active .nominee-card__media img,
-.nominee-card.is-active .nominee-card__name {
-  filter: blur(5px);
-}
-
 .nominee-card__action {
   position: absolute;
   inset: 0;
@@ -323,8 +271,8 @@ const photo = computed(() => mediaUrl(props.nominee.photoPath))
 
 /* узкая карточка (анкета, до ~240dp): шрифты и поля на ступень меньше */
 @container (max-width: 240px) {
-  .nominee-card__name {
-    font: 400 var(--type-title-m) var(--font-serif);
+  .nominee-card__channel + .nominee-card__badge {
+    top: calc(var(--space-3) + var(--control-h-sm));
   }
 
   .nominee-card__hover-label,

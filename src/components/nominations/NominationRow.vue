@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import {computed} from 'vue'
 import type {Nomination} from '@/api'
-import {votedFirst} from './votedFirst.ts'
-import MomentCard from './MomentCard.vue'
 import NominationTitle from './NominationTitle.vue'
 import NomineeCard from './NomineeCard.vue'
 import NomineeStrip from './NomineeStrip.vue'
@@ -16,8 +14,6 @@ const props = defineProps<{
 
 const emit = defineEmits<{ choose: [nomineeId: number] }>()
 
-// за кого голос — тот первым в ленте
-const nominees = computed(() => votedFirst(props.nomination.nominees, props.votedNomineeId))
 // после голоса подпись при наведении не нужна: карточка ведёт в анкету только для просмотра
 const hoverLabel = computed(() => (props.votedNomineeId ? undefined : 'Выбрать'))
 
@@ -30,25 +26,14 @@ function stateOf(nomineeId: number) {
   <section class="nomination-row" :aria-labelledby="`nomination-${nomination.id}`" :data-nomination-id="nomination.id">
     <NominationTitle :id="`nomination-${nomination.id}`" :nomination="nomination" year="2026"/>
 
-    <!-- key: при смене голоса лента пересоздаётся и начинается с начала (scroll-snap иначе держит в кадре прежнюю первую карточку) -->
     <NomineeStrip
-        :key="votedNomineeId ?? 'none'"
         class="nomination-row__strip"
         :class="{ 'nomination-row__strip--pairs': nomination.type === 'PAIR' }"
         :count="nomination.nominees.length"
         :label="`Номинанты: ${nomination.name}`"
     >
-      <li v-for="nominee in nominees" :key="nominee.id">
-        <MomentCard
-            v-if="nomination.type === 'MOMENT'"
-            :nominee="nominee"
-            :state="stateOf(nominee.id)"
-            :badge="votedNomineeId === nominee.id ? 'Ваш выбор' : undefined"
-            :hover-label="hoverLabel"
-            @select="emit('choose', nominee.id)"
-        />
+      <li v-for="nominee in nomination.nominees" :key="nominee.id">
         <NomineeCard
-            v-else
             :nominee="nominee"
             :state="stateOf(nominee.id)"
             :badge="votedNomineeId === nominee.id ? 'Ваш выбор' : undefined"

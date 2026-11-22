@@ -1,5 +1,5 @@
-import {computed, readonly, ref} from 'vue'
-import {api, ApiError, configureApiAuth, loginUrl, type Session, type User} from '@/api'
+import {computed, readonly, ref, watch} from 'vue'
+import {api, ApiError, configureApiAuth, loginUrl, type LoginProviderId, type Session, type User} from '@/api'
 
 const STORAGE_KEY = 'prime.session'
 
@@ -11,6 +11,31 @@ interface StoredSession {
 
 // Сессия живёт в localStorage: токен Bearer, а не cookie — фронтенд и API на разных доменах
 const session = ref<StoredSession | null>(readStored())
+
+const seedCookie = 'prime.voteSeed'
+const voteSeed = ref<number | null>(null)
+
+function readSeed(value: string | null | undefined): number | null {
+    if (!value || !/^\d{1,10}$/.test(value) || Number(value) > 0xffffffff) return null
+    return Number(value)
+}
+
+function restoreVoteSeed(userId: number) {
+    const key = `${seedCookie}.${userId}`
+    const cookies = new URLSearchParams(document.cookie.replaceAll('; ', '&'))
+    // Переносим seed прежнего формата только владельцу сохранённой сессии.
+    const legacy = readStored()?.user.id === userId ? readSeed(cookies.get(seedCookie)) : null
+    const seed = readSeed(cookies.get(key)) ?? readSeed(localStorage.getItem(key)) ?? legacy
+        ?? crypto.getRandomValues(new Uint32Array(1))[0]
+    localStorage.setItem(key, String(seed))
+    document.cookie = `${key}=${seed}; Path=/; Max-Age=34560000; SameSite=Lax`
+    if (cookies.has(seedCookie)) document.cookie = `${seedCookie}=; Path=/; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT`
+    return seed
+}
+
+watch(() => session.value?.user.id, (userId) => {
+    voteSeed.value = userId == null ? null : restoreVoteSeed(userId)
+}, {immediate: true, flush: 'sync'})
 
 function readStored(): StoredSession | null {
     try {
@@ -45,8 +70,8 @@ export function useAuth() {
     const user = computed(() => session.value?.user ?? null)
     const isLoggedIn = computed(() => session.value !== null)
 
-    /** Перейти на вход через провайдера (twitch | kick | vk | dev). */
-    function login(provider: string, redirectPath = '/') {
+    /** Перейти на вход через провайдера. */
+    function login(provider: LoginProviderId, redirectPath = '/') {
         window.location.assign(loginUrl(provider, redirectPath))
     }
 
@@ -74,13 +99,19 @@ export function useAuth() {
     }
 
     async function logout() {
+        const userId = session.value?.user.id
         try {
             if (session.value) await api.logout()
         } catch {
             // сервер недоступен или сессия уже мертва — локально выходим всё равно
         }
+        if (userId != null) {
+            const key = `${seedCookie}.${userId}`
+            document.cookie = `${key}=; Path=/; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT`
+            localStorage.removeItem(key)
+        }
         store(null)
     }
 
-    return {user, isLoggedIn, session: readonly(session), login, completeLogin, refresh, logout}
+    return {user, isLoggedIn, voteSeed: readonly(voteSeed), session: readonly(session), login, completeLogin, refresh, logout}
 }
