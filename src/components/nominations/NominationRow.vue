@@ -34,6 +34,7 @@ function stateOf(nomineeId: number) {
     <NomineeStrip
         :key="votedNomineeId ?? 'none'"
         class="nomination-row__strip"
+        :class="{ 'nomination-row__strip--pairs': nomination.type === 'PAIR' }"
         :count="nomination.nominees.length"
         :label="`Номинанты: ${nomination.name}`"
     >
@@ -66,5 +67,8 @@ function stateOf(nomineeId: number) {
 
 .nomination-row__strip {
   margin-top: var(--space-6);
+}
+@media (min-width: 840px) {
+  .nomination-row__strip--pairs { --per-view: 2; }
 }
 </style>

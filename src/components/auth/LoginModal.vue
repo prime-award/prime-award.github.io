@@ -3,6 +3,7 @@ import {computed, nextTick, ref, watch} from 'vue'
 import {useAuth} from '@/composable/useAuth.ts'
 import {useAppConfig} from '@/composable/useAppConfig.ts'
 import {useLoginModal} from '@/composable/useLoginModal.ts'
+import {PLATFORM_STYLE} from '@/utils/platforms'
 import {API_URL} from '@/api'
 
 const {isOpen, redirectPath, close} = useLoginModal()
@@ -13,13 +14,6 @@ const isDev = import.meta.env.DEV
 const dialog = ref<HTMLElement | null>(null)
 const pending = ref<string | null>(null)
 let returnFocus: HTMLElement | null = null
-
-// иконки платформ в фирменных цветах (простые SVG-пути)
-const PLATFORM_STYLE: Record<string, { color: string, mark: string }> = {
-  twitch: {color: '#9146FF', mark: 'M4 3 3 6v13h4v2h2l2-2h3l5-5V3H4Zm14 10-3 3h-3l-2 2v-2H7V5h11v8Zm-3-6v4h-2V7h2Zm-4 0v4H9V7h2Z'},
-  kick: {color: '#53FC18', mark: 'M4 3h5v5h2V6h2V4h2V3h5v6h-2v2h-2v2h2v2h2v6h-5v-1h-2v-2h-2v-2H9v5H4V3Z'},
-  vk: {color: '#0077FF', mark: 'M12.8 18C6.6 18 3.1 13.8 3 6.7h3.1c.1 5.2 2.4 7.4 4.2 7.9V6.7h2.9v4.5c1.8-.2 3.7-2.2 4.3-4.5h2.9c-.5 2.8-2.5 4.8-4 5.6 1.5.7 3.8 2.4 4.7 5.7h-3.2c-.7-2.2-2.4-3.9-4.7-4.1V18h-.4Z'},
-}
 
 const providers = computed(() =>
     (config.value?.providers ?? [

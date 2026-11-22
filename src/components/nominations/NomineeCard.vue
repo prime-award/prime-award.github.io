@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import PairPortraits from '@/components/nominations/PairPortraits.vue'
 import {computed, ref} from 'vue'
 import type {Nominee} from '@/api'
+import {channelPlatform} from '@/utils/platforms'
 import {mediaUrl} from '@/utils/media.ts'
 import type {CardState} from './cardState.ts'
 
@@ -20,6 +22,7 @@ const props = withDefaults(defineProps<{
 
 const emit = defineEmits<{ select: [] }>()
 
+const channel = computed(() => channelPlatform(props.nominee.link))
 const loaded = ref(false)
 const photo = computed(() => mediaUrl(props.nominee.photoPath))
 </script>
@@ -27,11 +30,12 @@ const photo = computed(() => mediaUrl(props.nominee.photoPath))
 <template>
   <article
       class="nominee-card"
-      :class="[`is-${state}`, { 'has-hover-label': hoverLabel }]"
+      :class="[`is-${state}`, { 'has-hover-label': hoverLabel, 'is-pair': nominee.type === 'PAIR' }]"
       :data-nominee-id="nominee.id"
       :data-state="state"
   >
-    <div class="nominee-card__media">
+    <PairPortraits v-if="nominee.type === 'PAIR'" :nominee="nominee" :eager="eager" captions/>
+    <div v-else class="nominee-card__media">
       <img
           v-if="photo"
           :src="photo"
@@ -44,7 +48,20 @@ const photo = computed(() => mediaUrl(props.nominee.photoPath))
       />
     </div>
 
-    <h3 class="nominee-card__name">{{ nominee.name }}</h3>
+    <div v-if="nominee.type !== 'PAIR'" class="nominee-card__caption">
+      <h3 class="nominee-card__name">{{ nominee.name }}</h3>
+      <a v-if="channel" class="nominee-card__channel" :href="channel.href"
+         target="_blank" rel="noopener noreferrer"
+         :aria-label="`Открыть канал ${nominee.name} на ${channel.name} в новой вкладке`">
+        <svg v-if="channel.mark" viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
+          <path :d="channel.mark" fill-rule="evenodd"/>
+        </svg>
+        <span v-else>{{ channel.name }}</span>
+        <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+          <path d="M9 2h5v5M14 2 7 9M6 3H3a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h9a1 1 0 0 0 1-1v-3"/>
+        </svg>
+      </a>
+    </div>
 
     <span v-if="badge" class="nominee-card__badge">{{ badge }}</span>
 
@@ -88,6 +105,14 @@ const photo = computed(() => mediaUrl(props.nominee.photoPath))
   transition: border-color 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
 }
 
+.nominee-card.is-pair {
+  aspect-ratio: auto;
+}
+
+.nominee-card.is-active .pair-portraits {
+  filter: blur(5px);
+}
+
 .nominee-card__media {
   position: relative;
   overflow: hidden;
@@ -116,9 +141,40 @@ const photo = computed(() => mediaUrl(props.nominee.photoPath))
   background: linear-gradient(to top, var(--bg), transparent);
 }
 
+.nominee-card__caption {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1) var(--space-2);
+  padding: var(--space-2) var(--space-3) var(--space-4);
+}
+
+.nominee-card__channel {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: var(--control-h-sm);
+  max-width: 100%;
+  padding-inline: var(--space-2);
+  border: 1px solid var(--line);
+  border-radius: var(--shape-full);
+  color: var(--text);
+  background: var(--bg);
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+
+.nominee-card__channel:hover,
+.nominee-card__channel:focus-visible {
+  background: var(--text);
+  color: var(--bg);
+}
+
 .nominee-card__name {
   margin: 0;
-  padding: var(--space-2) var(--space-3) var(--space-4);
   font: 400 var(--type-card-title) var(--font-serif);
   color: #fff;
   text-align: center;
@@ -192,7 +248,7 @@ const photo = computed(() => mediaUrl(props.nominee.photoPath))
     border-color: var(--text);
   }
 
-  .nominee-card.has-hover-label.is-idle:hover .nominee-card__hover-label {
+  .nominee-card.has-hover-label.is-idle:has(.nominee-card__hit:hover) .nominee-card__hover-label {
     opacity: 1;
     transform: none;
   }
@@ -232,7 +288,7 @@ const photo = computed(() => mediaUrl(props.nominee.photoPath))
 }
 
 /* подпись «Подтвердить голос» подсвечивается вместе с карточкой */
-.nominee-card.is-active:hover .nominee-card__action-label,
+.nominee-card.is-active:has(.nominee-card__hit:hover) .nominee-card__action-label,
 .nominee-card.is-active:has(.nominee-card__hit:focus-visible) .nominee-card__action-label {
   border-color: var(--text);
   background: var(--text);

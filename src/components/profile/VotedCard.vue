@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import PairPortraits from '@/components/nominations/PairPortraits.vue'
 import {computed} from 'vue'
 import type {VotedNomination} from '@/api'
 import {mediaUrl} from '@/utils/media.ts'
@@ -17,8 +18,9 @@ const isMoment = computed(() => props.item.nominee.type === 'MOMENT')
       :class="{ 'is-moment': isMoment }"
       :data-nomination-id="item.nomination.id"
   >
-    <div class="voted-card__photo">
-      <img v-if="item.nominee.photoPath" :src="mediaUrl(item.nominee.photoPath)" alt="" loading="lazy"/>
+    <PairPortraits v-if="item.nominee.type === 'PAIR'" :nominee="item.nominee"/>
+    <div v-else-if="item.nominee.photoPath" class="voted-card__photo">
+      <img :src="mediaUrl(item.nominee.photoPath)" alt="" loading="lazy"/>
     </div>
     <div class="voted-card__body">
       <h3 class="display voted-card__nomination">{{ item.nomination.name }}</h3>

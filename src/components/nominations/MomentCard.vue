@@ -27,10 +27,9 @@ const timecode = computed(() =>
 </script>
 
 <template>
-  <article class="moment-card" :class="[`is-${state}`, { 'has-hover-label': hoverLabel, 'has-timecode': timecode && !seekable }]" :data-nominee-id="nominee.id" :data-state="state">
-    <div class="moment-card__preview">
+  <article class="moment-card" :class="[`is-${state}`, { 'without-preview': !preview, 'has-hover-label': hoverLabel, 'has-timecode': timecode && !seekable }]" :data-nominee-id="nominee.id" :data-state="state">
+    <div v-if="preview" class="moment-card__preview">
       <img
-          v-if="preview"
           :src="preview"
           :class="{ 'is-loaded': loaded }"
           alt=""
@@ -129,6 +128,16 @@ const timecode = computed(() =>
   text-align: center;
   text-wrap: balance;
   transition: filter 0.3s ease;
+}
+
+.moment-card.without-preview .moment-card__body {
+  justify-content: center;
+  min-height: 8rem;
+  padding-block: var(--space-4);
+}
+
+.moment-card.without-preview:has(.moment-card__badge) .moment-card__body {
+  padding-top: var(--space-12);
 }
 
 .moment-card.has-timecode .moment-card__body {

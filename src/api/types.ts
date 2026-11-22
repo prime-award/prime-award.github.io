@@ -1,6 +1,12 @@
 // Типы ответов бэкенда (routes/dto/Dtos.kt). Медиа-поля (*Path) — пути от корня сайта, см. utils/media.ts.
 
-export type NominationType = 'STREAMER' | 'MOMENT'
+export type NominationType = 'STREAMER' | 'MOMENT' | 'PAIR'
+
+export interface PairMember {
+    id: number
+    name: string
+    photoPath: string | null
+}
 
 export interface Nominee {
     id: number
@@ -8,11 +14,12 @@ export interface Nominee {
     type: NominationType
     name: string
     photoPath: string | null
-    link: string | null
+    firstNominee?: PairMember
+    secondNominee?: PairMember
+    emoji?: string
+    link?: string | null
     /** MOMENT: кто участвует */
     participants: string | null
-    /** MOMENT: отдельное видео момента */
-    videoUrl: string | null
     /** MOMENT: где момент в общем видео номинации */
     timecodeSeconds: number | null
 }

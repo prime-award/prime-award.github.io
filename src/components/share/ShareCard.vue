@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import PairPortraits from '@/components/nominations/PairPortraits.vue'
 import {computed} from 'vue'
 import type {User, VotedNomination} from '@/api'
 import primeLogo from '@/assets/prime-logo.webp'
@@ -70,7 +71,8 @@ const site = window.location.host
     <!-- остальное: «номинация — за кого голос», портрет/превью растворяется в фоне строки -->
     <ol v-if="rest.length" class="share-card__list">
       <li v-for="item in rest" :key="item.nomination.id" class="share-card__row">
-        <img v-if="item.nominee.photoPath" class="share-card__row-bg" :class="{ 'is-moment': item.nominee.type === 'MOMENT' }" :src="mediaUrl(item.nominee.photoPath)" alt=""/>
+        <PairPortraits v-if="item.nominee.type === 'PAIR'" :nominee="item.nominee" class="share-card__row-bg" eager/>
+        <img v-else-if="item.nominee.photoPath" class="share-card__row-bg" :class="{ 'is-moment': item.nominee.type === 'MOMENT' }" :src="mediaUrl(item.nominee.photoPath)" alt=""/>
         <span class="share-card__row-nomination">{{ item.nomination.name }}</span>
         <span class="share-card__row-name">{{ item.nominee.name }}</span>
       </li>

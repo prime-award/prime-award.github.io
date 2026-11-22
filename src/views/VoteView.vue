@@ -45,7 +45,6 @@ const showChosen = ref(false)
 const skipping = ref(false)
 const notice = ref<{ kind: 'error' | 'info', text: string } | null>(null)
 const player = ref<InstanceType<typeof NominationPlayer> | null>(null)
-const playerOverride = ref<string | null>(null)
 
 useHead({title: computed(() => (nomination.value ? `${nomination.value.name} — анкета PRIME 2026` : 'Анкета — PRIME 2026'))})
 
@@ -64,7 +63,7 @@ const votingOpen = computed(() => config.value?.votingOpen ?? true)
 const readOnly = computed(() => voted.value !== null || !votingOpen.value)
 const isMoment = computed(() => nomination.value?.type === 'MOMENT')
 const showPlayer = computed(() => isMoment.value || !!nomination.value?.videoUrl)
-const playerUrl = computed(() => playerOverride.value ?? nomination.value?.videoUrl ?? null)
+const playerUrl = computed(() => nomination.value?.videoUrl ?? null)
 
 // место в общем списке номинаций: счётчик и стрелки
 const index = computed(() => summary.value?.findIndex((n) => n.id === nominationId.value) ?? -1)
@@ -77,7 +76,6 @@ async function load() {
   loadError.value = null
   activeId.value = null
   notice.value = null
-  playerOverride.value = null
   try {
     const [data] = await Promise.all([getNomination(target), loadVotes(), loadSummary(), loadConfig()])
     if (target !== nominationId.value) return
@@ -126,15 +124,6 @@ function select(nominee: Nominee) {
   activatedAt = Date.now()
 }
 
-function playMoment(nominee: Nominee) {
-  if (nominee.videoUrl) {
-    playerOverride.value = nominee.videoUrl
-  } else if (nominee.timecodeSeconds != null) {
-    playerOverride.value = null
-    player.value?.seek(nominee.timecodeSeconds)
-  }
-}
-
 const PLAYER_OPEN_KEY = 'prime.player.open'
 const playerOpen = ref(localStorage.getItem(PLAYER_OPEN_KEY) === '1')
 
@@ -144,12 +133,12 @@ function setPlayerOpen(open: boolean) {
 }
 
 /** Кнопка таймкода под карточкой момента: раскрыть видео (если свёрнуто) и перемотать на момент. */
-async function seek(nominee: Nominee) {
+async function seek(seconds: number) {
   if (!playerOpen.value) {
     setPlayerOpen(true)
     await nextTick()
   }
-  playMoment(nominee)
+  player.value?.seek(seconds)
 }
 
 async function submit(nomineeId: number) {
@@ -295,7 +284,7 @@ const actionHint = computed(() => (submitting.value ? 'Отправляем…' 
 
         <ul
             class="vote__grid"
-            :class="isMoment ? 'vote__grid--moments' : 'vote__grid--people'"
+            :class="{'vote__grid--moments': isMoment, 'vote__grid--pairs': nomination.type === 'PAIR', 'vote__grid--people': nomination.type === 'STREAMER'}"
             :aria-label="`Номинанты: ${nomination.name}`"
             @click.self="activeId = null"
         >
@@ -313,17 +302,17 @@ const actionHint = computed(() => (submitting.value ? 'Отправляем…' 
             />
             <!-- таймкод — отдельной кнопкой под карточкой: раскрывает видео и перематывает на момент -->
             <PrimeButton
-                v-if="isMoment && nominee.timecodeSeconds != null"
+                v-if="isMoment && playerUrl && nominee.timecodeSeconds != null"
                 class="vote__seek"
                 size="sm"
                 variant="ghost"
                 :aria-label="`Смотреть момент с ${formatTimecode(nominee.timecodeSeconds)}`"
-                @click="seek(nominee)"
+                @click="seek(nominee.timecodeSeconds)"
             >
               ▶ {{ formatTimecode(nominee.timecodeSeconds) }}
             </PrimeButton>
             <NomineeCard
-                v-else
+                v-if="!isMoment"
                 :nominee="nominee"
                 :state="stateOf(nominee.id)"
                 :badge="voted === nominee.id ? (showChosen ? 'Выбран' : 'Ваш выбор') : undefined"
@@ -472,6 +461,10 @@ const actionHint = computed(() => (submitting.value ? 'Отправляем…' 
   margin: 0 auto;
   padding: 0;
   list-style: none;
+}
+
+.vote__grid--pairs {
+  --card-w: min(100%, calc(2 * var(--ballot-card-w)));
 }
 
 .vote__grid--moments {
