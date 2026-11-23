@@ -19,22 +19,24 @@ const channel = computed(() => channelPlatform(props.nominee.link))
       :data-nominee-id="nominee.id"
       :data-state="state"
   >
-    <NomineePortrait :name="nominee.name" :photo-path="nominee.photoPath" :eager="eager"
-                     :participants="nominee.participants" :class="{'is-active': state === 'active'}">
-      <template v-if="$slots.media" #default><slot name="media"/></template>
-    </NomineePortrait>
+    <div class="nominee-card__content">
+      <NomineePortrait :name="nominee.name" :photo-path="nominee.photoPath" :eager="eager"
+                       :participants="nominee.participants">
+        <template v-if="$slots.media" #default><slot name="media"/></template>
+      </NomineePortrait>
 
-    <a v-if="channel && nominee.type !== 'PAIR'" class="nominee-card__channel" :href="channel.href"
-       target="_blank" rel="noopener noreferrer"
-       :aria-label="`Открыть канал ${nominee.name} на ${channel.name} в новой вкладке`">
-      <svg v-if="channel.mark" viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
-        <path :d="channel.mark" fill-rule="evenodd"/>
-      </svg>
-      <span v-else>{{ channel.name }}</span>
-      <svg viewBox="0 0 16 16" width="10" height="10" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-        <path d="M9 2h5v5M14 2 7 9M6 3H3a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h9a1 1 0 0 0 1-1v-3"/>
-      </svg>
-    </a>
+      <a v-if="channel && nominee.type !== 'PAIR'" class="nominee-card__channel" :href="channel.href"
+         :inert="state === 'active'" target="_blank" rel="noopener noreferrer"
+         :aria-label="`Открыть канал ${nominee.name} на ${channel.name} в новой вкладке`">
+        <svg v-if="channel.mark" viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
+          <path :d="channel.mark" fill-rule="evenodd"/>
+        </svg>
+        <span v-else>{{ channel.name }}</span>
+        <svg viewBox="0 0 16 16" width="10" height="10" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+          <path d="M9 2h5v5M14 2 7 9M6 3H3a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h9a1 1 0 0 0 1-1v-3"/>
+        </svg>
+      </a>
+    </div>
 
     <span v-if="badge" class="nominee-card__badge">{{ badge }}</span>
 
@@ -91,6 +93,17 @@ const channel = computed(() => channelPlatform(props.nominee.link))
   width: fit-content;
   margin: var(--space-1) auto 0;
   font-variant-numeric: tabular-nums;
+}
+
+.nominee-card__content {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+}
+
+.nominee-card.is-active .nominee-card__content {
+  filter: blur(5px);
 }
 
 .nominee-card__channel {
@@ -256,7 +269,7 @@ const channel = computed(() => channelPlatform(props.nominee.link))
 
 /* узкая карточка (анкета, до ~240dp): шрифты и поля на ступень меньше */
 @container (max-width: 240px) {
-  .nominee-card__channel + .nominee-card__badge {
+  .nominee-card__content:has(.nominee-card__channel) + .nominee-card__badge {
     top: calc(var(--space-3) + var(--control-h-sm));
   }
 

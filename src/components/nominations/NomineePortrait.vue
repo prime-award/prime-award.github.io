@@ -97,11 +97,6 @@ const loaded = ref(false)
   overflow-wrap: anywhere;
 }
 
-.portrait.is-active .nominee-card__media,
-.portrait.is-active .nominee-card__caption {
-  filter: blur(5px);
-}
-
 @container (max-width: 240px) {
   .nominee-card__name {
     font: 400 var(--type-title-m) var(--font-serif);
