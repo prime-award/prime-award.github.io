@@ -1,15 +1,29 @@
 <script setup lang="ts">
-import {onBeforeUnmount, onMounted, ref} from 'vue'
+import {computed, onBeforeUnmount, onMounted, ref} from 'vue'
+import {parseVideoSource, embedUrl} from './videoSource'
 import createPlayer from 'youtube-player'
 
 const props = defineProps<{url: string, start: number, end: number, title: string}>()
-const container = ref<HTMLDivElement>()
+const frame = ref<HTMLIFrameElement>()
+const source = computed(() => {
+  const parsed = parseVideoSource(props.url)
+  return parsed?.kind === 'youtube' ? parsed : null
+})
+const embedSrc = computed(() => {
+  if (!source.value) return undefined
+  const url = new URL(embedUrl(source.value, props.start))
+  url.searchParams.set('end', String(props.end))
+  url.searchParams.set('enablejsapi', '1')
+  url.searchParams.set('playsinline', '1')
+  url.searchParams.set('origin', window.location.origin)
+  return url.href
+})
 const failed = ref(false)
 let player: ReturnType<typeof createPlayer> | undefined
 let timer: number | undefined
 
 function segment(startSeconds = props.start) {
-  return {videoId: new URL(props.url).pathname.slice(1), startSeconds, endSeconds: props.end}
+  return {videoId: source.value!.id, startSeconds, endSeconds: props.end}
 }
 
 function reset() {
@@ -23,14 +37,12 @@ function seek(seconds: number) {
 }
 
 onMounted(() => {
-  const target = document.createElement('div')
-  container.value!.append(target)
-  const api = createPlayer(target, {
-    width: '100%', height: '100%', videoId: segment().videoId,
-    playerVars: {start: props.start, end: props.end, playsinline: 1, origin: location.origin, rel: 0},
-  })
+  if (!frame.value) return
+  const api = createPlayer(frame.value)
   player = api
-  api.on('error', () => { failed.value = true })
+  api.on('error', (event) => {
+    if ('data' in event && typeof event.data === 'number') failed.value = true
+  })
   api.on('stateChange', ({data}) => {
     if (!player) return
     window.clearInterval(timer)
@@ -54,8 +66,12 @@ defineExpose({seek})
 
 <template>
   <div class="player" :aria-label="`Видео: ${title}`">
-    <div v-show="!failed" ref="container" class="player__media" />
-    <div v-if="failed" class="player__placeholder">Не удалось загрузить видео</div>
+    <iframe v-if="embedSrc" v-show="!failed" ref="frame" class="player__media"
+            :src="embedSrc" :title="title" referrerpolicy="strict-origin-when-cross-origin"
+            allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen />
+    <div v-if="failed || !embedSrc" class="player__placeholder">
+      <a :href="url" target="_blank" rel="noopener">Открыть видео на YouTube</a>
+    </div>
   </div>
 </template>
 
