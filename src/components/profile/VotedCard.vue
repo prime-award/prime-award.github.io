@@ -1,22 +1,16 @@
 <script setup lang="ts">
 import {vFitText} from '@/directives/fitText'
 import PairPortraits from '@/components/nominations/PairPortraits.vue'
-import {computed} from 'vue'
 import type {VotedNomination} from '@/api'
 import {mediaUrl} from '@/utils/media.ts'
 
-// «Ваш выбор»: фото номинанта, номинация, ник. Клик — анкета в режиме просмотра.
-// Момент — по структуре карточки момента (MomentCard): превью 16:9 внутри карточки, под ним номинация,
-// название и участники.
-const props = defineProps<{ item: VotedNomination }>()
-const isMoment = computed(() => props.item.nominee.type === 'MOMENT')
+defineProps<{ item: VotedNomination }>()
 </script>
 
 <template>
   <RouterLink
       :to="`/vote/${item.nomination.id}`"
       class="voted-card"
-      :class="{ 'is-moment': isMoment }"
       :data-nomination-id="item.nomination.id"
   >
     <PairPortraits v-if="item.nominee.type === 'PAIR'" class="voted-card__portraits" :nominee="item.nominee"/>
@@ -26,7 +20,6 @@ const isMoment = computed(() => props.item.nominee.type === 'MOMENT')
     <div class="voted-card__body">
       <h3 v-fit-text="item.nomination.name" class="display voted-card__nomination">{{ item.nomination.name }}</h3>
       <p v-fit-text="item.nominee.name" class="voted-card__nominee">{{ item.nominee.name }}</p>
-      <p v-if="isMoment && item.nominee.participants" class="voted-card__participants">{{ item.nominee.participants }}</p>
     </div>
   </RouterLink>
 </template>
@@ -103,56 +96,5 @@ const isMoment = computed(() => props.item.nominee.type === 'MOMENT')
   color: var(--text-muted);
   font: 400 var(--type-title-l) var(--font-serif);
   text-transform: uppercase;
-}
-
-/*
- * Момент — как MomentCard: поля 8dp, превью 16:9 со скруглением 12dp, текст под ним.
- * Высота по содержимому; в ряду со стримерами текст встаёт по центру оставшегося места.
- */
-.voted-card.is-moment {
-  aspect-ratio: auto;
-  padding: var(--space-2);
-}
-
-.voted-card.is-moment .voted-card__photo {
-  flex: none;
-  aspect-ratio: 16 / 9;
-  border-radius: var(--shape-md);
-  background: var(--surface-2);
-}
-
-.voted-card.is-moment .voted-card__photo img {
-  object-position: 50% 20%;
-  opacity: 0.8;
-}
-
-.voted-card.is-moment .voted-card__photo::after {
-  height: 50%;
-}
-
-.voted-card.is-moment .voted-card__body {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  justify-content: center;
-  gap: var(--space-1);
-  padding: var(--space-3) var(--space-2) var(--space-4);
-  text-wrap: balance;
-}
-
-.voted-card.is-moment .voted-card__nomination,
-.voted-card.is-moment .voted-card__nominee {
-  padding: 0;
-}
-
-.voted-card.is-moment .voted-card__nominee {
-  color: var(--text);
-  text-transform: none;
-}
-
-.voted-card__participants {
-  margin: 0;
-  color: var(--text-subtle);
-  font: var(--type-body-m) var(--font-serif);
 }
 </style>
