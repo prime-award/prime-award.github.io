@@ -8,7 +8,7 @@ const loaded = ref(false)
 
 <template>
   <div class="portrait">
-    <div class="nominee-card__media">
+    <div class="nominee-card__media" :class="{ 'nominee-card__media--logo': photoPath?.startsWith('media/nominees/logos/') }">
       <slot>
         <img v-if="photoPath" :src="mediaUrl(photoPath)" :class="{'is-loaded': loaded, mirrored}"
            alt="" draggable="false" decoding="async" :loading="eager ? 'eager' : 'lazy'" @load="loaded = true"/>
@@ -64,6 +64,17 @@ const loaded = ref(false)
   inset: auto 0 0;
   height: 40%;
   background: linear-gradient(to top, var(--bg), transparent);
+}
+
+.nominee-card__media--logo img {
+  box-sizing: border-box;
+  object-fit: contain;
+  object-position: center;
+  padding: var(--space-3);
+}
+
+.nominee-card__media--logo::after {
+  content: none;
 }
 
 .nominee-card__caption {
