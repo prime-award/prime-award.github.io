@@ -270,7 +270,9 @@ const channel = computed(() => channelPlatform(props.nominee.link))
 /* узкая карточка (анкета, до ~240dp): шрифты и поля на ступень меньше */
 @container (max-width: 240px) {
   .nominee-card__content:has(.nominee-card__channel) + .nominee-card__badge {
-    top: calc(var(--space-3) + var(--control-h-sm));
+    left: var(--space-2);
+    translate: none;
+    padding-inline: var(--space-2);
   }
 
   .nominee-card__hover-label,
