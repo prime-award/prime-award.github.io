@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import {vFitText} from '@/directives/fitText'
 import type {NominationBrief} from '@/api'
 import PrimeButton from '@/components/ui/PrimeButton.vue'
 import {mediaUrl} from '@/utils/media.ts'
@@ -10,7 +11,7 @@ defineProps<{ nomination: NominationBrief }>()
 <template>
   <article class="unvoted-card" :data-nomination-id="nomination.id">
     <img v-if="nomination.iconPath" class="unvoted-card__icon" :src="mediaUrl(nomination.iconPath)" alt="" loading="lazy"/>
-    <h3 class="display unvoted-card__name">{{ nomination.name }}</h3>
+    <h3 v-fit-text="nomination.name" class="display unvoted-card__name">{{ nomination.name }}</h3>
     <p class="unvoted-card__description">{{ nomination.description }}</p>
     <PrimeButton class="unvoted-card__cta" :to="`/vote/${nomination.id}`" data-testid="make-choice">Сделать выбор</PrimeButton>
   </article>
@@ -42,6 +43,8 @@ defineProps<{ nomination: NominationBrief }>()
 }
 
 .unvoted-card__name {
+  white-space: nowrap;
+  align-self: stretch;
   font: 400 var(--type-headline-m) var(--font-display);
   color: #fff;
 }

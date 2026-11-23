@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import {vFitText} from '@/directives/fitText'
 import PairPortraits from '@/components/nominations/PairPortraits.vue'
 import {computed} from 'vue'
 import type {VotedNomination} from '@/api'
@@ -23,8 +24,8 @@ const isMoment = computed(() => props.item.nominee.type === 'MOMENT')
       <img :src="mediaUrl(item.nominee.photoPath)" alt="" loading="lazy"/>
     </div>
     <div class="voted-card__body">
-      <h3 class="display voted-card__nomination">{{ item.nomination.name }}</h3>
-      <p class="voted-card__nominee">{{ item.nominee.name }}</p>
+      <h3 v-fit-text="item.nomination.name" class="display voted-card__nomination">{{ item.nomination.name }}</h3>
+      <p v-fit-text="item.nominee.name" class="voted-card__nominee">{{ item.nominee.name }}</p>
       <p v-if="isMoment && item.nominee.participants" class="voted-card__participants">{{ item.nominee.participants }}</p>
     </div>
   </RouterLink>
@@ -89,18 +90,19 @@ const isMoment = computed(() => props.item.nominee.type === 'MOMENT')
 }
 
 .voted-card__nomination {
+  white-space: nowrap;
   margin: 0;
   padding: var(--space-2) var(--space-4) 0;
   font: 400 var(--type-headline-m) var(--font-display);
 }
 
 .voted-card__nominee {
+  white-space: nowrap;
   margin: 0;
   padding: var(--space-1) var(--space-4) var(--space-5);
   color: var(--text-muted);
   font: 400 var(--type-title-l) var(--font-serif);
   text-transform: uppercase;
-  overflow-wrap: anywhere;
 }
 
 /*

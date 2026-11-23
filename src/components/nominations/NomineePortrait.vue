@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import {vFitText} from '@/directives/fitText'
 import {ref} from 'vue'
 import {mediaUrl} from '@/utils/media'
 
@@ -15,7 +16,7 @@ const loaded = ref(false)
       </slot>
     </div>
     <div class="nominee-card__caption">
-      <h3 class="nominee-card__name">{{ name }}</h3>
+      <h3 v-fit-text="name" class="nominee-card__name">{{ name }}</h3>
       <p v-if="participants" class="portrait__participants">{{ participants }}</p>
     </div>
   </div>
@@ -88,12 +89,13 @@ const loaded = ref(false)
 }
 
 .nominee-card__name {
+  white-space: nowrap;
+  align-self: stretch;
   margin: 0;
   font: 400 var(--type-card-title) var(--font-serif);
   color: #fff;
   text-align: center;
   text-transform: uppercase;
-  overflow-wrap: anywhere;
 }
 
 .mirrored {

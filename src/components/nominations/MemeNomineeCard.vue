@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import {vFitText} from '@/directives/fitText'
 import NomineeCard from './NomineeCard.vue'
 import {formatTimecode, type NomineeCardProps} from './cardState'
 
@@ -10,7 +11,7 @@ const emit = defineEmits<{select: [], seek: [seconds: number]}>()
   <div class="meme-card">
     <NomineeCard v-bind="props" @select="emit('select')" @seek="emit('seek', $event)">
       <template #content>
-        <span class="meme-card__name">{{ nominee.name }}</span>
+        <span v-fit-text="nominee.name" class="meme-card__name">{{ nominee.name }}</span>
       </template>
     </NomineeCard>
     <span v-if="timing == null && nominee.timecodeSeconds" class="meme-card__timing">
@@ -27,11 +28,10 @@ const emit = defineEmits<{select: [], seek: [seconds: number]}>()
 }
 
 .meme-card__name {
+  white-space: nowrap;
   color: var(--text);
   font: 400 var(--type-title-l) var(--font-serif);
   text-align: center;
-  text-wrap: balance;
-  overflow-wrap: anywhere;
 }
 
 .meme-card__timing {
