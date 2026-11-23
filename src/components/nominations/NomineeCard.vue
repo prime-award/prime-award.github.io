@@ -1,26 +1,11 @@
 <script setup lang="ts">
-import PairPortraits from '@/components/nominations/PairPortraits.vue'
 import NomineePortrait from './NomineePortrait.vue'
 import PrimeButton from '@/components/ui/PrimeButton.vue'
 import {computed} from 'vue'
-import type {Nominee} from '@/api'
 import {channelPlatform} from '@/utils/platforms'
-import {formatTimecode, type CardState} from './cardState.ts'
+import {formatTimecode, type NomineeCardProps} from './cardState.ts'
 
-const props = withDefaults(defineProps<{
-  nominee: Nominee
-  state?: CardState
-  /** надпись по центру при наведении (главная: «Выбрать») */
-  hoverLabel?: string
-  /** кнопка поверх размытого фото в состоянии active (анкета: «Подтвердить голос») */
-  actionLabel?: string
-  /** подпись под кнопкой действия */
-  actionHint?: string
-  /** плашка сверху (например, «Ваш выбор») */
-  badge?: string
-  timing?: number | null
-  eager?: boolean
-}>(), {state: 'idle'})
+const props = withDefaults(defineProps<NomineeCardProps>(), {state: 'idle'})
 
 const emit = defineEmits<{ select: [], seek: [seconds: number] }>()
 
@@ -30,13 +15,14 @@ const channel = computed(() => channelPlatform(props.nominee.link))
 <template>
   <article
       class="nominee-card"
-      :class="[`is-${state}`, { 'has-hover-label': hoverLabel, 'is-pair': nominee.type === 'PAIR' }]"
+      :class="[`is-${state}`, { 'has-hover-label': hoverLabel }]"
       :data-nominee-id="nominee.id"
       :data-state="state"
   >
-    <PairPortraits v-if="nominee.type === 'PAIR'" :nominee="nominee" :eager="eager" :active="state === 'active'" captions/>
-    <NomineePortrait v-else :name="nominee.name" :photo-path="nominee.photoPath" :eager="eager"
-                     :participants="nominee.participants" :class="{'is-active': state === 'active'}"/>
+    <NomineePortrait :name="nominee.name" :photo-path="nominee.photoPath" :eager="eager"
+                     :participants="nominee.participants" :class="{'is-active': state === 'active'}">
+      <template v-if="$slots.media" #default><slot name="media"/></template>
+    </NomineePortrait>
 
     <a v-if="channel && nominee.type !== 'PAIR'" class="nominee-card__channel" :href="channel.href"
        target="_blank" rel="noopener noreferrer"
@@ -95,12 +81,9 @@ const channel = computed(() => channelPlatform(props.nominee.link))
   border-radius: var(--shape-lg);
   background: var(--bg);
   isolation: isolate;
+  min-height: min-content;
   aspect-ratio: 3 / 4;
   transition: border-color 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
-}
-
-.nominee-card.is-pair {
-  aspect-ratio: 3 / 2;
 }
 
 .nominee-card__timing {
@@ -186,7 +169,9 @@ const channel = computed(() => channelPlatform(props.nominee.link))
   backdrop-filter: blur(4px);
   color: #fff;
   font: 400 var(--type-title-m) var(--font-serif);
-  white-space: nowrap;
+  max-width: 100%;
+  text-align: center;
+  overflow-wrap: anywhere;
 }
 
 .nominee-card__hover-label {

@@ -6,6 +6,7 @@ import {api, ApiError, type Nomination, type Nominee, type Vote} from '@/api'
 import AppLoader from '@/components/AppLoader.vue'
 import NominationTitle from '@/components/nominations/NominationTitle.vue'
 import NomineeCard from '@/components/nominations/NomineeCard.vue'
+import PairNomineeCard from '@/components/nominations/PairNomineeCard.vue'
 import type {CardState} from '@/components/nominations/cardState.ts'
 import {ballotNominees} from '@/components/vote/ballotNominees.ts'
 import {useAuth} from '@/composable/useAuth.ts'
@@ -283,12 +284,11 @@ const actionHint = computed(() => (submitting.value ? 'Отправляем…' 
 
         <ul
             class="vote__grid"
-            :class="{'vote__grid--pairs': nomination.type === 'PAIR', 'vote__grid--people': nomination.type !== 'PAIR'}"
             :aria-label="`Номинанты: ${nomination.name}`"
             @click.self="activeId = null"
         >
           <li v-for="nominee in nominees" :key="nominee.id">
-            <NomineeCard
+            <component :is="nominee.type === 'PAIR' ? PairNomineeCard : NomineeCard"
                 :timing="momentTiming(nominee.timecodeSeconds)"
                 @seek="seek"
                 :nominee="nominee"
@@ -441,10 +441,6 @@ const actionHint = computed(() => (submitting.value ? 'Отправляем…' 
   list-style: none;
 }
 
-.vote__grid--pairs {
-  --card-w: min(100%, calc(2 * var(--ballot-card-w)));
-}
-
 .vote__grid > li {
   flex: 0 0 var(--card-w);
   min-width: 0;
@@ -452,7 +448,7 @@ const actionHint = computed(() => (submitting.value ? 'Отправляем…' 
 
 /* compact: одиночные карточки — по 2 в ряд */
 @media (max-width: 599px) {
-  .vote__grid--people > li {
+  .vote__grid > li {
     flex-basis: calc((100% - var(--layout-gutter)) / 2);
   }
 }

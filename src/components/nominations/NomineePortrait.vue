@@ -9,8 +9,10 @@ const loaded = ref(false)
 <template>
   <div class="portrait">
     <div class="nominee-card__media">
-      <img v-if="photoPath" :src="mediaUrl(photoPath)" :class="{'is-loaded': loaded, mirrored}"
+      <slot>
+        <img v-if="photoPath" :src="mediaUrl(photoPath)" :class="{'is-loaded': loaded, mirrored}"
            alt="" draggable="false" decoding="async" :loading="eager ? 'eager' : 'lazy'" @load="loaded = true"/>
+      </slot>
     </div>
     <div class="nominee-card__caption">
       <h3 class="nominee-card__name">{{ name }}</h3>
@@ -24,9 +26,9 @@ const loaded = ref(false)
   display: flex;
   flex-direction: column;
   container-type: inline-size;
-  height: 100%;
+  flex: 1;
   min-width: 0;
-  min-height: 0;
+  min-height: min-content;
 }
 
 .nominee-card__media {
@@ -35,6 +37,11 @@ const loaded = ref(false)
   min-height: 0;
   overflow: hidden;
   background: radial-gradient(70% 60% at 50% 45%, rgba(104, 119, 137, 0.9) 0%, rgba(56, 64, 74, 0.45) 50%, transparent 100%);
+}
+
+.nominee-card__media > :deep(*) {
+  position: absolute;
+  inset: 0;
 }
 
 .nominee-card__media img {
@@ -90,7 +97,7 @@ const loaded = ref(false)
   overflow-wrap: anywhere;
 }
 
-.portrait.is-active .nominee-card__media img,
+.portrait.is-active .nominee-card__media,
 .portrait.is-active .nominee-card__caption {
   filter: blur(5px);
 }

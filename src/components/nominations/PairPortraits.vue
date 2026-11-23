@@ -1,17 +1,14 @@
 <script setup lang="ts">
-import NomineePortrait from './NomineePortrait.vue'
 import type {Nominee} from '@/api'
 import {mediaUrl} from '@/utils/media'
 
-defineProps<{ nominee: Nominee, active?: boolean, captions?: boolean, eager?: boolean }>()
+defineProps<{ nominee: Nominee, eager?: boolean }>()
 </script>
 
 <template>
   <div class="pair-portraits">
     <div v-for="(member, index) in [nominee.firstNominee, nominee.secondNominee]" :key="index" class="pair-portraits__member">
-      <NomineePortrait v-if="captions" :name="member?.name" :photo-path="member?.photoPath" :eager="eager"
-                       :mirrored="index === 1" :class="{'is-active': active}"/>
-      <img v-else-if="member?.photoPath" :src="mediaUrl(member.photoPath)" alt="" draggable="false"
+      <img v-if="member?.photoPath" :src="mediaUrl(member.photoPath)" alt="" draggable="false"
            :loading="eager ? 'eager' : 'lazy'" :class="{ mirrored: index === 1 }"/>
     </div>
     <span class="pair-portraits__emoji" aria-hidden="true">{{ nominee.emoji }}</span>
@@ -23,7 +20,9 @@ defineProps<{ nominee: Nominee, active?: boolean, captions?: boolean, eager?: bo
   position: relative;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  aspect-ratio: 3 / 2;
+  height: 100%;
+  min-height: 0;
+  grid-template-rows: minmax(0, 1fr);
   background: var(--bg);
 }
 .pair-portraits__member {

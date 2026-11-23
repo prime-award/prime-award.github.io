@@ -3,6 +3,7 @@ import {computed} from 'vue'
 import type {Nomination} from '@/api'
 import NominationTitle from './NominationTitle.vue'
 import NomineeCard from './NomineeCard.vue'
+import PairNomineeCard from './PairNomineeCard.vue'
 import NomineeStrip from './NomineeStrip.vue'
 
 // Номинация на главной: заголовок, описание и лента номинантов (по макету Desktop-2).
@@ -28,12 +29,11 @@ function stateOf(nomineeId: number) {
 
     <NomineeStrip
         class="nomination-row__strip"
-        :class="{ 'nomination-row__strip--pairs': nomination.type === 'PAIR' }"
         :count="nomination.nominees.length"
         :label="`Номинанты: ${nomination.name}`"
     >
       <li v-for="nominee in nomination.nominees" :key="nominee.id">
-        <NomineeCard
+        <component :is="nominee.type === 'PAIR' ? PairNomineeCard : NomineeCard"
             :nominee="nominee"
             :state="stateOf(nominee.id)"
             :badge="votedNomineeId === nominee.id ? 'Ваш выбор' : undefined"
@@ -52,8 +52,5 @@ function stateOf(nomineeId: number) {
 
 .nomination-row__strip {
   margin-top: var(--space-6);
-}
-@media (min-width: 840px) {
-  .nomination-row__strip--pairs { --per-view: 2; }
 }
 </style>

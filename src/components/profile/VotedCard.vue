@@ -18,7 +18,7 @@ const isMoment = computed(() => props.item.nominee.type === 'MOMENT')
       :class="{ 'is-moment': isMoment }"
       :data-nomination-id="item.nomination.id"
   >
-    <PairPortraits v-if="item.nominee.type === 'PAIR'" :nominee="item.nominee"/>
+    <PairPortraits v-if="item.nominee.type === 'PAIR'" class="voted-card__portraits" :nominee="item.nominee"/>
     <div v-else-if="item.nominee.photoPath" class="voted-card__photo">
       <img :src="mediaUrl(item.nominee.photoPath)" alt="" loading="lazy"/>
     </div>
@@ -35,7 +35,8 @@ const isMoment = computed(() => props.item.nominee.type === 'MOMENT')
 .voted-card {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  width: 100%;
+  min-height: 100%;
   overflow: hidden;
   border: 1px solid var(--border);
   border-radius: var(--shape-lg);
@@ -45,6 +46,18 @@ const isMoment = computed(() => props.item.nominee.type === 'MOMENT')
   text-decoration: none;
   transition: border-color 0.2s ease;
   aspect-ratio: 3 / 4;
+}
+
+.voted-card__portraits,
+.voted-card__photo {
+  flex: 1;
+  min-height: 0;
+  height: auto;
+}
+
+.voted-card__body {
+  flex-shrink: 0;
+  overflow-wrap: anywhere;
 }
 
 .voted-card:hover {
