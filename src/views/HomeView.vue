@@ -72,6 +72,8 @@ loadVotes().finally(() => (votesReady.value = true))
       <SponsorsSection/>
     </section>
 
+    <VotingInfo/>
+
     <div class="home__list page-container" id="nominations" :aria-busy="loading">
       <h2 class="display home__list-title">Номинации</h2>
 
@@ -102,8 +104,6 @@ loadVotes().finally(() => (votesReady.value = true))
         </PrimeButton>
       </div>
     </div>
-
-    <VotingInfo/>
 
     <ContactAs/>
   </main>
