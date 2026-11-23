@@ -59,13 +59,14 @@ const isMoment = computed(() => nomination.value?.type === 'MOMENT')
 const isMeme = computed(() => nomination.value?.slug === 'mem')
 const videoSegment = computed(() => {
   const item = nomination.value
-  if (!item?.videoUrl || item.videoStartSeconds == null || item.videoEndSeconds == null) return null
+  if (!item?.videoUrl || item.videoStartSeconds == null) return null
   return {url: item.videoUrl, start: item.videoStartSeconds, end: item.videoEndSeconds}
 })
 
 function momentTiming(seconds: number | null) {
   const clip = videoSegment.value
-  return isMoment.value && clip && seconds != null && seconds >= clip.start && seconds < clip.end ? seconds : null
+  if (!isMoment.value || !clip || seconds == null || seconds < clip.start) return null
+  return clip.end === null || seconds < clip.end ? seconds : null
 }
 
 // место в общем списке номинаций: счётчик и стрелки

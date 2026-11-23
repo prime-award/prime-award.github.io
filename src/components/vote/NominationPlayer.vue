@@ -3,7 +3,7 @@ import {computed, onBeforeUnmount, onMounted, ref} from 'vue'
 import {parseVideoSource, embedUrl} from './videoSource'
 import createPlayer from 'youtube-player'
 
-const props = defineProps<{url: string, start: number, end: number, title: string}>()
+const props = defineProps<{url: string, start: number, end: number | null, title: string}>()
 const frame = ref<HTMLIFrameElement>()
 const source = computed(() => {
   const parsed = parseVideoSource(props.url)
@@ -12,7 +12,7 @@ const source = computed(() => {
 const embedSrc = computed(() => {
   if (!source.value) return undefined
   const url = new URL(embedUrl(source.value, props.start))
-  url.searchParams.set('end', String(props.end))
+  if (props.end !== null) url.searchParams.set('end', String(props.end))
   url.searchParams.set('enablejsapi', '1')
   url.searchParams.set('playsinline', '1')
   url.searchParams.set('origin', window.location.origin)
@@ -23,7 +23,8 @@ let player: ReturnType<typeof createPlayer> | undefined
 let timer: number | undefined
 
 function segment(startSeconds = props.start) {
-  return {videoId: source.value!.id, startSeconds, endSeconds: props.end}
+  const videoId = source.value!.id
+  return props.end === null ? {videoId, startSeconds} : {videoId, startSeconds, endSeconds: props.end}
 }
 
 function reset() {
@@ -33,7 +34,7 @@ function reset() {
 }
 
 function seek(seconds: number) {
-  if (seconds >= props.start && seconds < props.end) void player?.loadVideoById(segment(seconds))
+  if (seconds >= props.start && (props.end === null || seconds < props.end)) void player?.loadVideoById(segment(seconds))
 }
 
 onMounted(() => {
@@ -50,7 +51,7 @@ onMounted(() => {
     if (data === 1) {
       timer = window.setInterval(async () => {
         const time = await api.getCurrentTime()
-        if (player && (time >= props.end || time < props.start - 1)) reset()
+        if (player && (time < props.start - 1 || (props.end !== null && time >= props.end))) reset()
       }, 200)
     }
   })

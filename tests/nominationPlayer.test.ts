@@ -27,6 +27,23 @@ it('cues the original segment after playback ends, including after a nominee jum
     expect(api.destroy).toHaveBeenCalledOnce()
 })
 
+it('plays through the end of the video when the segment has no end time', () => {
+    const api = {on: vi.fn(), cueVideoById: vi.fn(), loadVideoById: vi.fn(), destroy: vi.fn()}
+    vi.mocked(createPlayer).mockReturnValue(api as unknown as ReturnType<typeof createPlayer>)
+    const wrapper = mount(NominationPlayer, {props: {
+        url: 'https://youtu.be/777Kux6CqFc', start: 1519, end: null, title: 'Мем года',
+    }})
+    expect(new URL(wrapper.get('iframe').element.src).searchParams.has('end')).toBe(false)
+    wrapper.vm.seek(1518)
+    wrapper.vm.seek(1615)
+    expect(api.loadVideoById).toHaveBeenCalledTimes(1)
+    expect(api.loadVideoById).toHaveBeenCalledWith({videoId: '777Kux6CqFc', startSeconds: 1615})
+    const stateChange = api.on.mock.calls.find(([event]) => event === 'stateChange')![1]
+    stateChange({data: 0})
+    expect(api.cueVideoById).toHaveBeenCalledWith({videoId: '777Kux6CqFc', startSeconds: 1519})
+    wrapper.unmount()
+})
+
 it('keeps the iframe visible when the API script fails and links to YouTube on playback errors', async () => {
     const api = {on: vi.fn(), destroy: vi.fn()}
     vi.mocked(createPlayer).mockReturnValue(api as unknown as ReturnType<typeof createPlayer>)
