@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import {onMounted, ref} from 'vue'
+import {watch, ref} from 'vue'
 import {useHead} from '@unhead/vue'
 import {api, ApiError, type Stats} from '@/api'
 import AppLoader from '@/components/AppLoader.vue'
 import PrimeButton from '@/components/ui/PrimeButton.vue'
 import {mediaUrl} from '@/utils/media.ts'
 
-// Статистика голосов — только в dev-режиме бэкенда (auth.devLogin). В проде эндпоинта нет (404).
-useHead({title: 'Статистика голосов (dev) — PRIME 2026'})
+const props = defineProps<{admin?: boolean}>()
+useHead({title: 'Статистика голосов — PRIME 2026'})
 
 const stats = ref<Stats | null>(null)
 const error = ref<string | null>(null)
@@ -16,9 +16,11 @@ const filter = ref('')
 async function load() {
   error.value = null
   try {
-    stats.value = await api.devStats()
+    stats.value = props.admin ? await api.adminStats() : await api.devStats()
   } catch (e) {
-    error.value = e instanceof ApiError && e.status === 404
+    error.value = e instanceof ApiError && e.status === 403
+        ? 'Статистика доступна только администраторам.'
+        : !props.admin && e instanceof ApiError && e.status === 404
         ? 'Статистика доступна только в режиме разработки (auth.devLogin на бэкенде).'
         : 'Не удалось загрузить статистику.'
   }
@@ -28,13 +30,13 @@ function visible(name: string) {
   return !filter.value || name.toLowerCase().includes(filter.value.toLowerCase())
 }
 
-onMounted(load)
+watch(() => props.admin, load, {immediate: true})
 </script>
 
 <template>
   <main class="stats page-container">
     <header class="stats__head">
-      <h1 class="display stats__title">Статистика <small>dev</small></h1>
+      <h1 class="display stats__title">Статистика <small v-if="!admin">dev</small></h1>
       <PrimeButton size="sm" @click="load">Обновить</PrimeButton>
     </header>
 

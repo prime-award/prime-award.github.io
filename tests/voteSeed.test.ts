@@ -4,7 +4,7 @@ import {useAuth} from '@/composable/useAuth'
 
 it('keeps the seed across token expiry and clears it on explicit logout', async () => {
     const auth = useAuth()
-    const user = {id: 17, platform: 'DEV' as const, login: 'dev', displayName: 'Dev', avatarUrl: null, nameColor: null}
+    const user = {id: 17, role: 'USER' as const, platform: 'DEV' as const, login: 'dev', displayName: 'Dev', avatarUrl: null, nameColor: null}
     const session = {token: 'first', expiresAt: new Date(Date.now() + 60_000).toISOString(), user, redirectPath: '/'}
     vi.spyOn(api, 'exchange').mockResolvedValue(session)
     await auth.completeLogin('code')

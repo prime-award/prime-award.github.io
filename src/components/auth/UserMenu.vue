@@ -39,9 +39,10 @@ function onFocusOut(event: FocusEvent) {
   if (!root.value?.contains(event.relatedTarget as Node | null)) open.value = false
 }
 
-async function go(action: 'profile' | 'logout') {
+async function go(action: 'profile' | 'stats' | 'logout') {
   open.value = false
   if (action === 'profile') await router.push('/profile')
+  else if (action === 'stats') await router.push('/admin/stats')
   else {
     await logout()
     // после выхода — всегда на главную
@@ -79,6 +80,9 @@ onBeforeUnmount(() => clearTimeout(closeTimer))
       <ul v-show="open" class="user-menu__list" role="menu">
         <li role="none">
           <button type="button" role="menuitem" @click="go('profile')">Профиль</button>
+        </li>
+        <li v-if="user.role === 'ADMIN'" role="none">
+          <button type="button" role="menuitem" @click="go('stats')">Статистика</button>
         </li>
         <li role="none">
           <button type="button" role="menuitem" class="is-danger" @click="go('logout')">Выйти</button>

@@ -67,6 +67,7 @@ export interface AppConfig {
 }
 
 export interface User {
+    role: 'USER' | 'ADMIN'
     id: number
     platform: 'TWITCH' | 'KICK' | 'VK' | 'DEV'
     login: string

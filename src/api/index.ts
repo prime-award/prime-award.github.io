@@ -25,6 +25,7 @@ export const api = {
     nextUnvoted: (after?: number) =>
         apiFetch<Nomination | null>('/prime/votes/next' + (after ? `?after=${after}` : '')),
 
+    adminStats: () => apiFetch<Stats>('/prime/admin/stats'),
     devStats: () => apiFetch<Stats>('/prime/dev/stats', {auth: false}),
 }
 

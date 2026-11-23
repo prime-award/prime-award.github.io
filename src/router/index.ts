@@ -48,6 +48,7 @@ const router = createRouter({
             component: () => import('../views/ProfileView.vue'),
         },
         {path: '/auth/callback', name: 'auth-callback', component: () => import('../views/AuthCallbackView.vue')},
+        {path: '/admin/stats', name: 'admin-stats', meta: {requiresAuth: true}, component: () => import('../views/DevStatsView.vue'), props: {admin: true}},
         {path: '/dev/stats', name: 'dev-stats', component: () => import('../views/DevStatsView.vue')},
 
         // демо-экран отборочного этапа
