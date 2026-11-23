@@ -4,6 +4,7 @@ import {useRoute, useRouter} from 'vue-router'
 import {useHead} from '@unhead/vue'
 import {api, ApiError, type Nomination, type Nominee, type Vote} from '@/api'
 import AppLoader from '@/components/AppLoader.vue'
+import MemeNomineeCard from '@/components/nominations/MemeNomineeCard.vue'
 import NominationTitle from '@/components/nominations/NominationTitle.vue'
 import NomineeCard from '@/components/nominations/NomineeCard.vue'
 import PairNomineeCard from '@/components/nominations/PairNomineeCard.vue'
@@ -55,6 +56,7 @@ const nominees = computed(() => nomination.value ? ballotNominees(nomination.val
 const votingOpen = computed(() => config.value?.votingOpen ?? true)
 const readOnly = computed(() => voted.value !== null || !votingOpen.value)
 const isMoment = computed(() => nomination.value?.type === 'MOMENT')
+const isMeme = computed(() => nomination.value?.slug === 'mem')
 const videoSegment = computed(() => {
   const item = nomination.value
   if (!item?.videoUrl || item.videoStartSeconds == null || item.videoEndSeconds == null) return null
@@ -288,7 +290,7 @@ const actionHint = computed(() => (submitting.value ? 'Отправляем…' 
             @click.self="activeId = null"
         >
           <li v-for="nominee in nominees" :key="nominee.id">
-            <component :is="nominee.type === 'PAIR' ? PairNomineeCard : NomineeCard"
+            <component :is="isMeme ? MemeNomineeCard : nominee.type === 'PAIR' ? PairNomineeCard : NomineeCard"
                 :timing="momentTiming(nominee.timecodeSeconds)"
                 @seek="seek"
                 :nominee="nominee"
@@ -381,20 +383,6 @@ const actionHint = computed(() => (submitting.value ? 'Отправляем…' 
 
 .vote__player {
   margin: 0;
-}
-
-/* карточка момента и её кнопка таймкода — столбиком, кнопка по центру */
-.vote__grid--moments > li {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-1);
-}
-
-.vote__grid--moments > li > .moment-card {
-  align-self: stretch;
-  flex: 1 1 auto;
-  height: auto; /* вместо 100%: место под кнопкой таймкода */
 }
 
 .vote__subtitle {

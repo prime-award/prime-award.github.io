@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {computed} from 'vue'
 import type {Nomination} from '@/api'
+import MemeNomineeCard from './MemeNomineeCard.vue'
 import NominationTitle from './NominationTitle.vue'
 import NomineeCard from './NomineeCard.vue'
 import PairNomineeCard from './PairNomineeCard.vue'
@@ -17,6 +18,7 @@ const emit = defineEmits<{ choose: [nomineeId: number] }>()
 
 // после голоса подпись при наведении не нужна: карточка ведёт в анкету только для просмотра
 const hoverLabel = computed(() => (props.votedNomineeId ? undefined : 'Выбрать'))
+const isMeme = computed(() => props.nomination.slug === 'mem')
 
 function stateOf(nomineeId: number) {
   return props.votedNomineeId === nomineeId ? 'selected' : 'idle'
@@ -33,7 +35,7 @@ function stateOf(nomineeId: number) {
         :label="`Номинанты: ${nomination.name}`"
     >
       <li v-for="nominee in nomination.nominees" :key="nominee.id">
-        <component :is="nominee.type === 'PAIR' ? PairNomineeCard : NomineeCard"
+        <component :is="isMeme ? MemeNomineeCard : nominee.type === 'PAIR' ? PairNomineeCard : NomineeCard"
             :nominee="nominee"
             :state="stateOf(nominee.id)"
             :badge="votedNomineeId === nominee.id ? 'Ваш выбор' : undefined"
