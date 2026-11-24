@@ -84,7 +84,7 @@ loadVotes().finally(() => (votesReady.value = true))
               :key="nomination.id"
               :nomination="nomination"
               :voted-nominee-id="votedNomineeId(nomination.id)"
-              @choose="(nomineeId) => openBallot(nomination.id, nomineeId)"
+              @choose="(nomineeId) => openBallot(nomination.position, nomineeId)"
           />
         </template>
 

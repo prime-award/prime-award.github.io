@@ -18,19 +18,19 @@ export function useVoteNavigation() {
             const next = await api.nextUnvoted()
             if (next) {
                 remember(next)
-                return router.push(`/vote/${next.id}`)
+                return router.push(`/vote/${next.position}`)
             }
             return router.push({path: '/profile', query: {done: '1'}})
         } catch {
             // сеть/сервер: откроем первую номинацию, анкета сама покажет ошибку или статус
             const summary = await loadSummary().catch(() => [])
-            return router.push(summary[0] ? `/vote/${summary[0].id}` : '/')
+            return router.push(summary[0] ? `/vote/${summary[0].position}` : '/')
         }
     }
 
     /** «Выбрать» на главной: анкета этой номинации с подсвеченным номинантом. */
-    function openBallot(nominationId: number, nomineeId?: number) {
-        const target = `/vote/${nominationId}` + (nomineeId ? `?nominee=${nomineeId}` : '')
+    function openBallot(position: number, nomineeId?: number) {
+        const target = `/vote/${position}` + (nomineeId ? `?nominee=${nomineeId}` : '')
         if (!isLoggedIn.value) return loginModal.open(target)
         return router.push(target)
     }

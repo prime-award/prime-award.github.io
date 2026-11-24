@@ -29,14 +29,14 @@ const router = createRouter({
                     const next = await api.nextUnvoted()
                     if (!next) return {path: '/profile', query: {done: '1'}}
                     useCatalog().remember(next)
-                    return `/vote/${next.id}`
+                    return `/vote/${next.position}`
                 } catch {
                     return '/'
                 }
             },
         },
         {
-            path: '/vote/:id(\\d+)',
+            path: '/vote/:position(\\d+)',
             name: 'ballot',
             meta: {requiresAuth: true},
             component: () => import('../views/VoteView.vue'),

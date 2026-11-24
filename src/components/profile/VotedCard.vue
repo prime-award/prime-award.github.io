@@ -9,7 +9,7 @@ defineProps<{ item: VotedNomination }>()
 
 <template>
   <RouterLink
-      :to="`/vote/${item.nomination.id}`"
+      :to="`/vote/${item.nomination.position}`"
       class="voted-card"
       :data-nomination-id="item.nomination.id"
   >

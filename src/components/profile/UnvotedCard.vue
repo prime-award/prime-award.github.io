@@ -13,7 +13,7 @@ defineProps<{ nomination: NominationBrief }>()
     <img v-if="nomination.iconPath" class="unvoted-card__icon" :src="mediaUrl(nomination.iconPath)" alt="" loading="lazy"/>
     <h3 v-fit-text="nomination.name" class="display unvoted-card__name">{{ nomination.name }}</h3>
     <p class="unvoted-card__description">{{ nomination.description }}</p>
-    <PrimeButton class="unvoted-card__cta" :to="`/vote/${nomination.id}`" data-testid="make-choice">Сделать выбор</PrimeButton>
+    <PrimeButton class="unvoted-card__cta" :to="`/vote/${nomination.position}`" data-testid="make-choice">Сделать выбор</PrimeButton>
   </article>
 </template>
 

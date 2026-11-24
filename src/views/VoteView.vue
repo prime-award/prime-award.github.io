@@ -2,7 +2,7 @@
 import {computed, nextTick, onBeforeUnmount, onMounted, ref, watch} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import {useHead} from '@unhead/vue'
-import {api, ApiError, type Nomination, type Nominee, type Vote} from '@/api'
+import {api, ApiError, type Nomination, type NominationBrief, type Nominee, type Vote} from '@/api'
 import AppLoader from '@/components/AppLoader.vue'
 import MemeNomineeCard from '@/components/nominations/MemeNomineeCard.vue'
 import NominationTitle from '@/components/nominations/NominationTitle.vue'
@@ -37,7 +37,7 @@ const loginModal = useLoginModal()
 const CONFIRM_GUARD_MS = 300
 let activatedAt = 0
 
-const nominationId = computed(() => Number(route.params.id))
+const position = computed(() => Number(route.params.position))
 const nomination = ref<Nomination | null>(null)
 const loading = ref(true)
 const loadError = ref<string | null>(null)
@@ -70,19 +70,27 @@ function momentTiming(seconds: number | null) {
 }
 
 // место в общем списке номинаций: счётчик и стрелки
-const index = computed(() => summary.value?.findIndex((n) => n.id === nominationId.value) ?? -1)
-const prevId = computed(() => (index.value > 0 ? summary.value![index.value - 1].id : null))
-const nextId = computed(() => (summary.value && index.value >= 0 && index.value < summary.value.length - 1 ? summary.value[index.value + 1].id : null))
+const index = computed(() => summary.value?.findIndex((n) => n.position === position.value) ?? -1)
+const previous = computed(() => (index.value > 0 ? summary.value![index.value - 1] : null))
+const following = computed(() => (summary.value && index.value >= 0 && index.value < summary.value.length - 1 ? summary.value[index.value + 1] : null))
 
 async function load() {
-  const target = nominationId.value
-  loading.value = !nomination.value || nomination.value.id !== target
+  const target = position.value
+  loading.value = !nomination.value || nomination.value.position !== target
   loadError.value = null
   activeId.value = null
   notice.value = null
   try {
-    const [data] = await Promise.all([getNomination(target), loadVotes(), loadSummary(), loadConfig()])
-    if (target !== nominationId.value) return
+    const [list] = await Promise.all([loadSummary(), loadVotes(), loadConfig()])
+    if (target !== position.value) return
+    const entry = list.find((item) => item.position === target)
+    if (!entry) {
+      nomination.value = null
+      loadError.value = 'Такой номинации нет.'
+      return
+    }
+    const data = await getNomination(entry.id)
+    if (target !== position.value) return
     // «Выбрано» сбрасываем, только когда пришла новая номинация: пока старая на экране, её вид не меняется
     showChosen.value = false
     nomination.value = data
@@ -92,18 +100,18 @@ async function load() {
     if (!readOnly.value && data.nominees.some((n) => n.id === preselected)) activeId.value = preselected
 
     // соседние анкеты — заранее, чтобы переход был мгновенным
-    if (prevId.value) getNomination(prevId.value).catch(() => {})
-    if (nextId.value) getNomination(nextId.value).catch(() => {})
+    if (previous.value) getNomination(previous.value.id).catch(() => {})
+    if (following.value) getNomination(following.value.id).catch(() => {})
   } catch (e) {
-    if (target !== nominationId.value) return
+    if (target !== position.value) return
     nomination.value = null
     loadError.value = e instanceof ApiError && e.status === 404 ? 'Такой номинации нет.' : 'Не удалось загрузить анкету.'
   } finally {
-    if (target === nominationId.value) loading.value = false
+    if (target === position.value) loading.value = false
   }
 }
 
-watch(nominationId, load, {immediate: true})
+watch(position, load, {immediate: true})
 
 function stateOf(nomineeId: number): CardState {
   if (voted.value !== null) return voted.value === nomineeId ? 'selected' : 'dimmed'
@@ -154,7 +162,7 @@ async function submit(nomineeId: number) {
     record(vote)
     activeId.value = null
     showChosen.value = true
-    await goToNextAfterVote(current.id)
+    await goToNextAfterVote(current)
   } catch (e) {
     handleVoteError(e)
   } finally {
@@ -187,14 +195,14 @@ function handleVoteError(e: unknown) {
 }
 
 /** Статус «Выбрано» висит минимум STATUS_MS и пока не загрузится следующая анкета, затем переход. */
-async function goToNextAfterVote(fromId: number) {
+async function goToNextAfterVote(current: Nomination) {
   const [next] = await Promise.all([
-    api.nextUnvoted(fromId).then((n) => (n ? remember(n) : null, n), () => undefined),
+    api.nextUnvoted(current.id).then((n) => (n ? remember(n) : null, n), () => undefined),
     new Promise((resolve) => setTimeout(resolve, STATUS_MS)),
   ])
   // пока ждали, пользователь ушёл на другую анкету — не уводим его
-  if (nominationId.value !== fromId) return
-  if (next) await router.push(`/vote/${next.id}`)
+  if (position.value !== current.position) return
+  if (next) await router.push(`/vote/${next.position}`)
   else if (next === null) await router.push({path: '/profile', query: {done: '1'}})
   else showChosen.value = false // сеть: остаёмся, кнопки навигации доступны
 }
@@ -206,26 +214,26 @@ async function skip() {
     const next = await api.nextUnvoted(nomination.value.id)
     if (next) {
       remember(next)
-      await router.push(`/vote/${next.id}`)
+      await router.push(`/vote/${next.position}`)
     } else {
       await router.push({path: '/profile', query: {done: '1'}})
     }
   } catch {
-    if (nextId.value) await router.push(`/vote/${nextId.value}`)
+    await go(following.value)
   } finally {
     skipping.value = false
   }
 }
 
-function go(target: number | null) {
-  if (target) router.push(`/vote/${target}`)
+function go(target: NominationBrief | null) {
+  if (target) return router.push(`/vote/${target.position}`)
 }
 
 function onKey(event: KeyboardEvent) {
   const el = event.target as HTMLElement | null
   if (el && (el.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(el.tagName))) return
-  if (event.key === 'ArrowLeft') go(prevId.value)
-  else if (event.key === 'ArrowRight') go(nextId.value)
+  if (event.key === 'ArrowLeft') go(previous.value)
+  else if (event.key === 'ArrowRight') go(following.value)
   else if (event.key === 'Escape') activeId.value = null
 }
 
@@ -308,9 +316,9 @@ const actionHint = computed(() => (submitting.value ? 'Отправляем…' 
     </Transition>
 
     <nav v-if="nomination && summary" class="vote__nav" aria-label="Анкеты">
-      <button type="button" class="vote__arrow" :disabled="!prevId" aria-label="Предыдущая номинация" data-testid="prev-nomination" @click="go(prevId)">&lt;</button>
+      <button type="button" class="vote__arrow" :disabled="!previous" aria-label="Предыдущая номинация" data-testid="prev-nomination" @click="go(previous)">&lt;</button>
       <span class="vote__counter" data-testid="nomination-counter">{{ index + 1 }}/{{ summary.length }}</span>
-      <button type="button" class="vote__arrow" :disabled="!nextId" aria-label="Следующая номинация" data-testid="next-nomination" @click="go(nextId)">&gt;</button>
+      <button type="button" class="vote__arrow" :disabled="!following" aria-label="Следующая номинация" data-testid="next-nomination" @click="go(following)">&gt;</button>
     </nav>
 
     <PrimeButton
