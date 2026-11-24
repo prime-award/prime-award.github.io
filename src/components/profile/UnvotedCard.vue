@@ -20,6 +20,8 @@ defineProps<{ nomination: NominationBrief }>()
 <style scoped>
 /* M3 card: поля 24dp, скругление 16dp; плашка 64dp высотой, название — headline */
 .unvoted-card {
+  position: relative;
+  isolation: isolate;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -33,7 +35,8 @@ defineProps<{ nomination: NominationBrief }>()
   transition: border-color 0.2s ease;
 }
 
-.unvoted-card:hover {
+.unvoted-card:hover,
+.unvoted-card:focus-within {
   border-color: var(--text);
 }
 
@@ -58,5 +61,13 @@ defineProps<{ nomination: NominationBrief }>()
 
 .unvoted-card__cta {
   margin-top: var(--space-2);
+}
+/* Расширяем область ссылки «Сделать выбор» до границ карточки. */
+.unvoted-card__cta::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: var(--shape-lg);
 }
 </style>
