@@ -3,6 +3,7 @@ import {computed, nextTick, onBeforeUnmount, ref, watch} from 'vue'
 import type {User, VotedNomination} from '@/api'
 import PrimeButton from '@/components/ui/PrimeButton.vue'
 import {downloadFile, safeFileName} from '@/utils/download.ts'
+import {mediaUrl} from '@/utils/media.ts'
 import ShareCard from './ShareCard.vue'
 
 // «Поделиться»: превью картинки «Мой выбор» и сохранение в JPEG целиком в браузере.
@@ -27,6 +28,39 @@ const canShareFiles = ref(false)
 let observer: ResizeObserver | null = null
 
 const fileName = computed(() => `prime-2026-${safeFileName(props.user.login)}.jpg`)
+
+const avatar = ref<string | null>(null)
+let avatarReady: Promise<void> = Promise.resolve()
+
+// Встраиваем фотографию в карточку, чтобы при экспорте JPEG повторно не обращаться к CDN.
+watch(() => props.open && mediaUrl(props.user.avatarUrl), (url, _, onCleanup) => {
+  avatar.value = null
+  if (!url) {
+    avatarReady = Promise.resolve()
+    return
+  }
+  const controller = new AbortController()
+  let objectUrl: string | undefined
+  onCleanup(() => {
+    controller.abort()
+    if (objectUrl) URL.revokeObjectURL(objectUrl)
+  })
+  avatarReady = (async () => {
+    const response = await fetch(url, {
+      signal: controller.signal,
+      credentials: 'omit',
+      referrerPolicy: 'no-referrer',
+    })
+    if (!response.ok) return
+    const blob = await response.blob()
+    if (controller.signal.aborted) return
+    objectUrl = URL.createObjectURL(blob)
+    const image = new Image()
+    image.src = objectUrl
+    await image.decode()
+    if (!controller.signal.aborted) avatar.value = objectUrl
+  })().catch(() => { /* Если фото недоступно, в карточке останется первая буква имени. */ })
+}, {immediate: true})
 
 watch(() => props.open, async (open) => {
   error.value = null
@@ -60,7 +94,8 @@ async function render(): Promise<Blob> {
   if (!card.value) throw new Error('nothing to render')
   const node = card.value
   const {toCanvas} = await import('html-to-image')
-  await document.fonts?.ready
+  await Promise.all([document.fonts?.ready, avatarReady])
+  await nextTick()
   // размер фиксированный: 1080 × высота карточки, без умножения на плотность экрана (иначе на Retina/телефоне ×2–×3)
   const canvas = await toCanvas(node, {
     pixelRatio: 1,
@@ -123,7 +158,7 @@ async function share() {
             <div class="share__sizer" :style="{ height: `${cardHeight * scale}px` }">
               <div class="share__scaler" :style="{ transform: `scale(${scale})` }">
                 <div ref="card">
-                  <ShareCard :user="user" :voted="voted" :total="total"/>
+                  <ShareCard :avatar="avatar" :user="user" :voted="voted" :total="total"/>
                 </div>
               </div>
             </div>

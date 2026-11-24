@@ -10,10 +10,10 @@ import {mediaUrl} from '@/utils/media.ts'
  * (html-to-image -> canvas). Король и Королева рунета — крупными блоками, остальные выборы — компактным
  * списком в три колонки «номинация — за кого голос» с портретом/превью на фоне строки. При всех 50 голосах
  * высота ~2100 px.
- * Все картинки — со своего домена: аватар с CDN платформы может «испачкать» canvas, поэтому его заменяем буквой.
  */
 const props = defineProps<{
   user: User
+  avatar: string | null
   voted: VotedNomination[]
   total: number
 }>()
@@ -26,15 +26,6 @@ const heroes = computed(() =>
 )
 const rest = computed(() => props.voted.filter((v) => !HERO_SLUGS.includes(v.nomination.slug)))
 
-const sameOriginAvatar = computed(() => {
-  const url = mediaUrl(props.user.avatarUrl)
-  if (!url) return null
-  try {
-    return new URL(url, window.location.href).origin === window.location.origin ? url : null
-  } catch {
-    return null
-  }
-})
 const initial = computed(() => props.user.displayName.trim().charAt(0).toUpperCase() || '?')
 const site = window.location.host
 </script>
@@ -45,7 +36,7 @@ const site = window.location.host
       <img :src="primeLogo" alt="PRIME 2026" class="share-card__logo"/>
       <div class="share-card__user">
         <span class="share-card__avatar" :style="{ '--accent': user.nameColor ?? '#687789' }">
-          <img v-if="sameOriginAvatar" :src="sameOriginAvatar" alt=""/>
+          <img v-if="avatar" :src="avatar" alt=""/>
           <span v-else>{{ initial }}</span>
         </span>
         <span class="share-card__nick">{{ user.displayName }}</span>
