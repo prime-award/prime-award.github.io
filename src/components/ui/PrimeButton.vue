@@ -21,7 +21,7 @@ const tag = computed(() => (props.to ? 'RouterLink' : props.href ? 'a' : 'button
       class="prime-button"
       :class="[`prime-button--${variant}`, `prime-button--${size}`, {'is-disabled': disabled}]"
       :to="to"
-      :href="href"
+      v-bind="to ? {} : {href}"
       :type="tag === 'button' ? type : undefined"
       :disabled="tag === 'button' ? disabled : undefined"
       :aria-disabled="disabled || undefined"
